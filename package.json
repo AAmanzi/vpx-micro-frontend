@@ -5,9 +5,38 @@
   "repository": "git@github.com:AAmanzi/visual-pinball-micro-frontend.git",
   "license": "MIT",
   "scripts": {
-    "dev": "electron ."
+    "dev:electron": "npm run build:preload && electron .",
+    "dev:next": "npm run build:preload && next dev",
+    "dev:mock": "DEV_MOCK=1 npm run dev:electron",
+    "dev": "yarn dev:mock",
+    "build:preload": "esbuild src/electron/preload.ts --bundle --platform=node --external:electron --outfile=src/electron/preload.js --format=cjs",
+    "build:next": "next build",
+    "start:next": "next start"
+  },
+  "dependencies": {
+    "electron-store": "^8.1.0",
+    "next": "^16.1.6",
+    "prettier": "^3.2.5",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "sass": "^1.72.0",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "electron": "^40.4.0"
+    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
+    "@types/node": "^20.8.4",
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "@typescript-eslint/eslint-plugin": "^7.2.0",
+    "@typescript-eslint/parser": "^7.2.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "electron": "^40.4.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.6",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2",
+    "esbuild": "^0.19.0"
   }
 }

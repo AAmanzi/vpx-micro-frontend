@@ -1,0 +1,104 @@
+.default-mode {
+  --primary: #faa61a;
+  --primary-rgb: 250, 166, 26;
+  --primary-vanished: #fef6e8;
+  --dark: #222;
+  --dark-rgb: 34, 34, 34;
+  --gray: #7d8082;
+  --gray-rgb: 125, 128, 130;
+  --dark-gray: #444;
+  --mid-gray: #9b9fa2;
+  --light-gray: #dadee2;
+  --mega-light-gray: #e8eff4;
+  --mega-light-gray-rgb: 232, 239, 244;
+  --green: #429950;
+  --green-rgb: 66, 153, 80;
+  --blue: #1a5bfa;
+  --blue-rgb: 26, 91, 250;
+  --blue-vanished: #e8eefe;
+  --red: #fa451a;
+  --red-rgb: 250, 69, 26;
+  --white: white;
+  --white-rgb: 255, 255, 255;
+  --black: black;
+  --black-rgb: 0, 0, 0;
+}
+
+.dark-mode {
+  --primary: #faa20f;
+  --primary-rgb: 250, 162, 15;
+  --primary-vanished: #674304;
+  --dark: #e6e6e6;
+  --dark-rgb: 230, 230, 230;
+  --gray: #8a8d8e;
+  --gray-rgb: 138, 141, 142;
+  --dark-gray: #bababa;
+  --mid-gray: #62676a;
+  --light-gray: #2f3337;
+  --mega-light-gray: #0a0a0a;
+  --mega-light-gray-rgb: 10, 10, 10;
+  --green: #429950;
+  --green-rgb: 66, 153, 80;
+  --blue: #6591fc;
+  --blue-rgb: 101, 145, 252;
+  --blue-vanished: #071947;
+  --red: #fa451a;
+  --red-rgb: 250, 69, 26;
+  --white: #242424;
+  --white-rgb: 36, 36, 36;
+  --black: #dadee2;
+  --black-rgb: 218, 222, 226;
+}
+
+html {
+  /* colors by purpose */
+  --primary-text-color: var(--dark);
+  --primary-text-color-rgb: var(--dark-rgb);
+  --secondary-text-color: var(--gray);
+  --accent-primary-text-color: var(--primary);
+  --accent-succes-text-color: var(--green);
+  --accent-info-text-color: var(--blue);
+  --accent-error-text-color: var(--red);
+  --accent-disabled-text-color: var(--light-gray);
+  --body-text-color: var(--dark-gray);
+
+  --card-box-shadow:
+    0px 5px 12px -5px var(--light-gray), 0px 1px 1px 0px var(--light-gray),
+    0px 10px 24px -10px var(--light-gray);
+}
+
+.primary-text-color {
+  color: var(--primary-text-color);
+}
+
+.secondary-text-color {
+  color: var(--secondary-text-color);
+}
+
+.body-text-color {
+  color: var(--body-text-color);
+}
+
+.mid-gray-text-color {
+  color: var(--mid-gray);
+}
+
+.accent-primary-text-color {
+  color: var(--accent-primary-text-color);
+}
+
+.accent-succes-text-color {
+  color: var(--accent-succes-text-color);
+}
+
+.accent-error-text-color {
+  color: var(--accent-error-text-color);
+}
+
+.accent-disabled-text-color {
+  color: var(--accent-disabled-text-color);
+}
+
+.accent-info-text-color {
+  color: var(--accent-info-text-color);
+}

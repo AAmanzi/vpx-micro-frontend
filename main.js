@@ -1,18 +1,6 @@
-const { app, BrowserWindow } = require('electron')
-
-const createWindow = () => {
-  const win = new BrowserWindow({
-    width: 800,
-    height: 600
-  })
-
-  win.loadFile('index.html')
-}
-
-app.whenReady().then(() => {
-  createWindow()
-})
-
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit()
-})
+// This file bootstraps the TypeScript Electron main under src/electron
+require('ts-node').register({
+  transpileOnly: true,
+  compilerOptions: { module: 'commonjs', esModuleInterop: true },
+});
+require('./src/electron/main.ts');

@@ -1,1 +1,8 @@
 /node_modules
+/.next
+/dist
+/out
+/build
+/.vscode
+.DS_Store
+*.log
