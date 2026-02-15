@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "dev:electron": "npm run build:preload && electron .",
-    "dev:next": "npm run build:preload && next dev",
+    "dev:next": "WEB_MODE=1 npm run build:preload && next dev",
     "dev:mock": "DEV_MOCK=1 npm run dev:electron",
     "dev": "yarn dev:mock",
     "build:preload": "esbuild src/electron/preload.ts --bundle --platform=node --external:electron --outfile=src/electron/preload.js --format=cjs",
@@ -14,11 +14,13 @@
     "start:next": "next start"
   },
   "dependencies": {
+    "classnames": "^2.5.1",
     "electron-store": "^8.1.0",
     "next": "^16.1.6",
     "prettier": "^3.2.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-icons": "^5.5.0",
     "sass": "^1.72.0",
     "uuid": "^13.0.0"
   },
@@ -31,12 +33,12 @@
     "@typescript-eslint/parser": "^7.2.0",
     "@vitejs/plugin-react": "^4.2.1",
     "electron": "^40.4.0",
+    "esbuild": "^0.19.0",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
     "ts-node": "^10.9.1",
-    "typescript": "^5.2.2",
-    "esbuild": "^0.19.0"
+    "typescript": "^5.2.2"
   }
 }

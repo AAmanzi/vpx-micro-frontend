@@ -1,0 +1,62 @@
+.outerWrapper {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 6;
+  backdrop-filter: blur(8px);
+  overscroll-behavior: contain;
+
+  &:first-child {
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+}
+
+.innerWrapper {
+  position: fixed;
+  max-height: 100%;
+  overflow: auto;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
+  padding: 10vh 24px 24px 24px;
+
+  &.allowOverflow {
+    overflow: visible;
+  }
+}
+
+.modal {
+  background-color: var(--dark-gray);
+  border-radius: 27px 27px 0px 0px;
+  padding-top: 24px;
+  padding-bottom: 24px;
+  border-radius: 27px;
+  box-shadow:
+    0px 5px 12px -5px rgba(var(--black-rgb), 0.2),
+    0px 1px 1px 0px rgba(var(--black-rgb), 0.2),
+    0px 10px 24px -10px rgba(var(--black-rgb), 0.2);
+}
+
+.headerWrapper {
+  position: relative;
+  padding-bottom: 24px;
+  min-height: 36px;
+
+  padding-left: 24px;
+  padding-right: 24px;
+  display: flex;
+
+  &.hasBorder {
+    border-bottom: thin solid var(--gray);
+  }
+}
+
+.titleAndDesctiptionWrapper {
+  margin-right: 12px;
+}
+
+.exitButtonWrapper {
+  margin-left: auto;
+}

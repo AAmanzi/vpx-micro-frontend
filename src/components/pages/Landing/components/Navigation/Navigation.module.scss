@@ -1,0 +1,10 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  background-color: var(--dark-gray);
+  padding: 20px;
+}
