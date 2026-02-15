@@ -1,0 +1,13 @@
+{
+  "name": "visual-pinball-micro-frontend",
+  "version": "1.0.0",
+  "main": "main.js",
+  "repository": "git@github.com:AAmanzi/visual-pinball-micro-frontend.git",
+  "license": "MIT",
+  "scripts": {
+    "dev": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^40.4.0"
+  }
+}
