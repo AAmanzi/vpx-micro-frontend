@@ -1,6 +1,14 @@
+import { Icon } from 'src/components/Icon/types';
+
 export enum Type {
   primary = 'primary',
   secondary = 'secondary',
+}
+
+export enum Size {
+  small = 'small',
+  medium = 'medium',
+  large = 'large',
 }
 
 export interface Props {
@@ -8,4 +16,7 @@ export interface Props {
   onClick: () => void;
   disabled?: boolean;
   type?: Type;
+  icon?: Icon;
+  size?: Size;
+  fill?: boolean;
 }

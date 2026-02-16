@@ -1,24 +1,64 @@
 .container {
   display: block;
   width: fit-content;
+
+  &:hover {
+    cursor: pointer;
+  }
 }
 
 .content {
-  height: 48px;
   display: flex;
   align-items: center;
-  border-radius: 12px;
+  border-radius: 14px;
+  transition: background-color 200ms ease-out;
+}
+
+.fill {
+  width: 100%;
+}
+
+.primary {
+  background-color: var(--primary);
+  color: var(--white);
+  box-shadow:
+    0px 4px 6px -4px rgba(var(--primary-rgb), 0.2),
+    0px 10px 15px -3px rgba(var(--primary-rgb), 0.2);
+
+  &:hover {
+    background-color: rgba(var(--primary-rgb), 0.8);
+  }
+}
+
+.secondary {
+  background-color: var(--secondary);
+  color: var(--white);
+}
+
+.small {
+  height: 20px;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+.medium {
+  height: 44px;
   padding-left: 16px;
   padding-right: 16px;
-  background-color: var(--primary);
+}
+
+.large {
+  height: 48px;
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
 .iconWrapper {
-  width: 24px;
-  height: 24px;
+  width: 18px;
+  height: 18px;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-left: 8px;
+  margin-right: 12px;
   flex-shrink: 0;
 }

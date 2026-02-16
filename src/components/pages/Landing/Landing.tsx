@@ -3,6 +3,7 @@ import { FunctionComponent, useEffect, useState } from 'react';
 
 import Button from 'src/components/Button';
 import { api } from 'src/consts';
+import { Config } from 'src/types/config';
 import { Table } from 'src/types/table';
 
 import style from './Landing.module.scss';
@@ -16,6 +17,9 @@ interface Props {}
 const Landing: FunctionComponent<Props> = () => {
   const [view, setView] = useState<View>(View.allTables);
   const [tables, setTables] = useState<Array<Table>>([]);
+  const [config, setConfig] = useState<Config>({
+    vpxRootPath: 'C:/Games/VisualPinball',
+  });
 
   useEffect(() => {
     api?.getAllTables().then(setTables);
@@ -32,7 +36,7 @@ const Landing: FunctionComponent<Props> = () => {
 
   return (
     <div className={style.container}>
-      <Navigation view={view} setView={setView} />
+      <Navigation view={view} setView={setView} config={config} />
       <div className={style.content}>{getView()}</div>
     </div>
   );

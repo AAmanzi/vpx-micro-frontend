@@ -4,6 +4,7 @@ const nextConfig = {
   sassOptions: {
     prependData: `@use 'src/styles/text' as *;`,
   },
+  devIndicators: false,
 };
 
 module.exports = nextConfig;
