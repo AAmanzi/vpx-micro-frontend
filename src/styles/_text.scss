@@ -226,6 +226,18 @@
   @include caption-medium-bold-mixin;
 }
 
+@mixin caption-small-regular-mixin {
+  font-family: 'Nunito', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: normal;
+}
+
+.caption-small-regular {
+  @include caption-small-regular-mixin;
+}
+
 @mixin caption-small-semibold-mixin {
   font-family: 'Nunito', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: 600;

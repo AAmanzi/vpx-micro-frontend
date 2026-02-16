@@ -12,11 +12,12 @@ export enum Size {
 }
 
 export interface Props {
-  label: string;
+  label?: string;
   onClick: () => void;
   disabled?: boolean;
   type?: Type;
   icon?: Icon;
   size?: Size;
   fill?: boolean;
+  circle?: boolean;
 }

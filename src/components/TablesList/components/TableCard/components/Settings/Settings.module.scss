@@ -1,0 +1,62 @@
+.container {
+  background-color: var(--dark-gray);
+  border: thin solid var(--gray);
+  border-radius: 12px;
+  width: 192px;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  transition: background-color 200ms ease-out;
+  width: 100%;
+  height: 44px;
+  padding-left: 16px;
+  padding-right: 16px;
+
+  &:hover {
+    & .icon,
+    & .label {
+      color: var(--white);
+    }
+  }
+
+  &.danger {
+    .icon {
+      color: rgba(var(--red-rgb), 0.8);
+      transition: color 200ms ease-out;
+    }
+
+    .label {
+      color: rgba(var(--red-rgb), 0.8);
+      transition: color 200ms ease-out;
+    }
+
+    &:hover {
+      & .icon,
+      & .label {
+        color: var(--red);
+      }
+    }
+  }
+}
+
+.icon {
+  color: var(--light-gray);
+  transition: color 200ms ease-out;
+}
+
+.label {
+  color: var(--light-gray);
+  transition: color 200ms ease-out;
+}
+
+.iconWrapper {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 12px;
+  flex-shrink: 0;
+}

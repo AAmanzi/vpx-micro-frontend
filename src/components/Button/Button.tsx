@@ -13,6 +13,7 @@ const Button: FunctionComponent<Props> = ({
   icon,
   size = Size.medium,
   fill,
+  circle,
 }) => {
   const handleClick = () => {
     if (!disabled) {
@@ -28,6 +29,7 @@ const Button: FunctionComponent<Props> = ({
         [style.small]: size === Size.small,
         [style.medium]: size === Size.medium,
         [style.large]: size === Size.large,
+        [style.circle]: circle,
       })}>
       {icon && (
         <div className={style.iconWrapper}>

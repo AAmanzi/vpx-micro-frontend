@@ -7,7 +7,8 @@ export type Icon =
   | 'play'
   | 'monitor'
   | 'edit'
-  | 'trash';
+  | 'trash'
+  | 'kebab';
 
 export interface Props {
   icon: Icon;
