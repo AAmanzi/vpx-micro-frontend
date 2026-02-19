@@ -1,40 +1,65 @@
 import classNames from 'classnames';
-import { FunctionComponent, useEffect, useRef, useState } from 'react';
+import {
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import Icon from 'src/components/Icon';
 
 import style from './Settings.module.scss';
+import DeleteTableModal from './components/DeleteTableModal';
+import RenameTableModal from './components/RenameTableModal';
 
 interface Props {
   id: string;
+  name: string;
+  romFile?: string;
+  vpxFile: string;
   close: () => void;
 }
 
-const Settings: FunctionComponent<Props> = ({ id, close }) => {
+const Settings: FunctionComponent<Props> = ({
+  id,
+  name,
+  romFile,
+  vpxFile,
+  close,
+}) => {
   const ref = useRef<HTMLDivElement | null>(null);
 
   const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const handleClick = (event: MouseEvent): void => {
-    if (event.target === null) {
-      return;
-    }
+  const handleClick = useCallback(
+    (event: MouseEvent): void => {
+      if (event.target === null) {
+        return;
+      }
 
-    if (ref.current && !ref.current.contains(event.target as Node)) {
-      close();
-    }
-  };
+      const targetElement =
+        event.target instanceof Element ? event.target : null;
+
+      if (targetElement?.closest('#modal')) {
+        return;
+      }
+
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        close();
+      }
+    },
+    [close],
+  );
 
   useEffect(() => {
-    if (ref.current) {
-      document.addEventListener('mousedown', handleClick);
-    }
+    document.addEventListener('mousedown', handleClick);
 
     return () => {
       document.removeEventListener('mousedown', handleClick);
     };
-  }, [ref]);
+  }, [handleClick]);
 
   return (
     <div ref={ref} className={style.container}>
@@ -58,6 +83,22 @@ const Settings: FunctionComponent<Props> = ({ id, close }) => {
           Delete table
         </span>
       </button>
+      {isRenameModalOpen && (
+        <RenameTableModal
+          id={id}
+          name={name}
+          close={() => setIsRenameModalOpen(false)}
+        />
+      )}
+      {isDeleteModalOpen && (
+        <DeleteTableModal
+          id={id}
+          name={name}
+          vpxFile={vpxFile}
+          romFile={romFile}
+          close={() => setIsDeleteModalOpen(false)}
+        />
+      )}
     </div>
   );
 };

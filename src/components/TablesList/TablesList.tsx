@@ -1,6 +1,4 @@
-import { FunctionComponent, useState } from 'react';
-import { FiPlay, FiStar } from 'react-icons/fi';
-import { HiOutlineEllipsisVertical } from 'react-icons/hi2';
+import { FunctionComponent } from 'react';
 
 import { Table } from 'src/types/table';
 
@@ -12,8 +10,6 @@ interface Props {
 }
 
 const TablesList: FunctionComponent<Props> = ({ tables }) => {
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
-
   return (
     <div className={style.container}>
       {tables.map((table) => (

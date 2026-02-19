@@ -14,9 +14,10 @@ const Button: FunctionComponent<Props> = ({
   size = Size.medium,
   fill,
   circle,
+  isSubmit = false,
 }) => {
   const handleClick = () => {
-    if (!disabled) {
+    if (!disabled && onClick) {
       onClick();
     }
   };
@@ -26,6 +27,8 @@ const Button: FunctionComponent<Props> = ({
       className={classNames(style.content, {
         [style.primary]: type === Type.primary,
         [style.secondary]: type === Type.secondary,
+        [style.transparent]: type === Type.transparent,
+        [style.danger]: type === Type.danger,
         [style.small]: size === Size.small,
         [style.medium]: size === Size.medium,
         [style.large]: size === Size.large,
@@ -42,18 +45,37 @@ const Button: FunctionComponent<Props> = ({
     </div>
   );
 
-  return (
-    <button
-      type='button'
-      className={classNames(style.container, {
-        [style.disabled]: disabled,
-        [style.fill]: fill,
-      })}
-      onClick={handleClick}
-      disabled={disabled}>
-      {content}
-    </button>
-  );
+  if (onClick) {
+    return (
+      <button
+        type='button'
+        className={classNames(style.container, {
+          [style.disabled]: disabled,
+          [style.fill]: fill,
+        })}
+        onClick={handleClick}
+        disabled={disabled}>
+        {content}
+      </button>
+    );
+  }
+
+  if (isSubmit) {
+    return (
+      <button
+        type='submit'
+        className={classNames(style.container, {
+          [style.disabled]: disabled,
+          [style.fill]: fill,
+        })}
+        onClick={handleClick}
+        disabled={disabled}>
+        {content}
+      </button>
+    );
+  }
+
+  return null;
 };
 
 export default Button;

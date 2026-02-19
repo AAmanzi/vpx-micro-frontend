@@ -2,6 +2,6 @@ export interface Table {
   id: string;
   name: string;
   vpxFile: string;
-  romFile: string;
+  romFile?: string;
   isFavorite: boolean;
 }

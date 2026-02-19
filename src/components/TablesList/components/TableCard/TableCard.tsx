@@ -1,7 +1,5 @@
 import classNames from 'classnames';
 import { FunctionComponent, useState } from 'react';
-import { FiPlay, FiStar } from 'react-icons/fi';
-import { HiOutlineEllipsisVertical } from 'react-icons/hi2';
 
 import Button from 'src/components/Button';
 import Icon from 'src/components/Icon';
@@ -23,11 +21,11 @@ const TableCard: FunctionComponent<Props> = ({
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const handlePlay = () => {
-    console.log('Play table:', id);
+    // TODO: API
   };
 
   const handleToggleFavorite = () => {
-    console.log('Toggle favorite for table:', id);
+    // TODO: API
     setFavorite((prev) => !prev);
   };
 
@@ -76,7 +74,13 @@ const TableCard: FunctionComponent<Props> = ({
             <Icon className='secondary-text-color' icon='kebab' />
             {isSettingsOpen && (
               <div className={style.settingsContainer}>
-                <Settings id={id} close={closeSettings} />
+                <Settings
+                  id={id}
+                  name={name}
+                  vpxFile={vpxFile}
+                  romFile={romFile}
+                  close={closeSettings}
+                />
               </div>
             )}
           </button>
@@ -86,9 +90,11 @@ const TableCard: FunctionComponent<Props> = ({
           <p className='secondary-text-color caption-small-regular'>
             {vpxFile}
           </p>
-          <p className='secondary-text-color caption-small-regular'>
-            ROM: {romFile}
-          </p>
+          {romFile && (
+            <p className='secondary-text-color caption-small-regular'>
+              ROM: {romFile}
+            </p>
+          )}
         </div>
       </div>
     </div>

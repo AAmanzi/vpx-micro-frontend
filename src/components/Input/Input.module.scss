@@ -1,0 +1,90 @@
+.container {
+  width: 100%;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  border: thin solid var(--gray);
+  transition: border-color 300ms ease-out;
+  background-color: var(--dark-gray);
+
+  &:focus-within {
+    border-color: var(--white);
+  }
+}
+
+.small {
+  height: 44px;
+  padding: 8px;
+}
+
+.medium {
+  height: 48px;
+  padding: 12px;
+}
+
+.big {
+  height: 64px;
+  padding: 18px;
+}
+
+.error {
+  border-color: var(--red);
+}
+
+.input {
+  background-color: transparent;
+  border: unset;
+  height: 100%;
+  flex: 1;
+  width: inherit;
+  line-height: normal !important;
+
+  &:focus {
+    outline: unset;
+  }
+
+  &::placeholder {
+    color: var(--secondary-text-color);
+    @include caption-big-semibold-mixin;
+  }
+
+  // chrome autofill micanje ruzne pozadine
+  &:-webkit-autofill,
+  :-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0px 24px var(--mega-light-gray) inset;
+    -webkit-text-fill-color: var(--primary-text-color);
+  }
+}
+
+.messageWrapper {
+  position: relative;
+}
+
+.message {
+  @include caption-medium-semibold-mixin;
+  position: absolute;
+  top: 8px;
+  left: 0;
+}
+
+.label {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: opacity 300ms ease-out;
+}
+
+.showDisabled {
+  opacity: 0.5;
+}
+
+.labelText {
+  display: block;
+  margin-bottom: 12px;
+}
+
+.wrapper {
+  width: 100%;
+}

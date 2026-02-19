@@ -55,4 +55,7 @@
   <symbol id="icon-kebab" viewBox="0 0 18 18">
     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.499" d="M8.997 9.747a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5M8.997 4.498a.75.75 0 1 0 0-1.499.75.75 0 0 0 0 1.5M8.997 14.995a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5"/>
   </symbol>
+  <symbol id="icon-cross" viewBox="0 0 20 20">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.666" d="M14.997 5 5 14.996M4.999 5l9.998 9.997"/>
+  </symbol>
 </svg>

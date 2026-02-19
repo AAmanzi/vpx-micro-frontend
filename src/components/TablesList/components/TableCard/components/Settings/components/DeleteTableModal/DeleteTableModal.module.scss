@@ -1,0 +1,32 @@
+.content {
+  margin: 24px;
+}
+
+.text {
+  @include caption-big-semibold-mixin;
+  color: var(--primary-text-color);
+  margin: 0;
+}
+
+.filesList {
+  margin: 12px 0 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fileItem {
+  @include caption-big-regular-mixin;
+  color: var(--secondary-text-color);
+  word-break: break-word;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+  margin-left: 24px;
+  margin-right: 24px;
+  gap: 12px;
+}

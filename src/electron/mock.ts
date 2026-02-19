@@ -22,6 +22,12 @@ export const Tables: Table[] = [
     romFile: 'mb_106.rom',
     isFavorite: false,
   },
+  {
+    id: 'table-4',
+    name: 'Space Cadet',
+    vpxFile: '/path/to/spacecadet.vpx',
+    isFavorite: false,
+  },
 ];
 
 export default Tables;

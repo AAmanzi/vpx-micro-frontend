@@ -3,6 +3,8 @@ import { Icon } from 'src/components/Icon/types';
 export enum Type {
   primary = 'primary',
   secondary = 'secondary',
+  transparent = 'transparent',
+  danger = 'danger',
 }
 
 export enum Size {
@@ -13,11 +15,12 @@ export enum Size {
 
 export interface Props {
   label?: string;
-  onClick: () => void;
+  onClick?: () => void;
   disabled?: boolean;
   type?: Type;
   icon?: Icon;
   size?: Size;
   fill?: boolean;
   circle?: boolean;
+  isSubmit?: boolean;
 }

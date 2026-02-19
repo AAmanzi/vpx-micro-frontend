@@ -8,7 +8,8 @@ export type Icon =
   | 'monitor'
   | 'edit'
   | 'trash'
-  | 'kebab';
+  | 'kebab'
+  | 'cross';
 
 export interface Props {
   icon: Icon;

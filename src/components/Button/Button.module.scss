@@ -35,8 +35,26 @@
   color: var(--white);
 }
 
+.transparent {
+  background-color: transparent;
+  color: var(--light-gray);
+
+  &:hover {
+    background-color: rgba(var(--white-rgb), 0.1);
+  }
+}
+
+.danger {
+  background-color: rgba(var(--red-rgb), 0.8);
+  color: var(--white);
+
+  &:hover {
+    background-color: var(--red);
+  }
+}
+
 .small {
-  height: 20px;
+  height: 36px;
   padding-left: 24px;
   padding-right: 24px;
 

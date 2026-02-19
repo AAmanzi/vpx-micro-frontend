@@ -8,10 +8,10 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 
-import Button, { Type as ButtonType } from 'src/components/Button';
+import Icon from 'src/components/Icon';
 
 import style from './Modal.module.scss';
-import { Props } from './types';
+import { Props, Size } from './types';
 
 const Modal: FunctionComponent<Props> = ({
   modalClassName,
@@ -20,16 +20,15 @@ const Modal: FunctionComponent<Props> = ({
   description,
   onExitClick,
   showExitButton = true,
-  buttonType = ButtonType.primary,
   headerClassName,
   allowOverflow = false,
   children,
+  size = Size.medium,
 }) => {
   const ref = useRef<Element | null>(null);
   const scrollPosition = useRef<number | null>(null);
   const didManipulateBody = useRef<boolean>(false);
   const previousBodyStyle = useRef<{
-    // TODO zaminit ovo sa cssText ali kad se rijese modali
     touchAction: string | undefined;
     overflowY: string | undefined;
   } | null>(null);
@@ -123,7 +122,10 @@ const Modal: FunctionComponent<Props> = ({
           [style.allowOverflow]: allowOverflow,
         })}>
         <div
-          className={classNames(style.modal, modalClassName)}
+          className={classNames(style.modal, modalClassName, {
+            [style.small]: size === Size.small,
+            [style.medium]: size === Size.medium,
+          })}
           onClick={stopBubbling}>
           {hasHeader && (
             <div
@@ -134,7 +136,7 @@ const Modal: FunctionComponent<Props> = ({
                 {title && (
                   <h2
                     className={classNames(
-                      'title-h4-bold',
+                      'title-h6-bold',
                       'primary-text-color',
                       titleClassName,
                     )}>
@@ -144,7 +146,7 @@ const Modal: FunctionComponent<Props> = ({
                 {description && (
                   <p
                     className={classNames(
-                      'caption-big-semibold',
+                      'caption-small-regular',
                       'secondary-text-color',
                     )}>
                     {description}
@@ -154,11 +156,17 @@ const Modal: FunctionComponent<Props> = ({
 
               {onExitClick && showExitButton && (
                 <div className={style.exitButtonWrapper}>
-                  <Button
-                    label='close'
-                    onClick={onExitClick}
-                    type={buttonType}
-                  />
+                  <button
+                    className={style.exitButton}
+                    type='button'
+                    onClick={onExitClick}>
+                    <Icon
+                      className='secondary-text-color'
+                      icon='cross'
+                      width={20}
+                      height={20}
+                    />
+                  </button>
                 </div>
               )}
             </div>

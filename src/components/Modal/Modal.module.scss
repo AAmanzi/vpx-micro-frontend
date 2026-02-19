@@ -29,14 +29,22 @@
 
 .modal {
   background-color: var(--dark-gray);
-  border-radius: 27px 27px 0px 0px;
   padding-top: 24px;
   padding-bottom: 24px;
-  border-radius: 27px;
+  border-radius: 24px;
+  border: thin solid var(--gray);
   box-shadow:
     0px 5px 12px -5px rgba(var(--black-rgb), 0.2),
     0px 1px 1px 0px rgba(var(--black-rgb), 0.2),
     0px 10px 24px -10px rgba(var(--black-rgb), 0.2);
+}
+
+.small {
+  width: min(320px, calc(100vw - 48px));
+}
+
+.medium {
+  width: min(576px, calc(100vw - 48px));
 }
 
 .headerWrapper {
@@ -47,6 +55,7 @@
   padding-left: 24px;
   padding-right: 24px;
   display: flex;
+  align-items: center;
 
   &.hasBorder {
     border-bottom: thin solid var(--gray);
@@ -59,4 +68,19 @@
 
 .exitButtonWrapper {
   margin-left: auto;
+}
+
+.exitButton {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  transition: background-color 200ms ease-in;
+
+  &:hover {
+    background-color: rgba(var(--white-rgb), 0.1);
+  }
 }
