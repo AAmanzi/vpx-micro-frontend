@@ -30,7 +30,7 @@ const Landing: FunctionComponent<Props> = () => {
       case View.allTables:
         return <AllTables tables={tables} />;
       case View.settings:
-        return <Settings />;
+        return <Settings config={config} />;
     }
   };
 

@@ -58,4 +58,16 @@
   <symbol id="icon-cross" viewBox="0 0 20 20">
     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.666" d="M14.997 5 5 14.996M4.999 5l9.998 9.997"/>
   </symbol>
+  <symbol id="icon-save" viewBox="0 0 16 16">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.333" d="M10.128 1.999c.351.005.687.149.933.4l2.532 2.532c.25.246.395.58.4.932v6.797a1.333 1.333 0 0 1-1.333 1.332H3.332a1.333 1.333 0 0 1-1.333-1.332V3.332a1.333 1.333 0 0 1 1.333-1.333z"/>
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.333" d="M11.327 13.992V9.328a.666.666 0 0 0-.666-.666H5.33a.666.666 0 0 0-.667.666v4.664M4.664 1.999v2.665a.666.666 0 0 0 .666.666h4.664"/>
+  </symbol>
+  <symbol id="icon-locked" viewBox="0 0 24 24">
+    <rect stroke-width='2' width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
+    <path stroke-width='2' d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+  </symbol>
+  <symbol id="icon-unlocked" viewBox="0 0 24 24">
+    <rect stroke-width='2' width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+    <path stroke-width='2' d="M7 11V7a5 5 0 0 1 9.9-1"/>
+  </symbol>
 </svg>

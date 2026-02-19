@@ -1,0 +1,56 @@
+.container {
+  padding: 16px;
+  border-radius: 12px;
+  background-color: var(--dark-gray);
+  border: thin solid var(--gray);
+  transition: border-color 300ms ease-out;
+
+  &.unlocked {
+    border-color: var(--primary);
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.lockButton {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--secondary-text-color);
+  transition:
+    color 200ms ease-out,
+    background-color 200ms ease-out;
+  background-color: transparent;
+  border-radius: 8px;
+
+  &:hover {
+    color: var(--primary-text-color);
+  }
+
+  &.unlocked {
+    color: var(--primary);
+    background-color: rgba(var(--primary-rgb), 0.1);
+  }
+}
+
+.displayValue {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  word-break: break-word;
+}
+
+.defaultBadge {
+  color: var(--light-gray);
+  font-style: italic;
+  flex-shrink: 0;
+}

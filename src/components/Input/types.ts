@@ -29,4 +29,5 @@ export type Props = {
     | 'decimal'
     | 'search';
   autoFocus?: boolean;
+  readonly?: boolean;
 };

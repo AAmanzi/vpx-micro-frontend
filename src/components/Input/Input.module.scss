@@ -1,10 +1,12 @@
 .container {
   width: 100%;
-  border-radius: 9px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   border: thin solid var(--gray);
-  transition: border-color 300ms ease-out;
+  transition:
+    border-color 300ms ease-out,
+    opacity 300ms ease-out;
   background-color: var(--dark-gray);
 
   &:focus-within {
@@ -29,6 +31,10 @@
 
 .error {
   border-color: var(--red);
+}
+
+.readonly {
+  opacity: 0.3;
 }
 
 .input {

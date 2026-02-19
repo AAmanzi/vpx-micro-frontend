@@ -1,0 +1,61 @@
+.container {
+  max-width: 768px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 68px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.headerIconWrapper {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background-color: var(--gray);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+}
+
+.section {
+  padding: 24px;
+  background-color: var(--dark-gray);
+  border-radius: 16px;
+  border: thin solid var(--gray);
+
+  &:not(:last-child) {
+    margin-bottom: 32px;
+  }
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.vpxDirectoryWrapper {
+  margin-bottom: 32px;
+
+  & .note {
+    margin-top: 8px;
+  }
+}
+
+.settingOption {
+  &:not(:last-child) {
+    margin-bottom: 16px;
+  }
+}
+
+.lockedSettingsWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}

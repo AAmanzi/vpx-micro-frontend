@@ -9,7 +9,10 @@ export type Icon =
   | 'edit'
   | 'trash'
   | 'kebab'
-  | 'cross';
+  | 'cross'
+  | 'save'
+  | 'locked'
+  | 'unlocked';
 
 export interface Props {
   icon: Icon;

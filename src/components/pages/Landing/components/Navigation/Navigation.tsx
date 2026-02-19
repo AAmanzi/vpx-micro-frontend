@@ -30,49 +30,51 @@ const Navigation: FunctionComponent<Props> = ({ view, setView, config }) => {
             fill
           />
         </div>
-        <div className={style.section}>
-          <h3
-            className={classNames(
-              'caption-small-semibold',
-              'secondary-text-color',
-              style.sectionTitle,
-            )}>
-            Navigation
-          </h3>
-          <button
-            onClick={() => setView(View.allTables)}
-            className={classNames(style.button, {
-              [style.active]: view === View.allTables,
-            })}>
-            <div className={style.iconWrapper}>
-              <Icon icon='grid' className={style.icon} />
-            </div>
-            <span className={classNames('button-text-16', style.label)}>
-              All Tables
-            </span>
-          </button>
-        </div>
-        <div className={style.section}>
-          <h3
-            className={classNames(
-              'caption-small-semibold',
-              'secondary-text-color',
-              style.sectionTitle,
-            )}>
-            System
-          </h3>
-          <button
-            onClick={() => setView(View.settings)}
-            className={classNames(style.button, {
-              [style.active]: view === View.settings,
-            })}>
-            <div className={style.iconWrapper}>
-              <Icon icon='cog' className={style.icon} />
-            </div>
-            <span className={classNames('button-text-16', style.label)}>
-              Settings
-            </span>
-          </button>
+        <div>
+          <div className={style.section}>
+            <h3
+              className={classNames(
+                'caption-small-semibold',
+                'secondary-text-color',
+                style.sectionTitle,
+              )}>
+              Navigation
+            </h3>
+            <button
+              onClick={() => setView(View.allTables)}
+              className={classNames(style.button, {
+                [style.active]: view === View.allTables,
+              })}>
+              <div className={style.iconWrapper}>
+                <Icon icon='grid' className={style.icon} />
+              </div>
+              <span className={classNames('button-text-16', style.label)}>
+                All Tables
+              </span>
+            </button>
+          </div>
+          <div className={style.section}>
+            <h3
+              className={classNames(
+                'caption-small-semibold',
+                'secondary-text-color',
+                style.sectionTitle,
+              )}>
+              System
+            </h3>
+            <button
+              onClick={() => setView(View.settings)}
+              className={classNames(style.button, {
+                [style.active]: view === View.settings,
+              })}>
+              <div className={style.iconWrapper}>
+                <Icon icon='cog' className={style.icon} />
+              </div>
+              <span className={classNames('button-text-16', style.label)}>
+                Settings
+              </span>
+            </button>
+          </div>
         </div>
         <div className={style.meta}>
           <div className={style.metaLabel}>

@@ -26,6 +26,7 @@ const Input: FunctionComponent<Props> = ({
   inputMode,
   autoFocus,
   placeholder,
+  readonly = false,
 }) => {
   const ref = useRef<HTMLInputElement>(null);
 
@@ -53,12 +54,6 @@ const Input: FunctionComponent<Props> = ({
     }
   };
 
-  const resetValue = () => {
-    if (onChange) {
-      onChange('');
-    }
-  };
-
   /* eslint-disable jsx-a11y/no-autofocus */
 
   const input = (
@@ -69,11 +64,12 @@ const Input: FunctionComponent<Props> = ({
           [style.medium]: size === Size.medium,
           [style.big]: size === Size.big,
           [style.error]: error,
+          [style.readonly]: readonly,
         })}>
         <input
           className={classNames(
             style.input,
-            'primary-text-color',
+            'secondary-text-color',
             'caption-big-regular',
           )}
           placeholder={placeholder}
@@ -87,6 +83,8 @@ const Input: FunctionComponent<Props> = ({
           inputMode={inputMode}
           autoFocus={autoFocus}
           required={inputType === 'date'}
+          readOnly={readonly}
+          disabled={readonly}
         />
       </div>
       {errorMessage && (
@@ -104,8 +102,8 @@ const Input: FunctionComponent<Props> = ({
       <label className={classNames(style.label)}>
         <span
           className={classNames(
-            'title-h6-bold',
-            'primary-text-color',
+            'caption-medium-regular',
+            'secondary-text-color',
             style.labelText,
           )}>
           {label}
