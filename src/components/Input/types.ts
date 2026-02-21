@@ -1,5 +1,7 @@
 import { FocusEvent, KeyboardEvent } from 'react';
 
+import { Icon } from '../Icon/types';
+
 export enum Size {
   small = 'small',
   medium = 'medium',
@@ -30,4 +32,5 @@ export type Props = {
     | 'search';
   autoFocus?: boolean;
   readonly?: boolean;
+  icon?: Icon;
 };

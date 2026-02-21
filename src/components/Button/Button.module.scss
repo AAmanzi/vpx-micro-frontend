@@ -31,8 +31,12 @@
 }
 
 .secondary {
-  background-color: var(--secondary);
+  background-color: var(--gray);
   color: var(--white);
+
+  &:hover {
+    background-color: rgba(var(--mid-gray-rgb), 0.5);
+  }
 }
 
 .transparent {

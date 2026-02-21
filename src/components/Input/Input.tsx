@@ -8,6 +8,7 @@ import {
   useRef,
 } from 'react';
 
+import Icon from '../Icon';
 import style from './Input.module.scss';
 import { Props, Size } from './types';
 
@@ -27,6 +28,7 @@ const Input: FunctionComponent<Props> = ({
   autoFocus,
   placeholder,
   readonly = false,
+  icon,
 }) => {
   const ref = useRef<HTMLInputElement>(null);
 
@@ -66,6 +68,12 @@ const Input: FunctionComponent<Props> = ({
           [style.error]: error,
           [style.readonly]: readonly,
         })}>
+        {icon && (
+          <Icon
+            className={classNames('secondary-text-color', style.icon)}
+            icon={icon}
+          />
+        )}
         <input
           className={classNames(
             style.input,

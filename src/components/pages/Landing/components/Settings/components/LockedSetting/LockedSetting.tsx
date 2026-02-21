@@ -2,6 +2,7 @@ import classNames from 'classnames';
 import { FunctionComponent, useEffect, useState } from 'react';
 
 import Icon from 'src/components/Icon';
+import { Icon as IconType } from 'src/components/Icon/types';
 import Input from 'src/components/Input';
 
 import style from './LockedSetting.module.scss';
@@ -11,6 +12,8 @@ interface Props {
   value: string;
   defaultValue: string;
   onSave: (value: string) => void;
+  lockedNote?: string;
+  lockedNoteIcon?: IconType;
 }
 
 const LockedSetting: FunctionComponent<Props> = ({
@@ -18,6 +21,8 @@ const LockedSetting: FunctionComponent<Props> = ({
   value: savedValue,
   defaultValue,
   onSave,
+  lockedNote,
+  lockedNoteIcon,
 }) => {
   const [isLocked, setIsLocked] = useState(!Boolean(savedValue));
   const [editValue, setEditValue] = useState(savedValue);
@@ -74,6 +79,21 @@ const LockedSetting: FunctionComponent<Props> = ({
         onChange={setEditValue}
         onBlur={handleBlur}
       />
+      {isLocked && lockedNote && (
+        <div className={style.lockedNote}>
+          {lockedNoteIcon && (
+            <Icon
+              icon={lockedNoteIcon}
+              width={10}
+              height={10}
+              className='secondary-text-color'
+            />
+          )}
+          <span className='caption-small-regular secondary-text-color'>
+            <i>{lockedNote}</i>
+          </span>
+        </div>
+      )}
     </div>
   );
 };

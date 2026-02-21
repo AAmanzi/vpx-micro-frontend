@@ -93,7 +93,6 @@ const Settings: FunctionComponent<Props> = ({
       {isDeleteModalOpen && (
         <DeleteTableModal
           id={id}
-          name={name}
           vpxFile={vpxFile}
           romFile={romFile}
           close={() => setIsDeleteModalOpen(false)}

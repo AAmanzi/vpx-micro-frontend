@@ -12,7 +12,9 @@ export type Icon =
   | 'cross'
   | 'save'
   | 'locked'
-  | 'unlocked';
+  | 'unlocked'
+  | 'search'
+  | 'reload';
 
 export interface Props {
   icon: Icon;

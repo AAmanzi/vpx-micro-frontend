@@ -1,0 +1,64 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 80px;
+  border-bottom: thin solid var(--gray);
+  padding-left: 32px;
+  padding-right: 32px;
+}
+
+.search {
+  max-width: 576px;
+  margin-right: 32px;
+  flex: 1;
+}
+
+.librarySize {
+  text-align: end;
+}
+
+.librarySizeLabel {
+  text-transform: uppercase;
+}
+
+.container {
+  margin: 24px;
+}
+
+.tablesWrapper {
+  margin-top: 24px;
+}
+
+.noData {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: rgba(var(--dark-gray-rgb), 0.2);
+  border: thin solid var(--gray);
+  border-radius: 24px;
+  padding-top: 80px;
+  padding-bottom: 80px;
+}
+
+.noDataIconWrapper {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--dark-gray);
+  border-radius: 24px;
+  margin-bottom: 16px;
+}
+
+.noDataTitle {
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.noDataDescription {
+  text-align: center;
+  margin-bottom: 24px;
+  max-width: 384px;
+}

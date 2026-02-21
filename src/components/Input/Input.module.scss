@@ -37,6 +37,11 @@
   opacity: 0.3;
 }
 
+.icon {
+  margin-right: 14px;
+  flex-shrink: 0;
+}
+
 .input {
   background-color: transparent;
   border: unset;
@@ -50,8 +55,7 @@
   }
 
   &::placeholder {
-    color: var(--secondary-text-color);
-    @include caption-big-semibold-mixin;
+    color: var(--mid-gray);
   }
 
   // chrome autofill micanje ruzne pozadine

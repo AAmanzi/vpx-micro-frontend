@@ -91,12 +91,16 @@ const Settings: FunctionComponent<Props> = ({ config }) => {
             value={romsDirectory}
             defaultValue={defaultRomsDirectory}
             onSave={handleSaveRomsDirectory}
+            lockedNote='Auto-syncing with Root'
+            lockedNoteIcon='reload'
           />
           <LockedSetting
             label='Tables Directory'
             value={tablesDirectory}
             defaultValue={defaultTablesDirectory}
             onSave={handleSaveTablesDirectory}
+            lockedNote='Auto-syncing with Root'
+            lockedNoteIcon='reload'
           />
         </div>
       </div>

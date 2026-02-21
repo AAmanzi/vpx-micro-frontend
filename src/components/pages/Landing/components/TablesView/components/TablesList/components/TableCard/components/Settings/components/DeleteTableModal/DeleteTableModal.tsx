@@ -10,14 +10,12 @@ import style from './DeleteTableModal.module.scss';
 
 interface Props {
   id: string;
-  name: string;
   romFile?: string;
   vpxFile: string;
   close: () => void;
 }
 
 const DeleteTableModal: FunctionComponent<Props> = ({
-  name,
   romFile,
   vpxFile,
   close,
@@ -34,7 +32,7 @@ const DeleteTableModal: FunctionComponent<Props> = ({
       onExitClick={close}
       size={ModalSize.small}>
       <div className={style.content}>
-        <p className={style.text}>Deleting {name} will remove these files:</p>
+        <p className={style.text}>These files will be deleted:</p>
         <ul className={style.filesList}>
           <li className={style.fileItem}>{vpxFile}</li>
           {romFile && <li className={style.fileItem}>{romFile}</li>}

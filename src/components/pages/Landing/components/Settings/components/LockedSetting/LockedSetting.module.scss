@@ -54,3 +54,11 @@
   font-style: italic;
   flex-shrink: 0;
 }
+
+.lockedNote {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  opacity: 0.5;
+}

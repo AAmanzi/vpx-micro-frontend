@@ -37,6 +37,10 @@
   padding-left: 16px;
   padding-right: 16px;
 
+  &:not(:last-child) {
+    margin-bottom: 8px;
+  }
+
   &:hover {
     background-color: rgba(var(--gray-rgb), 0.5);
 
