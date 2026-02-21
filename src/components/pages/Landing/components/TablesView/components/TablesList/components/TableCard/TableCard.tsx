@@ -4,6 +4,7 @@ import { FunctionComponent, useState } from 'react';
 import Button from 'src/components/Button';
 import Icon from 'src/components/Icon';
 import { Table } from 'src/types/table';
+import { displayDateWithTime } from 'src/utils';
 
 import style from './TableCard.module.scss';
 import Settings from './components/Settings';
@@ -16,6 +17,7 @@ const TableCard: FunctionComponent<Props> = ({
   name,
   romFile,
   vpxFile,
+  lastPlayed,
 }) => {
   const [favorite, setFavorite] = useState(isFavorite);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -93,6 +95,12 @@ const TableCard: FunctionComponent<Props> = ({
           {romFile && (
             <p className='secondary-text-color caption-small-regular'>
               ROM: {romFile}
+            </p>
+          )}
+          {lastPlayed && (
+            <p className='secondary-text-color caption-small-regular'>
+              Last Played:{' '}
+              {lastPlayed ? displayDateWithTime(lastPlayed) : 'Never'}
             </p>
           )}
         </div>

@@ -7,6 +7,7 @@ export const Tables: Table[] = [
     vpxFile: 'medieval madness v600.vpx',
     romFile: 'mm_109c.rom',
     isFavorite: true,
+    lastPlayed: Date.now() - 1000 * 60 * 60 * 24,
   },
   {
     id: 'table-2',
@@ -14,6 +15,7 @@ export const Tables: Table[] = [
     vpxFile: 'addams family v600.vpx',
     romFile: 'taf_l7.rom',
     isFavorite: false,
+    lastPlayed: Date.now() - 1000 * 60 * 60 * 24,
   },
   {
     id: 'table-3',

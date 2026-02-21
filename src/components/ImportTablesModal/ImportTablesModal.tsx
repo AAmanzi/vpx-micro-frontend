@@ -11,12 +11,13 @@ interface Props {
 }
 
 const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
-  const [selectedFiles, setSelectedFiles] = useState<FileSystemItem[]>([]);
+  const [filesToImport, setFilesToImport] = useState<FileSystemItem[]>([]);
 
   const handleFilesSelected = (files: FileSystemItem[]) => {
-    setSelectedFiles(files);
-    console.log('Selected files for import:', files);
+    setFilesToImport((prev) => [...prev, ...files]);
   };
+
+  console.log(filesToImport);
 
   return (
     <Modal
