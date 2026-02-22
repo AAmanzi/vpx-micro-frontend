@@ -4,7 +4,6 @@ import { FunctionComponent, useState } from 'react';
 import FileUpload from 'src/components/FileUpload';
 import Modal from 'src/components/Modal';
 import { FileSystemItem } from 'src/types/file';
-import { Table } from 'src/types/table';
 
 import Button, { Size as ButtonSize, Type as ButtonType } from '../Button';
 import CheckboxSwitch from '../CheckboxSwitch';
@@ -12,35 +11,26 @@ import Form from '../Form';
 import style from './ImportTablesModal.module.scss';
 import TableEntry from './components/TableEntry';
 import UnassignedRomEntry from './components/UnassignedRomEntry';
-import { TableFile } from './types';
-
-interface Props {
-  onClose: () => void;
-}
+import { Props, TableFile } from './types';
+import { buildImportSelectionResult } from './utils';
 
 const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
   const [tablesToImport, setTablesToImport] = useState<Array<TableFile>>([]);
   const [unassignedRoms, setUnassignedRoms] = useState<Array<FileSystemItem>>(
     [],
   );
-  const [deleteAfterImport, setDeleteAfterImport] = useState(false); // TODO: From config
+  // TODO: From config
+  const [deleteAfterImport, setDeleteAfterImport] = useState(false);
 
   const handleFilesSelected = (files: Array<FileSystemItem>) => {
-    const tableFiles = files.filter((file) => {
-      return file.name.endsWith('.vpx');
-    });
-    const romFiles = files.filter((file) => {
-      return file.name.endsWith('.zip');
+    const result = buildImportSelectionResult({
+      currentTables: tablesToImport,
+      currentUnassignedRoms: unassignedRoms,
+      incomingFiles: files,
     });
 
-    const newTables = tableFiles.map((file) => ({
-      name: file.name.replace('.vpx', '').trim(),
-      filePath: file.path,
-      fileName: file.name,
-    }));
-
-    setTablesToImport((prev) => [...prev, ...newTables]);
-    setUnassignedRoms((prev) => [...prev, ...romFiles]);
+    setTablesToImport(result.tablesToImport);
+    setUnassignedRoms(result.unassignedRoms);
   };
 
   const handleRemoveRomFile = (rom: FileSystemItem) => {
