@@ -12,13 +12,14 @@ import Form from '../Form';
 import style from './ImportTablesModal.module.scss';
 import TableEntry from './components/TableEntry';
 import UnassignedRomEntry from './components/UnassignedRomEntry';
+import { TableFile } from './types';
 
 interface Props {
   onClose: () => void;
 }
 
 const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
-  const [tablesToImport, setTablesToImport] = useState<Array<Table>>([]);
+  const [tablesToImport, setTablesToImport] = useState<Array<TableFile>>([]);
   const [unassignedRoms, setUnassignedRoms] = useState<Array<FileSystemItem>>(
     [],
   );
@@ -33,25 +34,52 @@ const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
     });
 
     const newTables = tableFiles.map((file) => ({
-      id: '',
       name: file.name.replace('.vpx', '').trim(),
-      vpxFile: file.name,
-      isFavorite: false,
+      filePath: file.path,
+      fileName: file.name,
     }));
 
     setTablesToImport((prev) => [...prev, ...newTables]);
     setUnassignedRoms((prev) => [...prev, ...romFiles]);
   };
 
-  const handleRemoveRomFile = (rom: FileSystemItem) => {};
+  const handleRemoveRomFile = (rom: FileSystemItem) => {
+    setUnassignedRoms((prev) => prev.filter((r) => r.path !== rom.path));
+  };
 
-  const handleRemoveTableFile = (table: Table) => {};
+  const handleRemoveTableFile = (table: TableFile) => {
+    if (table.rom) {
+      setUnassignedRoms((prev) => [...prev, table.rom!]);
+    }
 
-  const handleAssignRom = (table: Table, rom: FileSystemItem) => {};
+    setTablesToImport((prev) =>
+      prev.filter((t) => t.filePath !== table.filePath),
+    );
+  };
 
-  const handleRemoveRomFromTable = (table: Table) => {};
+  const handleAssignRom = (table: TableFile, rom: FileSystemItem) => {
+    setTablesToImport((prev) =>
+      prev.map((t) => (t.filePath === table.filePath ? { ...t, rom: rom } : t)),
+    );
+    setUnassignedRoms((prev) => prev.filter((r) => r.path !== rom.path));
+  };
 
-  const handleTableNameChange = (table: Table, newName: string) => {};
+  const handleRemoveRomFromTable = (table: TableFile) => {
+    setUnassignedRoms((prev) => [...prev, table.rom!]);
+    setTablesToImport((prev) =>
+      prev.map((t) =>
+        t.filePath === table.filePath ? { ...t, rom: undefined } : t,
+      ),
+    );
+  };
+
+  const handleTableNameChange = (table: TableFile, newName: string) => {
+    setTablesToImport((prev) =>
+      prev.map((t) =>
+        t.filePath === table.filePath ? { ...t, name: newName } : t,
+      ),
+    );
+  };
 
   const toggleDeleteAfterImport = () => {
     setDeleteAfterImport((prev) => !prev);
@@ -88,7 +116,7 @@ const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
               <div className={style.tableFiles}>
                 {tablesToImport.map((table) => (
                   <TableEntry
-                    key={table.vpxFile}
+                    key={table.filePath}
                     table={table}
                     unassignedRoms={unassignedRoms}
                     onAssignRom={handleAssignRom}

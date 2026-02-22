@@ -7,15 +7,17 @@ import Tag, { Type as TagType } from 'src/components/Tag';
 import { FileSystemItem } from 'src/types/file';
 import { Table } from 'src/types/table';
 
+import { TableFile } from '../../types';
 import style from './TableEntry.module.scss';
+import RomSelect from './components/RomSelect';
 
 interface Props {
-  table: Table;
+  table: TableFile;
   unassignedRoms: Array<FileSystemItem>;
-  onAssignRom: (table: Table, rom: FileSystemItem) => void;
-  onRemoveTable: (table: Table) => void;
-  onRemoveRom: (table: Table) => void;
-  onTableNameChange: (table: Table, newName: string) => void;
+  onAssignRom: (table: TableFile, rom: FileSystemItem) => void;
+  onRemoveTable: (table: TableFile) => void;
+  onRemoveRom: (table: TableFile) => void;
+  onTableNameChange: (table: TableFile, newName: string) => void;
 }
 
 const TableEntry: FunctionComponent<Props> = ({
@@ -28,8 +30,20 @@ const TableEntry: FunctionComponent<Props> = ({
 }) => {
   const [isRomSelectOpen, setIsRomSelectOpen] = useState(false);
 
+  const hasUnassignedRoms = unassignedRoms.length > 0;
+
   const handleNameChange = (value: string) => {
     onTableNameChange(table, value);
+  };
+
+  const handleRomSelect = (rom: FileSystemItem) => {
+    onAssignRom(table, rom);
+  };
+
+  const handleToggleRomSelect = () => {
+    if (hasUnassignedRoms) {
+      setIsRomSelectOpen((prev) => !prev);
+    }
   };
 
   return (
@@ -42,17 +56,19 @@ const TableEntry: FunctionComponent<Props> = ({
           fontWeight='bold'
         />
         <button
+          type='button'
           className={style.removeButton}
           onClick={() => onRemoveTable(table)}>
           <Icon className={style.removeIcon} icon='trash' />
         </button>
       </div>
       <div className={style.info}>
-        <Tag icon='file-code' label={table.vpxFile} />
-        {table.romFile ? (
+        <Tag icon='file-code' label={table.fileName} />
+        {table.rom ? (
           <div className={style.romInfo}>
-            <Tag icon='package' label={table.romFile} type={TagType.success} />
+            <Tag icon='package' label={table.rom.name} type={TagType.success} />
             <button
+              type='button'
               className={classNames(style.removeButton, style.small)}
               onClick={() => onRemoveRom(table)}>
               <Icon
@@ -64,26 +80,39 @@ const TableEntry: FunctionComponent<Props> = ({
             </button>
           </div>
         ) : (
-          <div>
+          <div className={style.assignRom}>
             <button
+              type='button'
               className={style.assignButton}
-              onClick={() => setIsRomSelectOpen((open) => !open)}>
+              onClick={handleToggleRomSelect}
+              disabled={!hasUnassignedRoms}>
               <Icon
                 className={style.assignIcon}
                 icon='circle-alert'
                 width={10}
                 height={10}
               />
-              <span className='caption-small-bold'>Assign ROM</span>
-              <Icon
-                className={classNames(style.chevronIcon, {
-                  [style.open]: isRomSelectOpen,
-                })}
-                icon='chevron-down'
-                width={10}
-                height={10}
-              />
+              <span className='caption-small-bold'>
+                {hasUnassignedRoms ? 'Assign ROM' : 'No ROMs available'}
+              </span>
+              {hasUnassignedRoms && (
+                <Icon
+                  className={classNames(style.chevronIcon, {
+                    [style.open]: isRomSelectOpen,
+                  })}
+                  icon='chevron-down'
+                  width={10}
+                  height={10}
+                />
+              )}
             </button>
+            {isRomSelectOpen && (
+              <RomSelect
+                unassignedRoms={unassignedRoms}
+                onSelect={handleRomSelect}
+                onClose={() => setIsRomSelectOpen(false)}
+              />
+            )}
           </div>
         )}
       </div>

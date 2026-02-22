@@ -8,6 +8,7 @@ import {
 } from 'react';
 
 import Icon from 'src/components/Icon';
+import useClickOutside from 'src/utils/useClickOutside';
 
 import style from './Settings.module.scss';
 import DeleteTableModal from './components/DeleteTableModal';
@@ -29,37 +30,10 @@ const Settings: FunctionComponent<Props> = ({
   close,
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
+  useClickOutside(ref, close, { ignoreSelector: '#modal' });
 
   const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
-  const handleClick = useCallback(
-    (event: MouseEvent): void => {
-      if (event.target === null) {
-        return;
-      }
-
-      const targetElement =
-        event.target instanceof Element ? event.target : null;
-
-      if (targetElement?.closest('#modal')) {
-        return;
-      }
-
-      if (ref.current && !ref.current.contains(event.target as Node)) {
-        close();
-      }
-    },
-    [close],
-  );
-
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClick);
-
-    return () => {
-      document.removeEventListener('mousedown', handleClick);
-    };
-  }, [handleClick]);
 
   return (
     <div ref={ref} className={style.container}>
