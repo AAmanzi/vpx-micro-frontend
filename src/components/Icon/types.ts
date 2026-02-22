@@ -14,7 +14,12 @@ export type Icon =
   | 'locked'
   | 'unlocked'
   | 'search'
-  | 'reload';
+  | 'reload'
+  | 'archive'
+  | 'file-code'
+  | 'package'
+  | 'circle-alert'
+  | 'chevron-down';
 
 export interface Props {
   icon: Icon;

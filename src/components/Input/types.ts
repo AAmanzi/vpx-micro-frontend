@@ -20,6 +20,7 @@ export type Props = {
   error?: boolean;
   label?: string;
   errorMessage?: string | null;
+  fontWeight?: 'regular' | 'semibold' | 'bold';
   inputType?: string;
   inputMode?:
     | 'none'

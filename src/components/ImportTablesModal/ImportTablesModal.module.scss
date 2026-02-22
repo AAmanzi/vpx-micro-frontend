@@ -1,0 +1,52 @@
+.content {
+  margin: 24px;
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+.section {
+  margin-top: 24px;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.tableFiles {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.unassignedRomFiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.footer {
+  padding: 24px 24px 0;
+  border-top: thin solid var(--gray);
+}
+
+.metaAndOptions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.deleteAfterImport {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+  gap: 12px;
+}

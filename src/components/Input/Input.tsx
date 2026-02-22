@@ -19,7 +19,7 @@ const Input: FunctionComponent<Props> = ({
   onFocus,
   onKeyDown,
   forceFocus = false,
-  size = Size.small,
+  size = Size.medium,
   error = false,
   label,
   errorMessage,
@@ -29,6 +29,7 @@ const Input: FunctionComponent<Props> = ({
   placeholder,
   readonly = false,
   icon,
+  fontWeight = 'regular',
 }) => {
   const ref = useRef<HTMLInputElement>(null);
 
@@ -78,7 +79,7 @@ const Input: FunctionComponent<Props> = ({
           className={classNames(
             style.input,
             'secondary-text-color',
-            'caption-big-regular',
+            `caption-big-${fontWeight}`,
           )}
           placeholder={placeholder}
           value={value}

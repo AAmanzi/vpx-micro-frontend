@@ -1,11 +1,15 @@
 .default-mode {
-  --primary: #2563eb;
+  /* --primary: #2563eb;
   --primary-rgb: 37, 99, 235;
-  --primary-vanished: #eaf1ff;
+  --primary-vanished: #eaf1ff; */
 
-  --yellow: #fe9a00;
-  --yellow-rgb: 254, 154, 0;
-  --yellow-vanished: #fff6db;
+  --primary: #4338ca;
+  --primary-rgb: 67, 56, 202;
+  --primary-vanished: #e6e8ff;
+
+  --yellow: #fbbf24;
+  --yellow-rgb: 251, 191, 36;
+  --yellow-vanished: #fff8e6;
 
   --dark: #0d0d0d;
   --dark-rgb: 27, 27, 27;
@@ -21,15 +25,17 @@
   --mega-light-gray: #e5e5e5;
   --mega-light-gray-rgb: 229, 229, 229;
 
-  --green: #2e7d32;
-  --green-rgb: 46, 125, 50;
+  --blue: #5b5df0;
+  --blue-rgb: 91, 93, 240;
+  --blue-vanished: #eef0ff;
 
-  --blue: #1d4ed8;
-  --blue-rgb: 29, 78, 216;
-  --blue-vanished: #e8efff;
+  --green: #22c55e;
+  --green-rgb: 34, 197, 94;
+  --green-vanished: #eafaf0;
 
-  --red: #dc2626;
-  --red-rgb: 220, 38, 38;
+  --red: #ef4444;
+  --red-rgb: 239, 68, 68;
+  --red-vanished: #ffecec;
 
   --white: #ffffff;
   --white-rgb: 255, 255, 255;

@@ -40,7 +40,6 @@ const api = {
 };
 
 if (typeof window !== 'undefined') {
-  console.log('HERE');
   // only set when not already provided by Electron preload
   if (!(window as any).api) {
     (window as any).api = api;

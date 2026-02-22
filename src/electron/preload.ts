@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer } from 'electron'
+import { contextBridge, ipcRenderer, webUtils } from 'electron'
 import type { Table } from 'src/types/table'
 
 const invoke = <T>(channel: string, ...args: any[]): Promise<T> => ipcRenderer.invoke(channel, ...args)
@@ -10,5 +10,6 @@ contextBridge.exposeInMainWorld('api', {
   updateTable: (id: string, item: Partial<Table>): Promise<Table | null> => invoke<Table | null>('api:updateTable', id, item),
   deleteTable: (id: string): Promise<boolean> => invoke<boolean>('api:deleteTable', id),
   setTableFavorite: (id: string, fav: boolean): Promise<Table | null> => invoke<Table | null>('api:setTableFavorite', id, fav),
-  ping: (): Promise<{ ok: true }> => invoke('api:ping')
+  ping: (): Promise<{ ok: true }> => invoke('api:ping'),
+  getPathForFile: (file: File): string => webUtils.getPathForFile(file),
 })

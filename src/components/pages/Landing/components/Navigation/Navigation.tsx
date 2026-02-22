@@ -36,6 +36,7 @@ const Navigation: FunctionComponent<Props> = ({ view, setView, config }) => {
               className={classNames(
                 'caption-small-semibold',
                 'secondary-text-color',
+                'uppercase',
                 style.sectionTitle,
               )}>
               Navigation

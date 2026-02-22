@@ -67,7 +67,7 @@ const TablesView: FunctionComponent<Props> = ({
             className={classNames(
               'secondary-text-color',
               'caption-big-regular',
-              style.librarySizeLabel,
+              'uppercase',
             )}>
             Library size
           </p>

@@ -1,0 +1,84 @@
+.container {
+  padding: 20px;
+  background-color: rgba(var(--gray-rgb), 0.3);
+  border-radius: 24px;
+  border: thin solid var(--gray);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 8px;
+}
+
+.removeButton {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border-radius: 8px;
+  flex-shrink: 0;
+  transition: background-color 200ms ease-in;
+
+  &.small {
+    width: 22px;
+    height: 22px;
+  }
+
+  &:hover {
+    background-color: rgba(var(--red-rgb), 0.1);
+
+    & .removeIcon {
+      color: rgba(var(--red-rgb), 0.6);
+    }
+  }
+}
+
+.removeIcon {
+  color: var(--secondary-text-color);
+  transition: color 200ms ease-in;
+}
+
+.info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.romInfo {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.assignButton {
+  padding: 4px 8px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  gap: 4px;
+  background-color: rgba(var(--yellow-rgb), 0.1);
+
+  & > span {
+    color: var(--yellow);
+  }
+}
+
+.assignIcon {
+  color: var(--yellow);
+}
+
+.chevronIcon {
+  color: var(--yellow);
+  transition: transform 200ms ease-in;
+
+  &.open {
+    transform: rotate(180deg);
+  }
+}
