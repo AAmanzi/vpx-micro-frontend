@@ -5,7 +5,7 @@
   "repository": "git@github.com:AAmanzi/visual-pinball-micro-frontend.git",
   "license": "MIT",
   "scripts": {
-    "dev:electron": "npm run build:preload && electron .",
+    "dev:electron": "npm run build:preload && nodemon",
     "dev:next": "WEB_MODE=1 npm run build:preload && next dev",
     "dev:mock": "DEV_MOCK=1 npm run dev:electron",
     "dev": "yarn dev:mock",
@@ -39,6 +39,7 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
+    "nodemon": "^3.0.2",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   }

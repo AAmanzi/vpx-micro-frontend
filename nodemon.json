@@ -1,0 +1,9 @@
+{
+  "watch": ["src/electron/**/*", "src/types/**/*", "main.js"],
+  "ext": "ts,js,json",
+  "ignore": ["src/electron/preload.js", "**/*.test.ts", "**/*.spec.ts"],
+  "exec": "electron .",
+  "env": {
+    "NODE_ENV": "development"
+  }
+}

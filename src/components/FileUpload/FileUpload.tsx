@@ -31,7 +31,10 @@ const FileUpload: FunctionComponent<Props> = ({
     directoryPath: string,
   ): Promise<Array<FileSystemItem>> => {
     try {
-      const items = await api.getDirectoryTree(directoryPath, acceptedExtensions);
+      const items = await api.getDirectoryTree(
+        directoryPath,
+        acceptedExtensions,
+      );
 
       if (!Array.isArray(items)) {
         return [];
@@ -90,13 +93,7 @@ const FileUpload: FunctionComponent<Props> = ({
       if (isValid) {
         if (isDirectory) {
           const children = await getDirectoryTree(path);
-
-          newItems.push({
-            path,
-            name: file.name,
-            children,
-          });
-
+          newItems.push(...children);
           continue;
         }
 
