@@ -11,9 +11,11 @@
     "dev": "yarn dev:mock",
     "build:preload": "esbuild src/electron/preload.ts --bundle --platform=node --external:electron --outfile=src/electron/preload.js --format=cjs",
     "build:next": "next build",
-    "start:next": "next start"
+    "start:next": "next start",
+    "vpx:cgamename": "node scripts/vpx-cgamename.js"
   },
   "dependencies": {
+    "cfb": "^1.2.2",
     "classnames": "^2.5.1",
     "electron-store": "^8.1.0",
     "next": "^16.1.6",
