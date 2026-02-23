@@ -12,6 +12,8 @@ contextBridge.exposeInMainWorld('api', {
   deleteTable: (id: string): Promise<boolean> => invoke<boolean>('api:deleteTable', id),
   setTableFavorite: (id: string, fav: boolean): Promise<Table | null> => invoke<Table | null>('api:setTableFavorite', id, fav),
   ping: (): Promise<{ ok: true }> => invoke('api:ping'),
+  getExpectedRomName: (vpxFilePath: string): Promise<string | null> =>
+    invoke<string | null>('api:getExpectedRomName', vpxFilePath),
   getPathForFile: (file: File): string => webUtils.getPathForFile(file),
   getDirectoryTree: (
     directoryPath: string,

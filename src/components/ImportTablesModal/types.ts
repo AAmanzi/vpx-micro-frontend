@@ -10,6 +10,7 @@ export interface TableFile {
   filePath: string;
   fileName: string;
   rom?: FileSystemItem;
+  expectedRomName?: string;
 }
 
 export interface Props {

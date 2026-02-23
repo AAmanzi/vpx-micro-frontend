@@ -22,9 +22,8 @@ const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
   // TODO: From config
   const [deleteAfterImport, setDeleteAfterImport] = useState(false);
 
-  const handleFilesSelected = (files: Array<FileSystemItem>) => {
-    console.log(files);
-    const result = buildImportSelectionResult({
+  const handleFilesSelected = async (files: Array<FileSystemItem>) => {
+    const result = await buildImportSelectionResult({
       currentTables: tablesToImport,
       currentUnassignedRoms: unassignedRoms,
       incomingFiles: files,

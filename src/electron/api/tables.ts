@@ -1,7 +1,6 @@
 import type { Table } from 'src/types/table'
-import * as db from './db'
 
-// Endpoint surface for tables with explicit names including 'table(s)'.
+import * as db from '../db'
 
 export function getAllTables(): Table[] {
   return db.getAll()
@@ -25,8 +24,4 @@ export function deleteTable(id: string): boolean {
 
 export function setTableFavorite(id: string, fav: boolean): Table | null {
   return db.setFavorite(id, fav)
-}
-
-export function ping(): { ok: true } {
-  return { ok: true }
 }

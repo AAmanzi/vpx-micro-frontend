@@ -93,7 +93,9 @@ const TableEntry: FunctionComponent<Props> = ({
                 height={10}
               />
               <span className='caption-small-bold'>
-                {hasUnassignedRoms ? 'Assign ROM' : 'No ROMs available'}
+                {table.expectedRomName
+                  ? `Expected: ${table.expectedRomName}`
+                  : 'No ROM expected'}
               </span>
               {hasUnassignedRoms && (
                 <Icon

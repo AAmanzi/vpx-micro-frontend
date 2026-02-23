@@ -38,6 +38,7 @@ const api = {
     return Promise.resolve(clone(tables[idx]));
   },
   ping: (): Promise<{ ok: true }> => Promise.resolve({ ok: true }),
+  getExpectedRomName: (): Promise<string | null> => Promise.resolve(null),
   getDirectoryTree: (): Promise<Array<FileSystemItem>> => Promise.resolve([]),
 };
 

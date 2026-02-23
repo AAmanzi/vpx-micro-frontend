@@ -1,14 +1,33 @@
+import { api } from 'src/consts';
 import { FileSystemItem } from 'src/types/file';
 
 import { ImportSelectionResult, TableFile } from '../types';
-import { createTableFile, isRomFile, isVpxFile } from './helpers';
-import {
-  applyPairedDropRule,
-  applySingleRomToLastTableRule,
-  applySingleTableToLastRomRule,
-} from './rules';
+import { applyExpectedRoms } from './rules';
 
-export const buildImportSelectionResult = ({
+const isVpxFile = (file: FileSystemItem): boolean =>
+  file.name.toLowerCase().endsWith('.vpx');
+
+const isRomFile = (file: FileSystemItem): boolean =>
+  file.name.toLowerCase().endsWith('.zip');
+
+const createTableFile = async (file: FileSystemItem): Promise<TableFile> => {
+  let expectedRomName: string | undefined;
+
+  try {
+    expectedRomName = (await api.getExpectedRomName(file.path)) ?? undefined;
+  } catch {
+    expectedRomName = undefined;
+  }
+
+  return {
+    name: file.name.replace(/\.vpx$/i, '').trim(),
+    filePath: file.path,
+    fileName: file.name,
+    expectedRomName,
+  };
+};
+
+export const buildImportSelectionResult = async ({
   currentTables,
   currentUnassignedRoms,
   incomingFiles,
@@ -16,17 +35,19 @@ export const buildImportSelectionResult = ({
   currentTables: Array<TableFile>;
   currentUnassignedRoms: Array<FileSystemItem>;
   incomingFiles: Array<FileSystemItem>;
-}): ImportSelectionResult => {
+}): Promise<ImportSelectionResult> => {
   const knownTablePaths = new Set(currentTables.map((table) => table.filePath));
   const knownRomPaths = new Set([
     ...currentUnassignedRoms.map((rom) => rom.path),
     ...currentTables.map((table) => table.rom?.path).filter(Boolean),
   ]);
 
-  const newTables = incomingFiles
-    .filter(isVpxFile)
-    .filter((file) => !knownTablePaths.has(file.path))
-    .map(createTableFile);
+  const newTables = await Promise.all(
+    incomingFiles
+      .filter(isVpxFile)
+      .filter((file) => !knownTablePaths.has(file.path))
+      .map(createTableFile),
+  );
 
   const newRoms = incomingFiles
     .filter(isRomFile)
@@ -35,21 +56,5 @@ export const buildImportSelectionResult = ({
   const nextTables = [...currentTables, ...newTables];
   const nextUnassignedRoms = [...currentUnassignedRoms, ...newRoms];
 
-  const afterTwoFileRule = applyPairedDropRule(
-    nextTables,
-    nextUnassignedRoms,
-    incomingFiles,
-  );
-
-  const afterSingleRomRule = applySingleRomToLastTableRule(
-    afterTwoFileRule.tablesToImport,
-    afterTwoFileRule.unassignedRoms,
-    incomingFiles,
-  );
-
-  return applySingleTableToLastRomRule(
-    afterSingleRomRule.tablesToImport,
-    afterSingleRomRule.unassignedRoms,
-    incomingFiles,
-  );
+  return applyExpectedRoms(nextTables, nextUnassignedRoms);
 };
