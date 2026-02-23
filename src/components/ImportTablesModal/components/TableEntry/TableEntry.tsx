@@ -83,18 +83,23 @@ const TableEntry: FunctionComponent<Props> = ({
           <div className={style.assignRom}>
             <button
               type='button'
-              className={style.assignButton}
+              className={classNames(style.assignButton, {
+                [style.noRomExpected]: !table.expectedRomName,
+                [style.romExpected]: table.expectedRomName,
+              })}
               onClick={handleToggleRomSelect}
               disabled={!hasUnassignedRoms}>
               <Icon
                 className={style.assignIcon}
-                icon='circle-alert'
+                icon={
+                  table.expectedRomName ? 'circle-alert' : 'circle-checkmark'
+                }
                 width={10}
                 height={10}
               />
               <span className='caption-small-bold'>
                 {table.expectedRomName
-                  ? `Expected: ${table.expectedRomName}`
+                  ? `Expected: ${table.expectedRomName}.zip`
                   : 'No ROM expected'}
               </span>
               {hasUnassignedRoms && (

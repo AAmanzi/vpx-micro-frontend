@@ -19,7 +19,8 @@ export type Icon =
   | 'file-code'
   | 'package'
   | 'circle-alert'
-  | 'chevron-down';
+  | 'chevron-down'
+  | 'circle-checkmark';
 
 export interface Props {
   icon: Icon;

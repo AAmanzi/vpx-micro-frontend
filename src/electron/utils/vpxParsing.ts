@@ -138,6 +138,9 @@ export function getExpectedRomNameFromVpxFile(
     for (const candidateText of candidates) {
       const value = extractGameName(candidateText);
 
+      // TODO:  check if table actually uses ROM name
+      //        - some VPX files have cGameName but don't actually require a ROM
+
       if (value !== null) {
         return value;
       }

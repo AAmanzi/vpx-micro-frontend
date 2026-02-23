@@ -97,4 +97,16 @@
   <symbol id="icon-chevron-down" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
     <path d="m6 9 6 6 6-6"/>
   </symbol>
+  <symbol id="icon-circle-checkmark" viewBox="0 0 12 12">
+    <g stroke-linecap="round" stroke-linejoin="round" clip-path="url(#a)">
+      <path d="M5.998 10.996a4.998 4.998 0 1 0 0-9.996 4.998 4.998 0 0 0 0 9.996"/>
+      <path d="m4.498 5.998 1 1 1.999-2"/>
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" d="M0 0h11.996v11.996H0z"/>
+      </clipPath>
+    </defs>
+  </symbol>
+
 </svg>
