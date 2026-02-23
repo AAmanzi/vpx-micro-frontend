@@ -23,6 +23,7 @@ const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
   const [deleteAfterImport, setDeleteAfterImport] = useState(false);
 
   const handleFilesSelected = (files: Array<FileSystemItem>) => {
+    console.log(files);
     const result = buildImportSelectionResult({
       currentTables: tablesToImport,
       currentUnassignedRoms: unassignedRoms,
@@ -90,7 +91,7 @@ const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
             label='Select Tables & ROMs'
             description='Drag and drop .vpx files, .zip ROMs, or folders here'
             acceptedExtensions={['.vpx', '.zip']}
-            acceptFolders={true}
+            acceptFolders
             onFilesSelected={handleFilesSelected}
           />
           {tablesToImport.length > 0 && (

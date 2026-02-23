@@ -11,5 +11,10 @@ import_electron.contextBridge.exposeInMainWorld("api", {
   deleteTable: (id) => invoke("api:deleteTable", id),
   setTableFavorite: (id, fav) => invoke("api:setTableFavorite", id, fav),
   ping: () => invoke("api:ping"),
-  getPathForFile: (file) => import_electron.webUtils.getPathForFile(file)
+  getPathForFile: (file) => import_electron.webUtils.getPathForFile(file),
+  getDirectoryTree: (directoryPath, acceptedExtensions) => invoke(
+    "api:getDirectoryTree",
+    directoryPath,
+    acceptedExtensions
+  )
 });

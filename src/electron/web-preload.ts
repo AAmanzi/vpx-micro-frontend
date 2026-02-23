@@ -1,4 +1,5 @@
 import TablesSource from 'src/electron/mock';
+import { FileSystemItem } from 'src/types/file';
 import type { Table } from 'src/types/table';
 
 const clone = <T>(v: T) => JSON.parse(JSON.stringify(v)) as T;
@@ -37,6 +38,7 @@ const api = {
     return Promise.resolve(clone(tables[idx]));
   },
   ping: (): Promise<{ ok: true }> => Promise.resolve({ ok: true }),
+  getDirectoryTree: (): Promise<Array<FileSystemItem>> => Promise.resolve([]),
 };
 
 if (typeof window !== 'undefined') {

@@ -7,6 +7,12 @@ import path from 'path';
 import * as api from './api';
 import * as db from './db';
 
+type FileSystemItem = {
+  path: string;
+  name: string;
+  children?: Array<FileSystemItem>;
+};
+
 const NEXT_PORT = process.env.NEXT_PORT || 3000;
 let nextProcess: any = null;
 
@@ -46,6 +52,59 @@ function waitForServer(port: number, timeout = 30000, interval = 300) {
     })();
   });
 }
+
+const listDirectoryItems = async (
+  directoryPath: string,
+  acceptedExtensions: Set<string>,
+): Promise<Array<FileSystemItem>> => {
+  let entries: Array<fs.Dirent> = [];
+
+  try {
+    entries = await fs.promises.readdir(directoryPath, { withFileTypes: true });
+  } catch (error) {
+    return [];
+  }
+
+  const items: Array<FileSystemItem> = [];
+
+  for (const entry of entries) {
+    if (entry.isSymbolicLink()) {
+      continue;
+    }
+
+    const entryPath = path.join(directoryPath, entry.name);
+
+    if (entry.isDirectory()) {
+      const children = await listDirectoryItems(entryPath, acceptedExtensions);
+
+      if (children.length > 0) {
+        items.push({
+          path: entryPath,
+          name: entry.name,
+          children,
+        });
+      }
+
+      continue;
+    }
+
+    if (!entry.isFile()) {
+      continue;
+    }
+
+    const extension = path.extname(entry.name).toLowerCase();
+    if (!acceptedExtensions.has(extension)) {
+      continue;
+    }
+
+    items.push({
+      path: entryPath,
+      name: entry.name,
+    });
+  }
+
+  return items;
+};
 
 const createWindow = () => {
   const win = new BrowserWindow({
@@ -96,6 +155,26 @@ app.whenReady().then(async () => {
     api.setTableFavorite(id, fav),
   );
   ipcMain.handle('api:ping', async () => api.ping());
+  ipcMain.handle(
+    'api:getDirectoryTree',
+    async (_, directoryPath: string, acceptedExtensions: string[]) => {
+      if (!directoryPath || !Array.isArray(acceptedExtensions)) {
+        return [];
+      }
+
+      const extensionSet = new Set(
+        acceptedExtensions
+          .map((extension) => extension.toLowerCase())
+          .filter(Boolean),
+      );
+
+      if (extensionSet.size === 0) {
+        return [];
+      }
+
+      return listDirectoryItems(directoryPath, extensionSet);
+    },
+  );
 
   createWindow();
 });

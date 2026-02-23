@@ -27,6 +27,25 @@ const FileUpload: FunctionComponent<Props> = ({
     return null;
   };
 
+  const getDirectoryTree = async (
+    directoryPath: string,
+  ): Promise<Array<FileSystemItem>> => {
+    try {
+      const items = await api.getDirectoryTree(directoryPath, acceptedExtensions);
+
+      if (!Array.isArray(items)) {
+        return [];
+      }
+
+      return items.filter(
+        (item): item is FileSystemItem =>
+          Boolean(item?.path) && Boolean(item?.name),
+      );
+    } catch (error) {
+      return [];
+    }
+  };
+
   const isValidFile = (path: string, isDirectory: boolean): boolean => {
     if (isDirectory) {
       return acceptFolders;
@@ -69,6 +88,18 @@ const FileUpload: FunctionComponent<Props> = ({
 
       const isValid = isValidFile(file.name, isDirectory);
       if (isValid) {
+        if (isDirectory) {
+          const children = await getDirectoryTree(path);
+
+          newItems.push({
+            path,
+            name: file.name,
+            children,
+          });
+
+          continue;
+        }
+
         newItems.push({
           path,
           name: file.name,
