@@ -27,8 +27,8 @@ const frontendApi: Api = {
       directoryPath,
       acceptedExtensions,
     ),
-  importTables: (tables): Promise<void> =>
-    invoke('api:importTables', tables).then(() => undefined),
+  importTables: (tables, deleteAfterImport): Promise<void> =>
+    invoke('api:importTables', tables, deleteAfterImport).then(() => undefined),
   getConfig: () => invoke('api:getConfig'),
   updateVpxRootPath: (path: string): Promise<void> =>
     invoke('api:updateVpxRootPath', path).then(() => undefined),

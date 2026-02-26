@@ -32,6 +32,7 @@ const Settings: FunctionComponent<Props> = ({ config }) => {
     await api.updateVpxRootPath(vpxRootPath);
   };
 
+  // TODO: not good when resetting to default, treating defaults as unlocked
   const handleSaveRomsDirectory = async (newValue: string) => {
     setRomsDirectory(newValue);
     // TODO: Response handling

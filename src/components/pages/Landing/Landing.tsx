@@ -15,17 +15,24 @@ interface Props {}
 const Landing: FunctionComponent<Props> = () => {
   const [view, setView] = useState<View>(View.allTables);
   const [tables, setTables] = useState<Array<Table>>([]);
-  const [config, setConfig] = useState<Config>({
-    vpxRootPath: 'C:/Games/VisualPinball',
-  });
+  const [config, setConfig] = useState<Config | null>(null);
+
+  const fetchTables = () => {
+    api.getAllTables().then(setTables);
+  };
 
   useEffect(() => {
-    api.getAllTables().then(setTables);
+    fetchTables();
+    api.getConfig().then(setConfig);
   }, []);
 
   const handleChangeView = (value: View) => {
     setView(value);
   };
+
+  if (!config) {
+    return null;
+  }
 
   const getView = () => {
     switch (view) {
@@ -37,6 +44,7 @@ const Landing: FunctionComponent<Props> = () => {
             librarySize={tables.length}
             title='All Tables'
             description='Manage your Visual Pinball library'
+            refetchTables={fetchTables}
           />
         );
       case View.favorites:
@@ -47,6 +55,7 @@ const Landing: FunctionComponent<Props> = () => {
             librarySize={tables.length}
             title='Favorites'
             description='Manage your favorite Visual Pinball tables'
+            refetchTables={fetchTables}
           />
         );
       case View.settings:
@@ -61,6 +70,7 @@ const Landing: FunctionComponent<Props> = () => {
         setView={handleChangeView}
         config={config}
         tables={tables}
+        refetchTables={fetchTables}
       />
       <div className={style.content}>{getView()}</div>
     </div>

@@ -15,7 +15,7 @@ var frontendApi = {
     directoryPath,
     acceptedExtensions
   ),
-  importTables: (tables) => invoke("api:importTables", tables).then(() => void 0),
+  importTables: (tables, deleteAfterImport) => invoke("api:importTables", tables, deleteAfterImport).then(() => void 0),
   getConfig: () => invoke("api:getConfig"),
   updateVpxRootPath: (path) => invoke("api:updateVpxRootPath", path).then(() => void 0),
   updateRomsDirectoryPath: (path) => invoke("api:updateRomsDirectoryPath", path).then(() => void 0),

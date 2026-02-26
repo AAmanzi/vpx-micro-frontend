@@ -16,6 +16,7 @@ interface Props {
   tables: Array<Table>;
   allTables?: Array<Table>;
   librarySize: number;
+  refetchTables: () => void;
 }
 
 const TablesView: FunctionComponent<Props> = ({
@@ -24,9 +25,15 @@ const TablesView: FunctionComponent<Props> = ({
   librarySize,
   title,
   description,
+  refetchTables,
 }) => {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [query, setQuery] = useState('');
+
+  const handleCloseImportModal = () => {
+    setIsImportModalOpen(false);
+    refetchTables();
+  };
 
   const getFilteredTables = () => {
     if (!query) {
@@ -162,7 +169,7 @@ const TablesView: FunctionComponent<Props> = ({
       </div>
       {isImportModalOpen && (
         <ImportTablesModal
-          onClose={() => setIsImportModalOpen(false)}
+          onClose={handleCloseImportModal}
           tables={allTables || tables}
         />
       )}

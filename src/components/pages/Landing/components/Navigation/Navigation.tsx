@@ -15,6 +15,7 @@ interface Props {
   setView: (view: View) => void;
   config: Config;
   tables: Array<Table>;
+  refetchTables: () => void;
 }
 
 const Navigation: FunctionComponent<Props> = ({
@@ -22,8 +23,14 @@ const Navigation: FunctionComponent<Props> = ({
   setView,
   config,
   tables,
+  refetchTables,
 }) => {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+
+  const handleCloseImportModal = () => {
+    setIsImportModalOpen(false);
+    refetchTables();
+  };
 
   return (
     <>
@@ -114,10 +121,7 @@ const Navigation: FunctionComponent<Props> = ({
         </div>
       </div>
       {isImportModalOpen && (
-        <ImportTablesModal
-          onClose={() => setIsImportModalOpen(false)}
-          tables={tables}
-        />
+        <ImportTablesModal onClose={handleCloseImportModal} tables={tables} />
       )}
     </>
   );

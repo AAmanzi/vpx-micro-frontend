@@ -1,9 +1,11 @@
+import { VPX_DEFAULT_ROM_PATH, VPX_DEFAULT_TABLES_PATH } from 'src/consts/vpx';
+
 export const getDefaultRomsDirectory = (vpxRootPath: string): string => {
-  return `${vpxRootPath}/VPinMAME/roms/`;
+  return `${vpxRootPath}/${VPX_DEFAULT_ROM_PATH}`;
 };
 
 export const getDefaultTablesDirectory = (vpxRootPath: string): string => {
-  return `${vpxRootPath}/Tables/`;
+  return `${vpxRootPath}/${VPX_DEFAULT_TABLES_PATH}`;
 };
 
 export const displayDateWithTime = (date: Date | number): string => {

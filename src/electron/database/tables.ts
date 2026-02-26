@@ -7,7 +7,7 @@ type StoreSchema = {
 };
 
 const store = new Store<StoreSchema>({
-  name: 'app-data',
+  name: 'app-tables',
   defaults: { tables: {} },
 });
 
@@ -49,6 +49,11 @@ export function setFavorite(id: string, fav: boolean): Table | null {
   tables[id] = existing;
   store.set('tables', tables);
   return existing;
+}
+
+export function get(id: string): Table | null {
+  const tables = store.get('tables') || {};
+  return tables[id] || null;
 }
 
 export function seed(items: Table[]) {

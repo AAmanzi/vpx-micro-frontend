@@ -24,6 +24,7 @@ const ImportTablesModal: FunctionComponent<Props> = ({ onClose, tables }) => {
   // TODO: From config
   const [deleteAfterImport, setDeleteAfterImport] = useState(false);
 
+  // TODO: Multifolder drop is not working well -- need to fix
   const handleFilesSelected = async (files: Array<FileSystemItem>) => {
     setIsLoading(true);
 
@@ -87,7 +88,7 @@ const ImportTablesModal: FunctionComponent<Props> = ({ onClose, tables }) => {
 
   const handleSubmit = async () => {
     // TODO: Response handling
-    await api.importTables(tablesToImport);
+    await api.importTables(tablesToImport, deleteAfterImport);
     onClose();
   };
 
