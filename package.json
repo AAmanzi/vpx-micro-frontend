@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "dev:electron": "npm run build:preload && nodemon",
-    "dev:next": "WEB_MODE=1 npm run build:preload && next dev",
+    "dev:next": "npm run build:preload && next dev",
     "dev:mock": "DEV_MOCK=1 npm run dev:electron",
     "dev": "yarn dev:mock",
     "build:preload": "esbuild src/electron/preload.ts --bundle --platform=node --external:electron --outfile=src/electron/preload.js --format=cjs",
