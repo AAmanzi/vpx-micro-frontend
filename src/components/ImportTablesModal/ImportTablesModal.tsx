@@ -3,7 +3,8 @@ import { FunctionComponent, useState } from 'react';
 
 import FileUpload from 'src/components/FileUpload';
 import Modal from 'src/components/Modal';
-import { FileSystemItem } from 'src/types/file';
+import api from 'src/consts';
+import { FileSystemItem, TableFile } from 'src/types/file';
 
 import Button, { Size as ButtonSize, Type as ButtonType } from '../Button';
 import CheckboxSwitch from '../CheckboxSwitch';
@@ -11,7 +12,7 @@ import Form from '../Form';
 import style from './ImportTablesModal.module.scss';
 import TableEntry from './components/TableEntry';
 import UnassignedRomEntry from './components/UnassignedRomEntry';
-import { Props, TableFile } from './types';
+import { Props } from './types';
 import { buildImportSelectionResult, filterExistingFiles } from './utils';
 
 const ImportTablesModal: FunctionComponent<Props> = ({ onClose, tables }) => {
@@ -84,8 +85,10 @@ const ImportTablesModal: FunctionComponent<Props> = ({ onClose, tables }) => {
     setDeleteAfterImport((prev) => !prev);
   };
 
-  const handleSubmit = () => {
-    // TODO: API
+  const handleSubmit = async () => {
+    // TODO: Response handling
+    await api.importTables(tablesToImport);
+    onClose();
   };
 
   return (

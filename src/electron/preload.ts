@@ -1,17 +1,20 @@
-import { contextBridge, ipcRenderer, webUtils } from 'electron'
-import type { FileSystemItem } from 'src/types/file'
-import type { Table } from 'src/types/table'
+import { contextBridge, ipcRenderer, webUtils } from 'electron';
 
-const invoke = <T>(channel: string, ...args: any[]): Promise<T> => ipcRenderer.invoke(channel, ...args)
+import type { Api } from 'src/types/api';
+import type { FileSystemItem } from 'src/types/file';
+import type { Table } from 'src/types/table';
 
-contextBridge.exposeInMainWorld('api', {
+const invoke = <T>(channel: string, ...args: any[]): Promise<T> =>
+  ipcRenderer.invoke(channel, ...args);
+
+const frontendApi: Api = {
   getAllTables: (): Promise<Table[]> => invoke<Table[]>('api:getAllTables'),
-  getTableById: (id: string): Promise<Table | null> => invoke<Table | null>('api:getTableById', id),
-  createTable: (item: Table): Promise<Table | null> => invoke<Table | null>('api:createTable', item),
-  updateTable: (id: string, item: Partial<Table>): Promise<Table | null> => invoke<Table | null>('api:updateTable', id, item),
-  deleteTable: (id: string): Promise<boolean> => invoke<boolean>('api:deleteTable', id),
-  setTableFavorite: (id: string, fav: boolean): Promise<Table | null> => invoke<Table | null>('api:setTableFavorite', id, fav),
-  ping: (): Promise<{ ok: true }> => invoke('api:ping'),
+  setTableFavorite: (id: string, fav: boolean): Promise<void> =>
+    invoke('api:setTableFavorite', id, fav).then(() => undefined),
+  deleteTable: (id: string): Promise<void> =>
+    invoke('api:deleteTable', id).then(() => undefined),
+  renameTable: (id: string, newName: string): Promise<void> =>
+    invoke('api:renameTable', id, newName).then(() => undefined),
   getExpectedRomName: (vpxFilePath: string): Promise<string | null> =>
     invoke<string | null>('api:getExpectedRomName', vpxFilePath),
   getPathForFile: (file: File): string => webUtils.getPathForFile(file),
@@ -24,4 +27,17 @@ contextBridge.exposeInMainWorld('api', {
       directoryPath,
       acceptedExtensions,
     ),
-})
+  importTables: (tables): Promise<void> =>
+    invoke('api:importTables', tables).then(() => undefined),
+  getConfig: () => invoke('api:getConfig'),
+  updateVpxRootPath: (path: string): Promise<void> =>
+    invoke('api:updateVpxRootPath', path).then(() => undefined),
+  updateRomsDirectoryPath: (path: string): Promise<void> =>
+    invoke('api:updateRomsDirectoryPath', path).then(() => undefined),
+  updateTablesDirectoryPath: (path: string): Promise<void> =>
+    invoke('api:updateTablesDirectoryPath', path).then(() => undefined),
+  startTable: (tableId: string): Promise<void> =>
+    invoke('api:startTable', tableId).then(() => undefined),
+};
+
+contextBridge.exposeInMainWorld('api', frontendApi);

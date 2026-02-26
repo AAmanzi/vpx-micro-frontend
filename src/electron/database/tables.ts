@@ -1,5 +1,4 @@
 import Store from 'electron-store';
-import { v4 as uuidv4 } from 'uuid';
 
 import type { Table } from 'src/types/table';
 
@@ -15,11 +14,6 @@ const store = new Store<StoreSchema>({
 export function getAll(): Table[] {
   const tables = store.get('tables') || {};
   return Object.values(tables).sort((a, b) => a.name.localeCompare(b.name));
-}
-
-export function getById(id: string): Table | null {
-  const tables = store.get('tables') || {};
-  return tables[id] ?? null;
 }
 
 export function create(item: Table): Table {
@@ -58,10 +52,10 @@ export function setFavorite(id: string, fav: boolean): Table | null {
 }
 
 export function seed(items: Table[]) {
-  const map: Record<string, Table> = {}
+  const map: Record<string, Table> = {};
   items.forEach((it) => {
-    map[it.id] = it
-  })
-  store.set('tables', map)
-  return Object.keys(map).length
+    map[it.id] = it;
+  });
+  store.set('tables', map);
+  return Object.keys(map).length;
 }

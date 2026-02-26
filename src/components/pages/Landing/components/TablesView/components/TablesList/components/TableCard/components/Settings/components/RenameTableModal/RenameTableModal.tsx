@@ -6,6 +6,7 @@ import Button, {
 } from 'src/components/Button';
 import Input from 'src/components/Input';
 import Modal, { Size as ModalSize } from 'src/components/Modal';
+import api from 'src/consts';
 
 import style from './RenameTableModal.module.scss';
 
@@ -22,8 +23,10 @@ const RenameTableModal: FunctionComponent<Props> = ({
 }) => {
   const [name, setName] = useState(nameFromProps);
 
-  const handleSave = () => {
-    // TODO: API
+  const handleSave = async () => {
+    // TODO: Response handling
+    await api.renameTable(id, name);
+    close();
   };
 
   return (

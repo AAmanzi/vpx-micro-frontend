@@ -1,27 +1,60 @@
-import type { Table } from 'src/types/table'
+import { v4 as uuidv4 } from 'uuid';
 
-import * as db from '../db'
+import type { TableFile } from 'src/types/file';
+import type { Table } from 'src/types/table';
+
+import * as tablesDb from '../database/tables';
 
 export function getAllTables(): Table[] {
-  return db.getAll()
+  return tablesDb.getAll();
 }
 
-export function getTableById(id: string): Table | null {
-  return db.getById(id)
+export function setTableFavorite(id: string, fav: boolean): void {
+  tablesDb.setFavorite(id, fav);
 }
 
-export function createTable(item: Table): Table | null {
-  return db.create(item)
+export function deleteTable(id: string): void {
+  tablesDb.remove(id);
 }
 
-export function updateTable(id: string, item: Partial<Table>): Table | null {
-  return db.update(id, item)
+export function renameTable(id: string, newName: string): void {
+  tablesDb.update(id, { name: newName });
 }
 
-export function deleteTable(id: string): boolean {
-  return db.remove(id)
+export function importTables(tables: Array<TableFile>): void {
+  const existingVpxPaths = new Set(
+    tablesDb
+      .getAll()
+      .map((table) =>
+        table.vpxFilePath.trim().toLowerCase().replace(/\\/g, '/'),
+      ),
+  );
+
+  tables.forEach((table) => {
+    const normalizedPath = table.filePath
+      .trim()
+      .toLowerCase()
+      .replace(/\\/g, '/');
+
+    if (existingVpxPaths.has(normalizedPath)) {
+      return;
+    }
+
+    const nextTable: Table = {
+      id: uuidv4(),
+      name: table.name,
+      vpxFile: table.fileName,
+      romFile: table.rom?.name,
+      isFavorite: false,
+      vpxFilePath: table.filePath,
+      romFilePath: table.rom?.path,
+    };
+
+    tablesDb.create(nextTable);
+    existingVpxPaths.add(normalizedPath);
+  });
 }
 
-export function setTableFavorite(id: string, fav: boolean): Table | null {
-  return db.setFavorite(id, fav)
+export function startTable(tableId: string): void {
+  // TODO
 }

@@ -4,8 +4,10 @@ import fs from 'fs';
 import http from 'http';
 import path from 'path';
 
+import type { TableFile } from 'src/types/file';
+
 import * as api from './api';
-import * as db from './db';
+import * as db from './database/tables';
 
 const NEXT_PORT = process.env.NEXT_PORT || 3000;
 let nextProcess: any = null;
@@ -84,18 +86,18 @@ app.whenReady().then(async () => {
     }
   }
 
-  // register IPC handlers that call the api layer (named with 'table(s)')
+  // register IPC handlers that call the api layer
   ipcMain.handle('api:getAllTables', async () => api.getAllTables());
-  ipcMain.handle('api:getTableById', async (_, id: string) => api.getTableById(id));
-  ipcMain.handle('api:createTable', async (_, item) => api.createTable(item));
-  ipcMain.handle('api:updateTable', async (_, id: string, item) =>
-    api.updateTable(id, item),
-  );
   ipcMain.handle('api:deleteTable', async (_, id: string) => api.deleteTable(id));
   ipcMain.handle('api:setTableFavorite', async (_, id: string, fav: boolean) =>
     api.setTableFavorite(id, fav),
   );
-  ipcMain.handle('api:ping', async () => api.ping());
+  ipcMain.handle('api:renameTable', async (_, id: string, newName: string) =>
+    api.renameTable(id, newName),
+  );
+  ipcMain.handle('api:importTables', async (_, tables: Array<TableFile>) =>
+    api.importTables(tables),
+  );
   ipcMain.handle('api:getExpectedRomName', async (_, vpxFilePath: string) =>
     api.getExpectedRomName(vpxFilePath),
   );
@@ -103,6 +105,19 @@ app.whenReady().then(async () => {
     'api:getDirectoryTree',
     async (_, directoryPath: string, acceptedExtensions: string[]) =>
       api.getDirectoryTree(directoryPath, acceptedExtensions),
+  );
+  ipcMain.handle('api:getConfig', async () => api.getConfig());
+  ipcMain.handle('api:updateVpxRootPath', async (_, path: string) =>
+    api.updateVpxRootPath(path),
+  );
+  ipcMain.handle('api:updateRomsDirectoryPath', async (_, path: string) =>
+    api.updateRomsDirectoryPath(path),
+  );
+  ipcMain.handle('api:updateTablesDirectoryPath', async (_, path: string) =>
+    api.updateTablesDirectoryPath(path),
+  );
+  ipcMain.handle('api:startTable', async (_, tableId: string) =>
+    api.startTable(tableId),
   );
 
   createWindow();

@@ -5,6 +5,7 @@ import Button, {
   Type as ButtonType,
 } from 'src/components/Button';
 import Modal, { Size as ModalSize } from 'src/components/Modal';
+import api from 'src/consts';
 
 import style from './DeleteTableModal.module.scss';
 
@@ -16,12 +17,15 @@ interface Props {
 }
 
 const DeleteTableModal: FunctionComponent<Props> = ({
+  id,
   romFile,
   vpxFile,
   close,
 }) => {
-  const handleDelete = () => {
-    // TODO: API
+  const handleDelete = async () => {
+    // TODO: Response handling
+    await api.deleteTable(id);
+    close();
   };
 
   return (

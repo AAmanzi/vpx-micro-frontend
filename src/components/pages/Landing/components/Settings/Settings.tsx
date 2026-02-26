@@ -4,6 +4,7 @@ import { FunctionComponent, useState } from 'react';
 import Button from 'src/components/Button';
 import Icon from 'src/components/Icon';
 import Input from 'src/components/Input';
+import api from 'src/consts';
 import { Config } from 'src/types/config';
 import { getDefaultRomsDirectory, getDefaultTablesDirectory } from 'src/utils';
 
@@ -26,18 +27,21 @@ const Settings: FunctionComponent<Props> = ({ config }) => {
   const defaultRomsDirectory = getDefaultRomsDirectory(vpxRootPath);
   const defaultTablesDirectory = getDefaultTablesDirectory(vpxRootPath);
 
-  const handleUpdateVpxRootPath = () => {
-    // TODO: API
+  const handleUpdateVpxRootPath = async () => {
+    // TODO: Response handling
+    await api.updateVpxRootPath(vpxRootPath);
   };
 
-  const handleSaveRomsDirectory = (newValue: string) => {
+  const handleSaveRomsDirectory = async (newValue: string) => {
     setRomsDirectory(newValue);
-    // TODO: API
+    // TODO: Response handling
+    api.updateRomsDirectoryPath(newValue);
   };
 
-  const handleSaveTablesDirectory = (newValue: string) => {
+  const handleSaveTablesDirectory = async (newValue: string) => {
     setTablesDirectory(newValue);
-    // TODO: API
+    // TODO: Response handling
+    await api.updateTablesDirectoryPath(newValue);
   };
 
   return (

@@ -20,7 +20,7 @@ const Landing: FunctionComponent<Props> = () => {
   });
 
   useEffect(() => {
-    api?.getAllTables().then(setTables);
+    api.getAllTables().then(setTables);
   }, []);
 
   const handleChangeView = (value: View) => {

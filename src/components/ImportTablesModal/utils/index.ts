@@ -1,8 +1,8 @@
 import { api } from 'src/consts';
-import { FileSystemItem } from 'src/types/file';
+import { FileSystemItem, TableFile } from 'src/types/file';
 import { Table } from 'src/types/table';
 
-import { ImportSelectionResult, TableFile } from '../types';
+import { ImportSelectionResult } from '../types';
 import { applyExpectedRoms } from './rules';
 
 const isVpxFile = (file: FileSystemItem): boolean =>

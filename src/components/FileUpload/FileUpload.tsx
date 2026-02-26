@@ -18,9 +18,9 @@ const FileUpload: FunctionComponent<Props> = ({
 }) => {
   const [dragActive, setDragActive] = useState(false);
 
-  const getPathForFile = async (file: File): Promise<string | null> => {
+  const getPathForFile = (file: File): string | null => {
     try {
-      const path = await api.getPathForFile(file);
+      const path = api.getPathForFile(file);
       if (typeof path === 'string' && path) {
         return path;
       }

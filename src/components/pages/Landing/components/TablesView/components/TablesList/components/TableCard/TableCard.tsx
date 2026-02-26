@@ -3,6 +3,7 @@ import { FunctionComponent, useState } from 'react';
 
 import Button from 'src/components/Button';
 import Icon from 'src/components/Icon';
+import api from 'src/consts';
 import { Table } from 'src/types/table';
 import { displayDateWithTime } from 'src/utils';
 
@@ -23,12 +24,19 @@ const TableCard: FunctionComponent<Props> = ({
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const handlePlay = () => {
-    // TODO: API
+    // TODO: Response handling
+    api.startTable(id);
   };
 
   const handleToggleFavorite = () => {
-    // TODO: API
-    setFavorite((prev) => !prev);
+    // TODO: Response handling
+    setFavorite((prev) => {
+      const newFav = !prev;
+
+      api.setTableFavorite(id, newFav);
+
+      return newFav;
+    });
   };
 
   const openSettings = () => {
