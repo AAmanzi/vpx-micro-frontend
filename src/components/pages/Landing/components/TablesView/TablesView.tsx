@@ -14,11 +14,13 @@ interface Props {
   title: string;
   description: string;
   tables: Array<Table>;
+  allTables?: Array<Table>;
   librarySize: number;
 }
 
 const TablesView: FunctionComponent<Props> = ({
   tables,
+  allTables,
   librarySize,
   title,
   description,
@@ -159,7 +161,10 @@ const TablesView: FunctionComponent<Props> = ({
         </div>
       </div>
       {isImportModalOpen && (
-        <ImportTablesModal onClose={() => setIsImportModalOpen(false)} />
+        <ImportTablesModal
+          onClose={() => setIsImportModalOpen(false)}
+          tables={allTables || tables}
+        />
       )}
     </>
   );

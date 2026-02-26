@@ -5,6 +5,7 @@ import Button, { Size as ButtonSize } from 'src/components/Button';
 import Icon from 'src/components/Icon';
 import ImportTablesModal from 'src/components/ImportTablesModal';
 import { Config } from 'src/types/config';
+import { Table } from 'src/types/table';
 
 import { View } from '../../types';
 import style from './Navigation.module.scss';
@@ -13,9 +14,15 @@ interface Props {
   view: View;
   setView: (view: View) => void;
   config: Config;
+  tables: Array<Table>;
 }
 
-const Navigation: FunctionComponent<Props> = ({ view, setView, config }) => {
+const Navigation: FunctionComponent<Props> = ({
+  view,
+  setView,
+  config,
+  tables,
+}) => {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   return (
@@ -107,7 +114,10 @@ const Navigation: FunctionComponent<Props> = ({ view, setView, config }) => {
         </div>
       </div>
       {isImportModalOpen && (
-        <ImportTablesModal onClose={() => setIsImportModalOpen(false)} />
+        <ImportTablesModal
+          onClose={() => setIsImportModalOpen(false)}
+          tables={tables}
+        />
       )}
     </>
   );

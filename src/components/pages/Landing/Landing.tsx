@@ -33,6 +33,7 @@ const Landing: FunctionComponent<Props> = () => {
         return (
           <TablesView
             tables={tables}
+            allTables={tables}
             librarySize={tables.length}
             title='All Tables'
             description='Manage your Visual Pinball library'
@@ -42,6 +43,7 @@ const Landing: FunctionComponent<Props> = () => {
         return (
           <TablesView
             tables={tables.filter((table) => table.isFavorite)}
+            allTables={tables}
             librarySize={tables.length}
             title='Favorites'
             description='Manage your favorite Visual Pinball tables'
@@ -54,7 +56,12 @@ const Landing: FunctionComponent<Props> = () => {
 
   return (
     <div className={style.container}>
-      <Navigation view={view} setView={handleChangeView} config={config} />
+      <Navigation
+        view={view}
+        setView={handleChangeView}
+        config={config}
+        tables={tables}
+      />
       <div className={style.content}>{getView()}</div>
     </div>
   );

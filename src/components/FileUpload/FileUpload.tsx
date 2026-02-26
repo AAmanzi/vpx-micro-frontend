@@ -4,6 +4,7 @@ import { FunctionComponent, useState } from 'react';
 import { api } from 'src/consts';
 import { FileSystemItem } from 'src/types/file';
 
+import Spinner from '../Spinner';
 import style from './FileUpload.module.scss';
 import { Props } from './types';
 
@@ -12,6 +13,7 @@ const FileUpload: FunctionComponent<Props> = ({
   description,
   acceptedExtensions,
   acceptFolders = true,
+  loading = false,
   onFilesSelected,
 }) => {
   const [dragActive, setDragActive] = useState(false);
@@ -62,6 +64,8 @@ const FileUpload: FunctionComponent<Props> = ({
     e.preventDefault();
     e.stopPropagation();
 
+    if (loading) return;
+
     if (e.type === 'dragenter' || e.type === 'dragover') {
       setDragActive(true);
     } else if (e.type === 'dragleave') {
@@ -72,6 +76,9 @@ const FileUpload: FunctionComponent<Props> = ({
   const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (loading) return;
+
     setDragActive(false);
 
     const files = e.dataTransfer.files;
@@ -113,14 +120,21 @@ const FileUpload: FunctionComponent<Props> = ({
     <div className={style.container}>
       <div
         className={classNames(style.dropZone, {
-          [style.dragActive]: dragActive,
+          [style.dragActive]: dragActive && !loading,
+          [style.loading]: loading,
         })}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
         onDrop={handleDrop}>
-        <div className={style.label}>{label}</div>
-        <div className={style.description}>{description}</div>
+        {!loading ? (
+          <>
+            <div className={style.label}>{label}</div>
+            <div className={style.description}>{description}</div>
+          </>
+        ) : (
+          <Spinner />
+        )}
       </div>
     </div>
   );

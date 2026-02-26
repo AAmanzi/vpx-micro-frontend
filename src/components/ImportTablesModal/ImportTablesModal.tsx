@@ -12,9 +12,10 @@ import style from './ImportTablesModal.module.scss';
 import TableEntry from './components/TableEntry';
 import UnassignedRomEntry from './components/UnassignedRomEntry';
 import { Props, TableFile } from './types';
-import { buildImportSelectionResult } from './utils';
+import { buildImportSelectionResult, filterExistingFiles } from './utils';
 
-const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
+const ImportTablesModal: FunctionComponent<Props> = ({ onClose, tables }) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [tablesToImport, setTablesToImport] = useState<Array<TableFile>>([]);
   const [unassignedRoms, setUnassignedRoms] = useState<Array<FileSystemItem>>(
     [],
@@ -23,14 +24,22 @@ const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
   const [deleteAfterImport, setDeleteAfterImport] = useState(false);
 
   const handleFilesSelected = async (files: Array<FileSystemItem>) => {
-    const result = await buildImportSelectionResult({
-      currentTables: tablesToImport,
-      currentUnassignedRoms: unassignedRoms,
-      incomingFiles: files,
-    });
+    setIsLoading(true);
 
-    setTablesToImport(result.tablesToImport);
-    setUnassignedRoms(result.unassignedRoms);
+    const filteredFiles = filterExistingFiles({ tables, files });
+
+    try {
+      const result = await buildImportSelectionResult({
+        currentTables: tablesToImport,
+        currentUnassignedRoms: unassignedRoms,
+        incomingFiles: filteredFiles,
+      });
+
+      setTablesToImport(result.tablesToImport);
+      setUnassignedRoms(result.unassignedRoms);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleRemoveRomFile = (rom: FileSystemItem) => {
@@ -92,6 +101,7 @@ const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
             acceptedExtensions={['.vpx', '.zip']}
             acceptFolders
             onFilesSelected={handleFilesSelected}
+            loading={isLoading}
           />
           {tablesToImport.length > 0 && (
             <div className={style.section}>

@@ -1,5 +1,6 @@
 import { api } from 'src/consts';
 import { FileSystemItem } from 'src/types/file';
+import { Table } from 'src/types/table';
 
 import { ImportSelectionResult, TableFile } from '../types';
 import { applyExpectedRoms } from './rules';
@@ -57,4 +58,42 @@ export const buildImportSelectionResult = async ({
   const nextUnassignedRoms = [...currentUnassignedRoms, ...newRoms];
 
   return applyExpectedRoms(nextTables, nextUnassignedRoms);
+};
+
+export const filterExistingFiles = ({
+  tables,
+  files,
+}: {
+  tables: Array<Table>;
+  files: Array<FileSystemItem>;
+}): Array<FileSystemItem> => {
+  const getFileName = (value: string): string =>
+    value.split(/[/\\]/).pop() || value;
+
+  const normalizeName = (value: string): string =>
+    getFileName(value).trim().toLowerCase();
+
+  const existingVpxFiles = new Set(
+    tables.map((table) => normalizeName(table.vpxFile)),
+  );
+  const existingRomFiles = new Set(
+    tables
+      .map((table) => table.romFile)
+      .filter((romFile): romFile is string => Boolean(romFile))
+      .map(normalizeName),
+  );
+
+  return files.filter((file) => {
+    const incomingName = normalizeName(file.name);
+
+    if (isVpxFile(file)) {
+      return !existingVpxFiles.has(incomingName);
+    }
+
+    if (isRomFile(file)) {
+      return !existingRomFiles.has(incomingName);
+    }
+
+    return true;
+  });
 };

@@ -1,4 +1,5 @@
 import { FileSystemItem } from 'src/types/file';
+import { Table } from 'src/types/table';
 
 export interface ImportSelectionResult {
   tablesToImport: Array<TableFile>;
@@ -15,4 +16,5 @@ export interface TableFile {
 
 export interface Props {
   onClose: () => void;
+  tables: Array<Table>;
 }

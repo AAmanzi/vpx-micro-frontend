@@ -8,6 +8,8 @@ export const Tables: Table[] = [
     romFile: 'mm_109c.rom',
     isFavorite: true,
     lastPlayed: Date.now() - 1000 * 60 * 60 * 24,
+    vpxFilePath: 'C:\\VisualPinball\\Tables\\medieval madness v600.vpx',
+    romFilePath: 'C:\\VisualPinball\\Roms\\mm_109c.rom',
   },
   {
     id: 'table-2',
@@ -16,6 +18,8 @@ export const Tables: Table[] = [
     romFile: 'taf_l7.rom',
     isFavorite: false,
     lastPlayed: Date.now() - 1000 * 60 * 60 * 24,
+    vpxFilePath: 'C:\\VisualPinball\\Tables\\addams family v600.vpx',
+    romFilePath: 'C:\\VisualPinball\\Roms\\taf_l7.rom',
   },
   {
     id: 'table-3',
@@ -23,12 +27,15 @@ export const Tables: Table[] = [
     vpxFile: 'monster bash v600.vpx',
     romFile: 'mb_106.rom',
     isFavorite: false,
+    vpxFilePath: 'C:\\VisualPinball\\Tables\\monster bash v600.vpx',
+    romFilePath: 'C:\\VisualPinball\\Roms\\mb_106.rom',
   },
   {
     id: 'table-4',
     name: 'Space Cadet',
     vpxFile: 'space cadet v600.vpx',
     isFavorite: false,
+    vpxFilePath: 'C:\\VisualPinball\\Tables\\space cadet v600.vpx',
   },
 ];
 

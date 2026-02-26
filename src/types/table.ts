@@ -5,4 +5,6 @@ export interface Table {
   romFile?: string;
   isFavorite: boolean;
   lastPlayed?: number;
+  vpxFilePath: string;
+  romFilePath?: string;
 }
