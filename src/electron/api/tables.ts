@@ -7,7 +7,7 @@ import type { Table } from 'src/types/table';
 
 import * as configDb from '../database/config';
 import * as tablesDb from '../database/tables';
-import { copyFile, moveFile } from '../utils/fileManagement';
+import { copyFile, deleteFile, moveFile } from '../utils/fileManagement';
 import { startVpxTable } from '../utils/startVpxTable';
 
 export function getAllTables(): Table[] {
@@ -19,9 +19,19 @@ export function setTableFavorite(id: string, fav: boolean): void {
 }
 
 export function deleteTable(id: string): void {
+  const table = tablesDb.get(id);
+
+  if (!table) {
+    return;
+  }
+
   tablesDb.remove(id);
 
-  // TODO: delete files
+  deleteFile(table.vpxFilePath);
+
+  if (table.romFilePath) {
+    deleteFile(table.romFilePath);
+  }
 }
 
 export function renameTable(id: string, newName: string): void {

@@ -49,3 +49,23 @@ export const moveFile = (sourcePath: string, destinationPath: string): void => {
     fs.unlinkSync(resolvedSourcePath);
   }
 };
+
+export const deleteFile = (sourcePath: string): void => {
+  const resolvedSourcePath = resolveUserPath(sourcePath);
+
+  try {
+    const stat = fs.statSync(resolvedSourcePath);
+
+    if (!stat.isFile()) {
+      throw new Error(`Source path is not a file: ${resolvedSourcePath}`);
+    }
+
+    fs.unlinkSync(resolvedSourcePath);
+  } catch (error: any) {
+    if (error?.code === 'ENOENT') {
+      return;
+    }
+
+    throw error;
+  }
+};
