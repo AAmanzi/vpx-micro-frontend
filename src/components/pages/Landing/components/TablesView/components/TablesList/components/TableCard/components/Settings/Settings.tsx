@@ -1,13 +1,8 @@
 import classNames from 'classnames';
-import {
-  FunctionComponent,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { FunctionComponent, use, useRef, useState } from 'react';
 
 import Icon from 'src/components/Icon';
+import { useTablesContext } from 'src/providers/tables';
 import useClickOutside from 'src/utils/useClickOutside';
 
 import style from './Settings.module.scss';
@@ -32,8 +27,22 @@ const Settings: FunctionComponent<Props> = ({
   const ref = useRef<HTMLDivElement | null>(null);
   useClickOutside(ref, close, { ignoreSelector: '#modal' });
 
+  const { fetchTables } = useTablesContext();
+
   const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const closeRenameModal = () => {
+    setIsRenameModalOpen(false);
+    fetchTables();
+    close();
+  };
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    fetchTables();
+    close();
+  };
 
   return (
     <div ref={ref} className={style.container}>
@@ -58,18 +67,14 @@ const Settings: FunctionComponent<Props> = ({
         </span>
       </button>
       {isRenameModalOpen && (
-        <RenameTableModal
-          id={id}
-          name={name}
-          close={() => setIsRenameModalOpen(false)}
-        />
+        <RenameTableModal id={id} name={name} close={closeRenameModal} />
       )}
       {isDeleteModalOpen && (
         <DeleteTableModal
           id={id}
           vpxFile={vpxFile}
           romFile={romFile}
-          close={() => setIsDeleteModalOpen(false)}
+          close={closeDeleteModal}
         />
       )}
     </div>

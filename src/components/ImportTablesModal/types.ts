@@ -8,5 +8,4 @@ export interface ImportSelectionResult {
 
 export interface Props {
   onClose: () => void;
-  tables: Array<Table>;
 }

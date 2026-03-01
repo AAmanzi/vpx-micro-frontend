@@ -20,6 +20,9 @@ var frontendApi = {
   updateVpxRootPath: (path) => invoke("api:updateVpxRootPath", path).then(() => void 0),
   updateRomsDirectoryPath: (path) => invoke("api:updateRomsDirectoryPath", path).then(() => void 0),
   updateTablesDirectoryPath: (path) => invoke("api:updateTablesDirectoryPath", path).then(() => void 0),
+  updateDeleteFilesAfterImport: (deleteAfterImport) => invoke("api:updateDeleteFilesAfterImport", deleteAfterImport).then(
+    () => void 0
+  ),
   startTable: (tableId) => invoke("api:startTable", tableId).then(() => void 0)
 };
 import_electron.contextBridge.exposeInMainWorld("api", frontendApi);

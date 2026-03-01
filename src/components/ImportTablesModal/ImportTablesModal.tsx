@@ -1,9 +1,11 @@
 import classNames from 'classnames';
-import { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useEffect, useState } from 'react';
 
 import FileUpload from 'src/components/FileUpload';
 import Modal from 'src/components/Modal';
 import api from 'src/consts';
+import { useConfigContext } from 'src/providers/config';
+import { useTablesContext } from 'src/providers/tables';
 import { FileSystemItem, TableFile } from 'src/types/file';
 
 import Button, { Size as ButtonSize, Type as ButtonType } from '../Button';
@@ -15,14 +17,22 @@ import UnassignedRomEntry from './components/UnassignedRomEntry';
 import { Props } from './types';
 import { buildImportSelectionResult, filterExistingFiles } from './utils';
 
-const ImportTablesModal: FunctionComponent<Props> = ({ onClose, tables }) => {
+const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
+  const { tables } = useTablesContext();
+  const { config, fetchConfig } = useConfigContext();
+
   const [isLoading, setIsLoading] = useState(false);
   const [tablesToImport, setTablesToImport] = useState<Array<TableFile>>([]);
   const [unassignedRoms, setUnassignedRoms] = useState<Array<FileSystemItem>>(
     [],
   );
-  // TODO: From config
   const [deleteAfterImport, setDeleteAfterImport] = useState(false);
+
+  useEffect(() => {
+    if (config) {
+      setDeleteAfterImport(config.deleteFilesAfterImport);
+    }
+  }, [config]);
 
   // TODO: Multifolder drop is not working well -- need to fix
   const handleFilesSelected = async (files: Array<FileSystemItem>) => {
@@ -89,6 +99,9 @@ const ImportTablesModal: FunctionComponent<Props> = ({ onClose, tables }) => {
   const handleSubmit = async () => {
     // TODO: Response handling
     await api.importTables(tablesToImport, deleteAfterImport);
+    await api.updateDeleteFilesAfterImport(deleteAfterImport);
+    fetchConfig();
+
     onClose();
   };
 

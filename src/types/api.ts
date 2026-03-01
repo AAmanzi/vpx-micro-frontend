@@ -27,6 +27,7 @@ export interface Api {
   updateVpxRootPath: (path: string) => Promise<void>;
   updateRomsDirectoryPath: (path: string) => Promise<void>;
   updateTablesDirectoryPath: (path: string) => Promise<void>;
+  updateDeleteFilesAfterImport: (deleteAfterImport: boolean) => Promise<void>;
 }
 
 declare global {

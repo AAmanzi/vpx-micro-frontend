@@ -13,6 +13,7 @@ const store = new Store<ConfigStoreSchema>({
   defaults: {
     config: {
       vpxRootPath: VPX_DEFAULT_ROOT_PATH,
+      deleteFilesAfterImport: false,
       romsDirectory: '',
       tablesDirectory: '',
     },
@@ -63,5 +64,12 @@ export function updateTablesDirectoryPath(path: string): void {
   store.set('config', {
     ...getStoredConfig(),
     tablesDirectory: path,
+  });
+}
+
+export function updateDeleteFilesAfterImport(deleteAfterImport: boolean): void {
+  store.set('config', {
+    ...getStoredConfig(),
+    deleteFilesAfterImport: deleteAfterImport,
   });
 }

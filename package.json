@@ -1,5 +1,5 @@
 {
-  "name": "visual-pinball-micro-frontend",
+  "name": "vpx-micro-frontend",
   "version": "1.0.0",
   "main": "main.js",
   "repository": "git@github.com:AAmanzi/visual-pinball-micro-frontend.git",
@@ -8,11 +8,12 @@
     "dev:electron": "npm run build:preload && nodemon",
     "dev:next": "npm run build:preload && next dev",
     "dev:mock": "DEV_MOCK=1 npm run dev:electron",
-    "dev": "yarn dev:mock",
+    "dev": "yarn dev:electron",
     "build:preload": "esbuild src/electron/preload.ts --bundle --platform=node --external:electron --outfile=src/electron/preload.js --format=cjs",
     "build:next": "next build",
     "start:next": "next start",
-    "vpx:cgamename": "node scripts/vpx-cgamename.js"
+    "vpx:cgamename": "node scripts/vpx-cgamename.js",
+    "db:reset": "electron scripts/reset-db.js"
   },
   "dependencies": {
     "cfb": "^1.2.2",

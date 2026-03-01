@@ -5,24 +5,22 @@ import Button from 'src/components/Button';
 import Icon from 'src/components/Icon';
 import Input from 'src/components/Input';
 import api from 'src/consts';
-import { Config } from 'src/types/config';
+import { useConfigContext } from 'src/providers/config';
 import { getDefaultRomsDirectory, getDefaultTablesDirectory } from 'src/utils';
 
 import style from './Settings.module.scss';
 import LockedSetting from './components/LockedSetting';
 
-interface Props {
-  config: Config;
-}
+const Settings: FunctionComponent = () => {
+  const { config, fetchConfig } = useConfigContext();
 
-const Settings: FunctionComponent<Props> = ({ config }) => {
-  const [vpxRootPath, setVpxRootPath] = useState(config.vpxRootPath);
-  const [romsDirectory, setRomsDirectory] = useState(
-    config.romsDirectory || '',
-  );
-  const [tablesDirectory, setTablesDirectory] = useState(
-    config.tablesDirectory || '',
-  );
+  const [_vpxRootPath, setVpxRootPath] = useState('');
+  const [_romsDirectory, setRomsDirectory] = useState('');
+  const [_tablesDirectory, setTablesDirectory] = useState('');
+
+  const vpxRootPath = _vpxRootPath || config?.vpxRootPath || '';
+  const romsDirectory = _romsDirectory || config?.romsDirectory || '';
+  const tablesDirectory = _tablesDirectory || config?.tablesDirectory || '';
 
   const defaultRomsDirectory = getDefaultRomsDirectory(vpxRootPath);
   const defaultTablesDirectory = getDefaultTablesDirectory(vpxRootPath);
@@ -30,19 +28,22 @@ const Settings: FunctionComponent<Props> = ({ config }) => {
   const handleUpdateVpxRootPath = async () => {
     // TODO: Response handling
     await api.updateVpxRootPath(vpxRootPath);
+    fetchConfig();
   };
 
   // TODO: not good when resetting to default, treating defaults as unlocked
   const handleSaveRomsDirectory = async (newValue: string) => {
     setRomsDirectory(newValue);
     // TODO: Response handling
-    api.updateRomsDirectoryPath(newValue);
+    await api.updateRomsDirectoryPath(newValue);
+    fetchConfig();
   };
 
   const handleSaveTablesDirectory = async (newValue: string) => {
     setTablesDirectory(newValue);
     // TODO: Response handling
     await api.updateTablesDirectoryPath(newValue);
+    fetchConfig();
   };
 
   return (
@@ -81,6 +82,7 @@ const Settings: FunctionComponent<Props> = ({ config }) => {
               label='VPX Root Directory'
               value={vpxRootPath}
               onChange={setVpxRootPath}
+              onBlur={handleUpdateVpxRootPath}
             />
             <div
               className={classNames(

@@ -36,6 +36,10 @@ const frontendApi: Api = {
     invoke('api:updateRomsDirectoryPath', path).then(() => undefined),
   updateTablesDirectoryPath: (path: string): Promise<void> =>
     invoke('api:updateTablesDirectoryPath', path).then(() => undefined),
+  updateDeleteFilesAfterImport: (deleteAfterImport: boolean): Promise<void> =>
+    invoke('api:updateDeleteFilesAfterImport', deleteAfterImport).then(
+      () => undefined,
+    ),
   startTable: (tableId: string): Promise<void> =>
     invoke('api:startTable', tableId).then(() => undefined),
 };

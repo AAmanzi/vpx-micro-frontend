@@ -17,3 +17,7 @@ export function updateRomsDirectoryPath(path: string): void {
 export function updateTablesDirectoryPath(path: string): void {
   configDb.updateTablesDirectoryPath(path);
 }
+
+export function updateDeleteFilesAfterImport(deleteAfterImport: boolean): void {
+  configDb.updateDeleteFilesAfterImport(deleteAfterImport);
+}

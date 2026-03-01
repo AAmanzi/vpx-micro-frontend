@@ -77,7 +77,7 @@ app.whenReady().then(async () => {
   if (process.env.DEV_MOCK) {
     try {
       // dynamic import so mock is only loaded in dev when requested
-      const mock = await import('./mock');
+      const mock = await import('./database/mock');
       const items = mock.Tables || mock.default || [];
       const count = db.seed(items);
       console.log(`Seeded ${count} mock tables`);
@@ -119,6 +119,11 @@ app.whenReady().then(async () => {
   );
   ipcMain.handle('api:updateTablesDirectoryPath', async (_, path: string) =>
     api.updateTablesDirectoryPath(path),
+  );
+  ipcMain.handle(
+    'api:updateDeleteFilesAfterImport',
+    async (_, deleteAfterImport: boolean) =>
+      api.updateDeleteFilesAfterImport(deleteAfterImport),
   );
   ipcMain.handle('api:startTable', async (_, tableId: string) =>
     api.startTable(tableId),

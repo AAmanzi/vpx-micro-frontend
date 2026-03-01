@@ -5,6 +5,7 @@ import Button, { Type as ButtonType } from 'src/components/Button';
 import Icon from 'src/components/Icon';
 import ImportTablesModal from 'src/components/ImportTablesModal';
 import Input from 'src/components/Input';
+import { useTablesContext } from 'src/providers/tables';
 import { Table } from 'src/types/table';
 
 import style from './TablesView.module.scss';
@@ -14,25 +15,23 @@ interface Props {
   title: string;
   description: string;
   tables: Array<Table>;
-  allTables?: Array<Table>;
   librarySize: number;
-  refetchTables: () => void;
 }
 
 const TablesView: FunctionComponent<Props> = ({
   tables,
-  allTables,
   librarySize,
   title,
   description,
-  refetchTables,
 }) => {
+  const { fetchTables } = useTablesContext();
+
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [query, setQuery] = useState('');
 
   const handleCloseImportModal = () => {
     setIsImportModalOpen(false);
-    refetchTables();
+    fetchTables();
   };
 
   const getFilteredTables = () => {
@@ -168,10 +167,7 @@ const TablesView: FunctionComponent<Props> = ({
         </div>
       </div>
       {isImportModalOpen && (
-        <ImportTablesModal
-          onClose={handleCloseImportModal}
-          tables={allTables || tables}
-        />
+        <ImportTablesModal onClose={handleCloseImportModal} />
       )}
     </>
   );

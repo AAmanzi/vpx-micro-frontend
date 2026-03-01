@@ -4,8 +4,8 @@ import { FunctionComponent, useState } from 'react';
 import Button, { Size as ButtonSize } from 'src/components/Button';
 import Icon from 'src/components/Icon';
 import ImportTablesModal from 'src/components/ImportTablesModal';
-import { Config } from 'src/types/config';
-import { Table } from 'src/types/table';
+import { useConfigContext } from 'src/providers/config';
+import { useTablesContext } from 'src/providers/tables';
 
 import { View } from '../../types';
 import style from './Navigation.module.scss';
@@ -13,23 +13,17 @@ import style from './Navigation.module.scss';
 interface Props {
   view: View;
   setView: (view: View) => void;
-  config: Config;
-  tables: Array<Table>;
-  refetchTables: () => void;
 }
 
-const Navigation: FunctionComponent<Props> = ({
-  view,
-  setView,
-  config,
-  tables,
-  refetchTables,
-}) => {
+const Navigation: FunctionComponent<Props> = ({ view, setView }) => {
+  const { fetchTables } = useTablesContext();
+  const { config } = useConfigContext();
+
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   const handleCloseImportModal = () => {
     setIsImportModalOpen(false);
-    refetchTables();
+    fetchTables();
   };
 
   return (
@@ -116,12 +110,12 @@ const Navigation: FunctionComponent<Props> = ({
             </span>
           </div>
           <span className='caption-small-semibold secondary-text-color'>
-            {config.vpxRootPath}
+            {config?.vpxRootPath}
           </span>
         </div>
       </div>
       {isImportModalOpen && (
-        <ImportTablesModal onClose={handleCloseImportModal} tables={tables} />
+        <ImportTablesModal onClose={handleCloseImportModal} />
       )}
     </>
   );
