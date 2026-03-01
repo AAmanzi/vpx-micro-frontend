@@ -24,6 +24,12 @@ const ensureDestinationDirectory = (destinationPath: string): void => {
   }
 };
 
+const IGNORABLE_DIRECTORY_ENTRIES = new Set([
+  '.DS_Store',
+  'Thumbs.db',
+  'desktop.ini',
+]);
+
 export const copyFile = (sourcePath: string, destinationPath: string): void => {
   const resolvedSourcePath = resolveUserPath(sourcePath);
   const resolvedDestinationPath = resolveUserPath(destinationPath);
@@ -67,5 +73,66 @@ export const deleteFile = (sourcePath: string): void => {
     }
 
     throw error;
+  }
+};
+
+export const removeEmptyParentDirectories = (sourcePath: string): void => {
+  let currentDirectory = path.dirname(resolveUserPath(sourcePath));
+  const homeDirectory = path.resolve(os.homedir());
+
+  while (true) {
+    const resolvedCurrentDirectory = path.resolve(currentDirectory);
+    const parentDirectory = path.dirname(resolvedCurrentDirectory);
+
+    if (
+      resolvedCurrentDirectory === parentDirectory ||
+      resolvedCurrentDirectory === homeDirectory
+    ) {
+      return;
+    }
+
+    try {
+      const stat = fs.statSync(resolvedCurrentDirectory);
+
+      if (!stat.isDirectory()) {
+        return;
+      }
+
+      const entries = fs.readdirSync(resolvedCurrentDirectory);
+      const nonIgnorableEntries = entries.filter(
+        (entry) => !IGNORABLE_DIRECTORY_ENTRIES.has(entry),
+      );
+
+      if (nonIgnorableEntries.length > 0) {
+        return;
+      }
+
+      entries
+        .filter((entry) => IGNORABLE_DIRECTORY_ENTRIES.has(entry))
+        .forEach((entry) => {
+          const entryPath = path.join(resolvedCurrentDirectory, entry);
+
+          try {
+            fs.unlinkSync(entryPath);
+          } catch (error: any) {
+            if (error?.code !== 'ENOENT') {
+              throw error;
+            }
+          }
+        });
+
+      fs.rmdirSync(resolvedCurrentDirectory);
+      currentDirectory = parentDirectory;
+    } catch (error: any) {
+      if (
+        error?.code === 'ENOENT' ||
+        error?.code === 'ENOTEMPTY' ||
+        error?.code === 'EEXIST'
+      ) {
+        return;
+      }
+
+      throw error;
+    }
   }
 };

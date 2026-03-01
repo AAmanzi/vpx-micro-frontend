@@ -7,7 +7,12 @@ import type { Table } from 'src/types/table';
 
 import * as configDb from '../database/config';
 import * as tablesDb from '../database/tables';
-import { copyFile, deleteFile, moveFile } from '../utils/fileManagement';
+import {
+  copyFile,
+  deleteFile,
+  moveFile,
+  removeEmptyParentDirectories,
+} from '../utils/fileManagement';
 import { startVpxTable } from '../utils/startVpxTable';
 
 export function getAllTables(): Table[] {
@@ -43,6 +48,7 @@ export function importTables(
   deleteAfterImport: boolean,
 ): void {
   const transferFile = deleteAfterImport ? moveFile : copyFile;
+  const movedSourceFilePaths = new Set<string>();
   const tablesDirectoryPath = configDb.getTablesDirectoryPath();
   const romsDirectoryPath = configDb.getRomsDirectoryPath();
 
@@ -77,11 +83,19 @@ export function importTables(
 
     if (vpxSourceFilePath !== vpxDestinationFilePath) {
       transferFile(vpxSourceFilePath, vpxDestinationFilePath);
+
+      if (deleteAfterImport) {
+        movedSourceFilePaths.add(vpxSourceFilePath);
+      }
     }
 
     if (romSourceFilePath && romDestinationFilePath) {
       if (romSourceFilePath !== romDestinationFilePath) {
         transferFile(romSourceFilePath, romDestinationFilePath);
+
+        if (deleteAfterImport) {
+          movedSourceFilePaths.add(romSourceFilePath);
+        }
       }
     }
 
@@ -98,6 +112,12 @@ export function importTables(
     tablesDb.create(nextTable);
     existingVpxPaths.add(normalizedDestinationPath);
   });
+
+  if (deleteAfterImport) {
+    Array.from(movedSourceFilePaths).forEach((sourceFilePath) => {
+      removeEmptyParentDirectories(sourceFilePath);
+    });
+  }
 }
 
 export function startTable(tableId: string): void {
