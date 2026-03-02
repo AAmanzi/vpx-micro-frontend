@@ -81,38 +81,67 @@ const FileUpload: FunctionComponent<Props> = ({
 
     setDragActive(false);
 
-    const files = e.dataTransfer.files;
-    if (files.length === 0) return;
+    const dropItems = Array.from(e.dataTransfer.items || []);
+    const files = Array.from(e.dataTransfer.files || []);
 
-    const newItems: Array<FileSystemItem> = [];
+    if (dropItems.length === 0 && files.length === 0) return;
 
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      const path = await getPathForFile(file);
+    const resolvedItems = await Promise.all(
+      (dropItems.length > 0
+        ? dropItems
+            .filter((item) => item.kind === 'file')
+            .map(async (item) => {
+              const file = item.getAsFile();
+              if (!file) {
+                return [] as Array<FileSystemItem>;
+              }
 
-      if (!path) continue;
+              const path = getPathForFile(file);
+              if (!path) {
+                return [] as Array<FileSystemItem>;
+              }
 
-      const item = e.dataTransfer.items?.[i];
-      const entry = item?.webkitGetAsEntry?.();
-      const isDirectory = Boolean(entry?.isDirectory);
+              const entry = item.webkitGetAsEntry?.();
+              const isDirectory = Boolean(entry?.isDirectory);
+              if (!isValidFile(path, isDirectory)) {
+                return [] as Array<FileSystemItem>;
+              }
 
-      const isValid = isValidFile(file.name, isDirectory);
-      if (isValid) {
-        if (isDirectory) {
-          const children = await getDirectoryTree(path);
-          newItems.push(...children);
-          continue;
-        }
+              if (isDirectory) {
+                return getDirectoryTree(path);
+              }
 
-        newItems.push({
-          path,
-          name: file.name,
-        });
-      }
-    }
+              return [
+                {
+                  path,
+                  name: file.name,
+                },
+              ];
+            })
+        : files.map(async (file) => {
+            const path = getPathForFile(file);
+            if (!path || !isValidFile(path, false)) {
+              return [] as Array<FileSystemItem>;
+            }
 
-    if (newItems.length > 0) {
-      onFilesSelected(newItems);
+            return [
+              {
+                path,
+                name: file.name,
+              },
+            ];
+          })) as Array<Promise<Array<FileSystemItem>>>,
+    );
+
+    const newItems = resolvedItems.flat();
+    const uniqueItems = newItems.filter(
+      (item, index, allItems) =>
+        allItems.findIndex((candidate) => candidate.path === item.path) ===
+        index,
+    );
+
+    if (uniqueItems.length > 0) {
+      onFilesSelected(uniqueItems);
     }
   };
 
