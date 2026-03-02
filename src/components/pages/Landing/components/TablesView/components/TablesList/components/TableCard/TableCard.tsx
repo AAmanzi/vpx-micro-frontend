@@ -18,7 +18,7 @@ const TableCard: FunctionComponent<Props> = ({
   name,
   romFile,
   vpxFile,
-  lastPlayed,
+  lastPlayedTimestamp,
 }) => {
   const [favorite, setFavorite] = useState(isFavorite);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -105,10 +105,12 @@ const TableCard: FunctionComponent<Props> = ({
               ROM: {romFile}
             </p>
           )}
-          {lastPlayed && (
+          {lastPlayedTimestamp && (
             <p className='secondary-text-color caption-small-regular'>
               Last Played:{' '}
-              {lastPlayed ? displayDateWithTime(lastPlayed) : 'Never'}
+              {lastPlayedTimestamp
+                ? displayDateWithTime(lastPlayedTimestamp)
+                : 'Never'}
             </p>
           )}
         </div>

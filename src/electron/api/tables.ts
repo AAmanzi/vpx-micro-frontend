@@ -107,6 +107,7 @@ export function importTables(
       isFavorite: false,
       vpxFilePath: vpxDestinationFilePath,
       romFilePath: romDestinationFilePath,
+      dateAddedTimestamp: Date.now(),
     };
 
     tablesDb.create(nextTable);
@@ -127,6 +128,10 @@ export function startTable(tableId: string): void {
   if (!table) {
     return;
   }
+
+  tablesDb.update(tableId, {
+    lastPlayedTimestamp: Date.now(),
+  });
 
   startVpxTable(table.vpxFilePath, config.vpxRootPath, VPX_DEFAULT_EXECUTABLE);
 }
