@@ -32,10 +32,19 @@ const LockedSetting: FunctionComponent<Props> = ({
   }, [savedValue]);
 
   const handleToggleLock = () => {
-    onSave(defaultValue);
     setEditValue(defaultValue);
 
-    setIsLocked((prev) => !prev);
+    setIsLocked((prev) => {
+      const newIsLocked = !prev;
+
+      if (newIsLocked) {
+        onSave('');
+      } else {
+        onSave(defaultValue);
+      }
+
+      return newIsLocked;
+    });
   };
 
   const handleBlur = () => {
