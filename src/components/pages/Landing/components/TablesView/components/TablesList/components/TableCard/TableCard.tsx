@@ -137,9 +137,7 @@ const TableCard: FunctionComponent<Props> = ({
                 Last Played
               </p>
               <p className='secondary-text-color caption-small-semibold uppercase'>
-                {lastPlayedTimestamp
-                  ? displayRelativeDate(lastPlayedTimestamp)
-                  : 'Never'}
+                {displayRelativeDate(lastPlayedTimestamp)}
               </p>
             </div>
           </div>

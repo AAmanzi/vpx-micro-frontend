@@ -16,7 +16,13 @@ export const displayDate = (date: Date | number): string => {
   });
 };
 
-export const displayRelativeDate = (date: Date | number): string => {
+export const displayRelativeDate = (
+  date: Date | number | null | undefined,
+): string => {
+  if (date === undefined || date === null) {
+    return 'Never';
+  }
+
   const timestamp = new Date(date).getTime();
 
   if (Number.isNaN(timestamp)) {
