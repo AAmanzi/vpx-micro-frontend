@@ -7,7 +7,7 @@ import api from 'src/consts';
 import { useTablesContext } from 'src/providers/tables';
 import { useToastContext } from 'src/providers/toast';
 import { Table } from 'src/types/table';
-import { displayDateWithTime } from 'src/utils';
+import { displayDate, displayRelativeDate } from 'src/utils';
 
 import style from './TableCard.module.scss';
 import Settings from './components/Settings';
@@ -20,6 +20,7 @@ const TableCard: FunctionComponent<Props> = ({
   name,
   romFile,
   vpxFile,
+  dateAddedTimestamp,
   lastPlayedTimestamp,
 }) => {
   const [favorite, setFavorite] = useState(isFavorite);
@@ -110,22 +111,38 @@ const TableCard: FunctionComponent<Props> = ({
         </div>
 
         <div className={style.meta}>
-          <p className='secondary-text-color caption-small-regular'>
+          <p className='secondary-text-color caption-small-semibold'>
             {vpxFile}
           </p>
           {romFile && (
-            <p className='secondary-text-color caption-small-regular'>
-              ROM: {romFile}
-            </p>
+            <div className={style.romPill}>
+              <span className={style.romDot} />
+              <p className='secondary-text-color caption-small-semibold'>
+                {romFile}
+              </p>
+            </div>
           )}
-          {lastPlayedTimestamp && (
-            <p className='secondary-text-color caption-small-regular'>
-              Last Played:{' '}
-              {lastPlayedTimestamp
-                ? displayDateWithTime(lastPlayedTimestamp)
-                : 'Never'}
-            </p>
-          )}
+
+          <div className={style.datesGrid}>
+            <div className={style.dateItem}>
+              <p className='secondary-text-color caption-small-semibold uppercase'>
+                Added
+              </p>
+              <p className='secondary-text-color caption-small-semibold uppercase'>
+                {displayDate(dateAddedTimestamp)}
+              </p>
+            </div>
+            <div className={style.dateItem}>
+              <p className='secondary-text-color caption-small-semibold uppercase'>
+                Last Played
+              </p>
+              <p className='secondary-text-color caption-small-semibold uppercase'>
+                {lastPlayedTimestamp
+                  ? displayRelativeDate(lastPlayedTimestamp)
+                  : 'Never'}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

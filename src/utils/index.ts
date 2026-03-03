@@ -8,14 +8,42 @@ export const getDefaultTablesDirectory = (vpxRootPath: string): string => {
   return `${vpxRootPath}/${VPX_DEFAULT_TABLES_PATH}`;
 };
 
-export const displayDateWithTime = (date: Date | number): string => {
-  const d = new Date(date);
-  const options: Intl.DateTimeFormatOptions = {
-    month: 'short',
+export const displayDate = (date: Date | number): string => {
+  return new Date(date).toLocaleDateString(undefined, {
     day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  };
+    month: 'short',
+    year: 'numeric',
+  });
+};
 
-  return d.toLocaleDateString(undefined, options);
+export const displayRelativeDate = (date: Date | number): string => {
+  const timestamp = new Date(date).getTime();
+
+  if (Number.isNaN(timestamp)) {
+    return '';
+  }
+
+  const diffMs = timestamp - Date.now();
+  const absoluteDiffMs = Math.abs(diffMs);
+
+  if (absoluteDiffMs < 60 * 1000) {
+    return 'Just now';
+  }
+
+  const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: 'always' });
+  const units: Array<{ unit: Intl.RelativeTimeFormatUnit; ms: number }> = [
+    { unit: 'year', ms: 365 * 24 * 60 * 60 * 1000 },
+    { unit: 'month', ms: 30 * 24 * 60 * 60 * 1000 },
+    { unit: 'day', ms: 24 * 60 * 60 * 1000 },
+    { unit: 'hour', ms: 60 * 60 * 1000 },
+    { unit: 'minute', ms: 60 * 1000 },
+  ];
+
+  for (const { unit, ms } of units) {
+    if (absoluteDiffMs >= ms) {
+      return rtf.format(Math.round(diffMs / ms), unit);
+    }
+  }
+
+  return 'Just now';
 };

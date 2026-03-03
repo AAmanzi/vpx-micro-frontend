@@ -53,6 +53,9 @@
 
 .content {
   padding: 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .header {
@@ -86,5 +89,41 @@
 .meta {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 12px;
+  flex: 1;
+}
+
+.romPill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: thin solid rgba(var(--white-rgb), 0.1);
+  border-radius: 999px;
+  padding: 10px 14px;
+}
+
+.romDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--blue);
+  flex-shrink: 0;
+}
+
+.datesGrid {
+  margin-top: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.dateItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  &:last-child {
+    align-items: flex-end;
+    text-align: right;
+  }
 }
