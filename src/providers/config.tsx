@@ -33,7 +33,11 @@ export const ConfigProvider: FunctionComponent<{ children: ReactNode }> = ({
   const [config, setConfig] = useState<Config | null>(null);
 
   const fetchConfig = () => {
-    api.getConfig().then(setConfig);
+    api.getConfig().then(({ data }) => {
+      if (data) {
+        setConfig(data);
+      }
+    });
   };
 
   useEffect(() => {

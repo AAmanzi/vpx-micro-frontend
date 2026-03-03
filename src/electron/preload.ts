@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer, webUtils } from 'electron';
 
-import type { Api } from 'src/types/api';
+import type { Api, ApiResult } from 'src/types/api';
+import type { Config } from 'src/types/config';
 import type { FileSystemItem } from 'src/types/file';
 import type { Table } from 'src/types/table';
 
@@ -8,40 +9,65 @@ const invoke = <T>(channel: string, ...args: any[]): Promise<T> =>
   ipcRenderer.invoke(channel, ...args);
 
 const frontendApi: Api = {
-  getAllTables: (): Promise<Table[]> => invoke<Table[]>('api:getAllTables'),
-  setTableFavorite: (id: string, fav: boolean): Promise<void> =>
-    invoke('api:setTableFavorite', id, fav).then(() => undefined),
-  deleteTable: (id: string): Promise<void> =>
-    invoke('api:deleteTable', id).then(() => undefined),
-  renameTable: (id: string, newName: string): Promise<void> =>
-    invoke('api:renameTable', id, newName).then(() => undefined),
-  getExpectedRomName: (vpxFilePath: string): Promise<string | null> =>
-    invoke<string | null>('api:getExpectedRomName', vpxFilePath),
-  getPathForFile: (file: File): string => webUtils.getPathForFile(file),
+  getAllTables: (): Promise<ApiResult<Table[]>> =>
+    invoke<ApiResult<Table[]>>('api:getAllTables'),
+  setTableFavorite: (id: string, fav: boolean): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:setTableFavorite', id, fav),
+  deleteTable: (id: string): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:deleteTable', id),
+  renameTable: (id: string, newName: string): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:renameTable', id, newName),
+  getExpectedRomName: (
+    vpxFilePath: string,
+  ): Promise<ApiResult<string | null>> =>
+    invoke<ApiResult<string | null>>('api:getExpectedRomName', vpxFilePath),
+  getPathForFile: (file: File): ApiResult<string> => {
+    try {
+      return {
+        success: true,
+        data: webUtils.getPathForFile(file),
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: {
+          code: 'FILE_PATH_ERROR',
+          message:
+            error instanceof Error
+              ? error.message
+              : 'Failed to resolve file path',
+        },
+      };
+    }
+  },
   getDirectoryTree: (
     directoryPath: string,
     acceptedExtensions: string[],
-  ): Promise<Array<FileSystemItem>> =>
-    invoke<Array<FileSystemItem>>(
+  ): Promise<ApiResult<Array<FileSystemItem>>> =>
+    invoke<ApiResult<Array<FileSystemItem>>>(
       'api:getDirectoryTree',
       directoryPath,
       acceptedExtensions,
     ),
-  importTables: (tables, deleteAfterImport): Promise<void> =>
-    invoke('api:importTables', tables, deleteAfterImport).then(() => undefined),
-  getConfig: () => invoke('api:getConfig'),
-  updateVpxRootPath: (path: string): Promise<void> =>
-    invoke('api:updateVpxRootPath', path).then(() => undefined),
-  updateRomsDirectoryPath: (path: string): Promise<void> =>
-    invoke('api:updateRomsDirectoryPath', path).then(() => undefined),
-  updateTablesDirectoryPath: (path: string): Promise<void> =>
-    invoke('api:updateTablesDirectoryPath', path).then(() => undefined),
-  updateDeleteFilesAfterImport: (deleteAfterImport: boolean): Promise<void> =>
-    invoke('api:updateDeleteFilesAfterImport', deleteAfterImport).then(
-      () => undefined,
+  importTables: (tables, deleteAfterImport): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:importTables', tables, deleteAfterImport),
+  getConfig: (): Promise<ApiResult<Config>> =>
+    invoke<ApiResult<Config>>('api:getConfig'),
+  updateVpxRootPath: (path: string): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:updateVpxRootPath', path),
+  updateRomsDirectoryPath: (path: string): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:updateRomsDirectoryPath', path),
+  updateTablesDirectoryPath: (path: string): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:updateTablesDirectoryPath', path),
+  updateDeleteFilesAfterImport: (
+    deleteAfterImport: boolean,
+  ): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>(
+      'api:updateDeleteFilesAfterImport',
+      deleteAfterImport,
     ),
-  startTable: (tableId: string): Promise<void> =>
-    invoke('api:startTable', tableId).then(() => undefined),
+  startTable: (tableId: string): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:startTable', tableId),
 };
 
 contextBridge.exposeInMainWorld('api', frontendApi);

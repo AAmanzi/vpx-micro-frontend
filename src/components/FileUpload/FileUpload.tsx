@@ -20,7 +20,7 @@ const FileUpload: FunctionComponent<Props> = ({
 
   const getPathForFile = (file: File): string | null => {
     try {
-      const path = api.getPathForFile(file);
+      const { data: path } = api.getPathForFile(file);
       if (typeof path === 'string' && path) {
         return path;
       }
@@ -33,7 +33,7 @@ const FileUpload: FunctionComponent<Props> = ({
     directoryPath: string,
   ): Promise<Array<FileSystemItem>> => {
     try {
-      const items = await api.getDirectoryTree(
+      const { data: items } = await api.getDirectoryTree(
         directoryPath,
         acceptedExtensions,
       );

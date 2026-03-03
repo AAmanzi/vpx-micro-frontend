@@ -2,32 +2,53 @@ import { Config } from './config';
 import { FileSystemItem, TableFile } from './file';
 import { Table } from './table';
 
+export interface ApiError {
+  code: string;
+  message?: string;
+}
+
+export type ApiResult<T> =
+  | {
+      success: true;
+      data: T;
+      error?: never;
+    }
+  | {
+      success: false;
+      data?: never;
+      error: ApiError;
+    };
+
 export interface Api {
   // Tables
-  getAllTables: () => Promise<Array<Table>>;
-  setTableFavorite: (id: string, fav: boolean) => Promise<void>;
-  deleteTable: (id: string) => Promise<void>;
-  renameTable: (id: string, newName: string) => Promise<void>;
+  getAllTables: () => Promise<ApiResult<Array<Table>>>;
+  setTableFavorite: (id: string, fav: boolean) => Promise<ApiResult<null>>;
+  deleteTable: (id: string) => Promise<ApiResult<null>>;
+  renameTable: (id: string, newName: string) => Promise<ApiResult<null>>;
   importTables: (
     tables: Array<TableFile>,
     deleteAfterImport: boolean,
-  ) => Promise<void>;
-  startTable: (tableId: string) => Promise<void>;
+  ) => Promise<ApiResult<null>>;
+  startTable: (tableId: string) => Promise<ApiResult<null>>;
 
   // FileSystem
-  getPathForFile: (file: File) => string;
+  getPathForFile: (file: File) => ApiResult<string>;
   getDirectoryTree: (
     directoryPath: string,
     acceptedExtensions: string[],
-  ) => Promise<Array<FileSystemItem>>;
-  getExpectedRomName: (vpxFilePath: string) => Promise<string | null>;
+  ) => Promise<ApiResult<Array<FileSystemItem>>>;
+  getExpectedRomName: (
+    vpxFilePath: string,
+  ) => Promise<ApiResult<string | null>>;
 
   // Config
-  getConfig: () => Promise<Config>;
-  updateVpxRootPath: (path: string) => Promise<void>;
-  updateRomsDirectoryPath: (path: string) => Promise<void>;
-  updateTablesDirectoryPath: (path: string) => Promise<void>;
-  updateDeleteFilesAfterImport: (deleteAfterImport: boolean) => Promise<void>;
+  getConfig: () => Promise<ApiResult<Config>>;
+  updateVpxRootPath: (path: string) => Promise<ApiResult<null>>;
+  updateRomsDirectoryPath: (path: string) => Promise<ApiResult<null>>;
+  updateTablesDirectoryPath: (path: string) => Promise<ApiResult<null>>;
+  updateDeleteFilesAfterImport: (
+    deleteAfterImport: boolean,
+  ) => Promise<ApiResult<null>>;
 }
 
 declare global {

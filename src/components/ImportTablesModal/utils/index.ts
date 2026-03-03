@@ -15,7 +15,8 @@ const createTableFile = async (file: FileSystemItem): Promise<TableFile> => {
   let expectedRomName: string | undefined;
 
   try {
-    expectedRomName = (await api.getExpectedRomName(file.path)) ?? undefined;
+    expectedRomName =
+      (await api.getExpectedRomName(file.path)).data ?? undefined;
   } catch {
     expectedRomName = undefined;
   }

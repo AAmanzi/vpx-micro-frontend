@@ -33,7 +33,11 @@ export const TablesProvider: FunctionComponent<{ children: ReactNode }> = ({
   const [tables, setTables] = useState<Array<Table>>([]);
 
   const fetchTables = () => {
-    api.getAllTables().then(setTables);
+    api.getAllTables().then(({ data }) => {
+      if (data) {
+        setTables(data);
+      }
+    });
   };
 
   useEffect(() => {

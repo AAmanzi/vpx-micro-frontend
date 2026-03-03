@@ -1,6 +1,7 @@
 import { FileSystemItem } from 'src/types/file';
+import { TableFile } from 'src/types/file';
 
-import { ImportSelectionResult, TableFile } from '../types';
+import { ImportSelectionResult } from '../types';
 
 const normalizeRomName = (value: string): string =>
   value

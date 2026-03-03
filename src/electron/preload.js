@@ -5,24 +5,40 @@ var import_electron = require("electron");
 var invoke = (channel, ...args) => import_electron.ipcRenderer.invoke(channel, ...args);
 var frontendApi = {
   getAllTables: () => invoke("api:getAllTables"),
-  setTableFavorite: (id, fav) => invoke("api:setTableFavorite", id, fav).then(() => void 0),
-  deleteTable: (id) => invoke("api:deleteTable", id).then(() => void 0),
-  renameTable: (id, newName) => invoke("api:renameTable", id, newName).then(() => void 0),
+  setTableFavorite: (id, fav) => invoke("api:setTableFavorite", id, fav),
+  deleteTable: (id) => invoke("api:deleteTable", id),
+  renameTable: (id, newName) => invoke("api:renameTable", id, newName),
   getExpectedRomName: (vpxFilePath) => invoke("api:getExpectedRomName", vpxFilePath),
-  getPathForFile: (file) => import_electron.webUtils.getPathForFile(file),
+  getPathForFile: (file) => {
+    try {
+      return {
+        success: true,
+        data: import_electron.webUtils.getPathForFile(file)
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: {
+          code: "FILE_PATH_ERROR",
+          message: error instanceof Error ? error.message : "Failed to resolve file path"
+        }
+      };
+    }
+  },
   getDirectoryTree: (directoryPath, acceptedExtensions) => invoke(
     "api:getDirectoryTree",
     directoryPath,
     acceptedExtensions
   ),
-  importTables: (tables, deleteAfterImport) => invoke("api:importTables", tables, deleteAfterImport).then(() => void 0),
+  importTables: (tables, deleteAfterImport) => invoke("api:importTables", tables, deleteAfterImport),
   getConfig: () => invoke("api:getConfig"),
-  updateVpxRootPath: (path) => invoke("api:updateVpxRootPath", path).then(() => void 0),
-  updateRomsDirectoryPath: (path) => invoke("api:updateRomsDirectoryPath", path).then(() => void 0),
-  updateTablesDirectoryPath: (path) => invoke("api:updateTablesDirectoryPath", path).then(() => void 0),
-  updateDeleteFilesAfterImport: (deleteAfterImport) => invoke("api:updateDeleteFilesAfterImport", deleteAfterImport).then(
-    () => void 0
+  updateVpxRootPath: (path) => invoke("api:updateVpxRootPath", path),
+  updateRomsDirectoryPath: (path) => invoke("api:updateRomsDirectoryPath", path),
+  updateTablesDirectoryPath: (path) => invoke("api:updateTablesDirectoryPath", path),
+  updateDeleteFilesAfterImport: (deleteAfterImport) => invoke(
+    "api:updateDeleteFilesAfterImport",
+    deleteAfterImport
   ),
-  startTable: (tableId) => invoke("api:startTable", tableId).then(() => void 0)
+  startTable: (tableId) => invoke("api:startTable", tableId)
 };
 import_electron.contextBridge.exposeInMainWorld("api", frontendApi);

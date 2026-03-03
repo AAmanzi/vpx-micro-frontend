@@ -1,6 +1,8 @@
+import { apiFailure, apiSuccess } from '.';
 import fs from 'fs';
 import path from 'path';
 
+import type { ApiResult } from 'src/types/api';
 import type { FileSystemItem } from 'src/types/file';
 
 import { getExpectedRomNameFromVpxFile } from '../utils/vpxParsing';
@@ -50,16 +52,22 @@ const listDirectoryItems = async (
   return items;
 };
 
-export function getExpectedRomName(vpxFilePath: string): string | null {
-  return getExpectedRomNameFromVpxFile(vpxFilePath);
+export function getExpectedRomName(
+  vpxFilePath: string,
+): ApiResult<string | null> {
+  try {
+    return apiSuccess(getExpectedRomNameFromVpxFile(vpxFilePath));
+  } catch (error) {
+    return apiFailure(error);
+  }
 }
 
-export function getDirectoryTree(
+export async function getDirectoryTree(
   directoryPath: string,
   acceptedExtensions: string[],
-): Promise<Array<FileSystemItem>> {
+): Promise<ApiResult<Array<FileSystemItem>>> {
   if (!directoryPath || !Array.isArray(acceptedExtensions)) {
-    return Promise.resolve([]);
+    return Promise.resolve(apiSuccess([]));
   }
 
   const extensionSet = new Set(
@@ -69,8 +77,13 @@ export function getDirectoryTree(
   );
 
   if (extensionSet.size === 0) {
-    return Promise.resolve([]);
+    return Promise.resolve(apiSuccess([]));
   }
 
-  return listDirectoryItems(directoryPath, extensionSet);
+  try {
+    const items_1 = await listDirectoryItems(directoryPath, extensionSet);
+    return apiSuccess(items_1);
+  } catch (error) {
+    return apiFailure(error);
+  }
 }

@@ -5,9 +5,8 @@ import Icon from 'src/components/Icon';
 import Input, { Size as InputSize } from 'src/components/Input';
 import Tag, { Type as TagType } from 'src/components/Tag';
 import { FileSystemItem } from 'src/types/file';
-import { Table } from 'src/types/table';
+import { TableFile } from 'src/types/file';
 
-import { TableFile } from '../../types';
 import style from './TableEntry.module.scss';
 import RomSelect from './components/RomSelect';
 
