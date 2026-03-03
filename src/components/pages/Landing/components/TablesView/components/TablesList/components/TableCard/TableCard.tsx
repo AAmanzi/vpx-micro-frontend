@@ -4,6 +4,7 @@ import { FunctionComponent, useState } from 'react';
 import Button from 'src/components/Button';
 import Icon from 'src/components/Icon';
 import api from 'src/consts';
+import { useTablesContext } from 'src/providers/tables';
 import { useToastContext } from 'src/providers/toast';
 import { Table } from 'src/types/table';
 import { displayDateWithTime } from 'src/utils';
@@ -24,6 +25,7 @@ const TableCard: FunctionComponent<Props> = ({
   const [favorite, setFavorite] = useState(isFavorite);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { showErrorToast } = useToastContext();
+  const { fetchTables } = useTablesContext();
 
   const handlePlay = async () => {
     const { error } = await api.startTable(id);
@@ -43,7 +45,11 @@ const TableCard: FunctionComponent<Props> = ({
     if (error) {
       setFavorite(!newFav);
       showErrorToast(error.message || 'Failed to update favorite');
+
+      return;
     }
+
+    fetchTables();
   };
 
   const openSettings = () => {
