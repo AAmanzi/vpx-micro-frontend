@@ -7,6 +7,7 @@ import Button, {
 import Input from 'src/components/Input';
 import Modal, { Size as ModalSize } from 'src/components/Modal';
 import api from 'src/consts';
+import { useToastContext } from 'src/providers/toast';
 
 import style from './RenameTableModal.module.scss';
 
@@ -22,10 +23,18 @@ const RenameTableModal: FunctionComponent<Props> = ({
   close,
 }) => {
   const [name, setName] = useState(nameFromProps);
+  const { showErrorToast } = useToastContext();
 
   const handleSave = async () => {
-    // TODO: Response handling
-    await api.renameTable(id, name);
+    const { error } = await api.renameTable(id, name);
+
+    if (error) {
+
+      showErrorToast(error.message || 'Failed to rename table');
+
+      return;
+    }
+
     close();
   };
 

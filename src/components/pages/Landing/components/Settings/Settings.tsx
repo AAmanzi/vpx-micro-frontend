@@ -6,6 +6,7 @@ import Icon from 'src/components/Icon';
 import Input from 'src/components/Input';
 import api from 'src/consts';
 import { useConfigContext } from 'src/providers/config';
+import { useToastContext } from 'src/providers/toast';
 import { getDefaultRomsDirectory, getDefaultTablesDirectory } from 'src/utils';
 
 import style from './Settings.module.scss';
@@ -13,6 +14,7 @@ import LockedSetting from './components/LockedSetting';
 
 const Settings: FunctionComponent = () => {
   const { config, fetchConfig } = useConfigContext();
+  const { showErrorToast } = useToastContext();
 
   const [_vpxRootPath, setVpxRootPath] = useState('');
   const [_romsDirectory, setRomsDirectory] = useState('');
@@ -26,23 +28,40 @@ const Settings: FunctionComponent = () => {
   const defaultTablesDirectory = getDefaultTablesDirectory(vpxRootPath);
 
   const handleUpdateVpxRootPath = async () => {
-    // TODO: Response handling
-    await api.updateVpxRootPath(vpxRootPath);
+    const { error } = await api.updateVpxRootPath(vpxRootPath);
+
+    if (error) {
+      showErrorToast(error.message || 'Failed to update VPX root path');
+
+      return;
+    }
+
     fetchConfig();
   };
 
-  // TODO: not good when resetting to default, treating defaults as unlocked
   const handleSaveRomsDirectory = async (newValue: string) => {
     setRomsDirectory(newValue);
-    // TODO: Response handling
-    await api.updateRomsDirectoryPath(newValue);
+    const { error } = await api.updateRomsDirectoryPath(newValue);
+
+    if (error) {
+      showErrorToast(error.message || 'Failed to update ROMs directory');
+
+      return;
+    }
+
     fetchConfig();
   };
 
   const handleSaveTablesDirectory = async (newValue: string) => {
     setTablesDirectory(newValue);
-    // TODO: Response handling
-    await api.updateTablesDirectoryPath(newValue);
+    const { error } = await api.updateTablesDirectoryPath(newValue);
+
+    if (error) {
+      showErrorToast(error.message || 'Failed to update tables directory');
+
+      return;
+    }
+
     fetchConfig();
   };
 

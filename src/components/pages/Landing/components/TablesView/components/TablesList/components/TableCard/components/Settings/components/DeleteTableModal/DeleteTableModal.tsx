@@ -6,6 +6,7 @@ import Button, {
 } from 'src/components/Button';
 import Modal, { Size as ModalSize } from 'src/components/Modal';
 import api from 'src/consts';
+import { useToastContext } from 'src/providers/toast';
 
 import style from './DeleteTableModal.module.scss';
 
@@ -22,9 +23,18 @@ const DeleteTableModal: FunctionComponent<Props> = ({
   vpxFile,
   close,
 }) => {
+  const { showErrorToast } = useToastContext();
+
   const handleDelete = async () => {
-    // TODO: Response handling
-    await api.deleteTable(id);
+    const { error } = await api.deleteTable(id);
+
+    if (error) {
+
+      showErrorToast(error.message || 'Failed to delete table');
+
+      return;
+    }
+
     close();
   };
 

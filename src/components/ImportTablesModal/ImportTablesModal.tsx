@@ -6,6 +6,7 @@ import Modal from 'src/components/Modal';
 import api from 'src/consts';
 import { useConfigContext } from 'src/providers/config';
 import { useTablesContext } from 'src/providers/tables';
+import { useToastContext } from 'src/providers/toast';
 import { FileSystemItem, TableFile } from 'src/types/file';
 
 import Button, { Size as ButtonSize, Type as ButtonType } from '../Button';
@@ -20,6 +21,7 @@ import { buildImportSelectionResult, filterExistingFiles } from './utils';
 const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
   const { tables } = useTablesContext();
   const { config, fetchConfig } = useConfigContext();
+  const { showErrorToast } = useToastContext();
 
   const [isLoading, setIsLoading] = useState(false);
   const [tablesToImport, setTablesToImport] = useState<Array<TableFile>>([]);
@@ -34,7 +36,6 @@ const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
     }
   }, [config]);
 
-  // TODO: Multifolder drop is not working well -- need to fix
   const handleFilesSelected = async (files: Array<FileSystemItem>) => {
     setIsLoading(true);
 
@@ -97,9 +98,29 @@ const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
   };
 
   const handleSubmit = async () => {
-    // TODO: Response handling
-    await api.importTables(tablesToImport, deleteAfterImport);
-    await api.updateDeleteFilesAfterImport(deleteAfterImport);
+    const { error: importTablesError } = await api.importTables(
+      tablesToImport,
+      deleteAfterImport,
+    );
+
+    if (importTablesError) {
+      showErrorToast(importTablesError.message || 'Failed to import tables');
+
+      return;
+    }
+
+    const { error: updateDeleteAfterImportError } =
+      await api.updateDeleteFilesAfterImport(deleteAfterImport);
+
+    if (updateDeleteAfterImportError) {
+      showErrorToast(
+        updateDeleteAfterImportError.message ||
+          'Failed to update import setting',
+      );
+
+      return;
+    }
+
     fetchConfig();
 
     onClose();
