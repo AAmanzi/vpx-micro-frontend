@@ -1,0 +1,82 @@
+.container {
+  position: fixed;
+  z-index: 7;
+  display: flex;
+  align-items: flex-start;
+  visibility: hidden;
+
+  border-radius: 14px;
+  padding: 12px;
+  width: calc(100% - 48px);
+  bottom: 32px;
+  right: 20px;
+  transform: translateX(calc(100% + 20px));
+  width: 292px;
+  background-color: var(--dark-gray);
+
+  &.open {
+    visibility: visible;
+    transform: translateX(0);
+  }
+
+  &.transition {
+    transition:
+      transform 300ms ease-out,
+      visibility 300ms ease-out;
+  }
+
+  &.success {
+    border: 2px solid var(--green);
+
+    .iconWrapper {
+      background-color: rgba(var(--green-rgb), 0.2);
+    }
+
+    .icon {
+      color: var(--green);
+    }
+  }
+
+  &.error {
+    border: 2px solid var(--red);
+
+    .iconWrapper {
+      background-color: rgba(var(--red-rgb), 0.2);
+    }
+
+    .icon {
+      color: var(--red);
+    }
+  }
+
+  &.warning {
+    border: 2px solid var(--yellow);
+
+    .iconWrapper {
+      background-color: rgba(var(--yellow-rgb), 0.2);
+    }
+
+    .icon {
+      color: var(--yellow);
+    }
+  }
+}
+
+.iconWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.icon {
+  color: var(--white);
+}
+
+.closeButton {
+  margin-left: auto;
+}

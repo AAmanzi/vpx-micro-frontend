@@ -20,7 +20,9 @@ export type Icon =
   | 'package'
   | 'circle-alert'
   | 'chevron-down'
-  | 'circle-checkmark';
+  | 'circle-checkmark'
+  | 'triangle-alert'
+  | 'circle-cross';
 
 export interface Props {
   icon: Icon;
