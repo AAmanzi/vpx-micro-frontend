@@ -53,3 +53,20 @@ export const displayRelativeDate = (
 
   return 'Just now';
 };
+
+export const getDeterministicVariant = (
+  value: string,
+  variantsCount: number,
+): number => {
+  if (!value || variantsCount <= 0) {
+    return 0;
+  }
+
+  let hash = 0;
+
+  for (let index = 0; index < value.length; index += 1) {
+    hash = (hash * 31 + value.charCodeAt(index)) >>> 0;
+  }
+
+  return hash % variantsCount;
+};

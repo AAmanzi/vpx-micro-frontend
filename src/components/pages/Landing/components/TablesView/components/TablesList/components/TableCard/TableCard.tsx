@@ -1,13 +1,17 @@
 import classNames from 'classnames';
 import { FunctionComponent, useState } from 'react';
 
-import Button from 'src/components/Button';
+import Button, { Size as ButtonSize } from 'src/components/Button';
 import Icon from 'src/components/Icon';
 import api from 'src/consts';
 import { useTablesContext } from 'src/providers/tables';
 import { useToastContext } from 'src/providers/toast';
 import { Table } from 'src/types/table';
-import { displayDate, displayRelativeDate } from 'src/utils';
+import {
+  displayDate,
+  displayRelativeDate,
+  getDeterministicVariant,
+} from 'src/utils';
 
 import style from './TableCard.module.scss';
 import Settings from './components/Settings';
@@ -61,10 +65,21 @@ const TableCard: FunctionComponent<Props> = ({
     setIsSettingsOpen(false);
   };
 
+  const playAreaVariant = getDeterministicVariant(romFile || vpxFile || id, 8);
+
   return (
     <div className={style.card}>
-      <div className={style.playArea}>
-        <Button circle icon='play' onClick={handlePlay} />
+      <div
+        className={classNames(
+          style.playArea,
+          style[`playAreaVariant${playAreaVariant}`],
+        )}>
+        <Button
+          circle
+          icon='play'
+          onClick={handlePlay}
+          size={ButtonSize.large}
+        />
       </div>
 
       <button
