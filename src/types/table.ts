@@ -1,3 +1,5 @@
+import { FileSystemItem, TableFile } from './file';
+
 export interface Table {
   id: string;
   name: string;
@@ -10,4 +12,14 @@ export interface Table {
   isFavorite: boolean;
   lastPlayedTimestamp?: number;
   dateAddedTimestamp: number;
+}
+
+export interface ScanResult {
+  newTables: Array<TableFile>;
+  unmatchedRoms: Array<FileSystemItem>;
+  tablesWithMissingFiles: Array<{
+    table: Table;
+    missingVpxFile: boolean;
+    missingRomFile: boolean;
+  }>;
 }

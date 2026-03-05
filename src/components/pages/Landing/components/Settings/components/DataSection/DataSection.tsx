@@ -2,10 +2,10 @@ import classNames from 'classnames';
 import { FunctionComponent, useState } from 'react';
 
 import Icon from 'src/components/Icon';
+import ScanLibraryModal from 'src/components/ScanLibraryModal';
 
 import style from './DataSection.module.scss';
 import ExportTablesModal from './components/ExportTablesModal';
-import ScanLibraryModal from './components/ScanLibraryModal';
 
 const DataSection: FunctionComponent = () => {
   const [isScanLibraryModalOpen, setIsScanLibraryModalOpen] = useState(false);

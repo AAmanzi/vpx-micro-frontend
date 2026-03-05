@@ -4,8 +4,8 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { VPX_DEFAULT_EXECUTABLE } from 'src/consts/vpx';
 import type { ApiResult } from 'src/types/api';
-import type { TableFile } from 'src/types/file';
-import type { Table } from 'src/types/table';
+import type { FileSystemItem, TableFile } from 'src/types/file';
+import type { ScanResult, Table } from 'src/types/table';
 
 import * as configDb from '../database/config';
 import * as tablesDb from '../database/tables';
@@ -16,6 +16,11 @@ import {
   moveFile,
   removeEmptyParentDirectories,
 } from '../utils/fileManagement';
+import {
+  findTablesWithMissingFiles,
+  scanNewRoms,
+  scanNewTables,
+} from '../utils/scanVpxLibrary';
 import { startVpxTable } from '../utils/startVpxTable';
 
 export function getAllTables(): ApiResult<Table[]> {
@@ -218,44 +223,142 @@ export function clearTables(): ApiResult<null> {
   }
 }
 
-export function scanVpxLibrary(): ApiResult<Array<TableFile>> {
-  return apiSuccess([]);
+export function scanVpxLibrary(): ApiResult<ScanResult> {
+  // info:
+  // - all roms are matched by file name
+  // - all table files are matched by vpx file name
+
+  // get all tables
+  // get config paths
+  const tables = tablesDb.getAll();
+  const tablesDirectoryPath = configDb.getTablesDirectoryPath();
+  const romsDirectoryPath = configDb.getRomsDirectoryPath();
+
+  // create set of existing table vpx files
+  // create set of existing rom files
+  const existingVpxFiles = tables.map((table) => table.vpxFilePath);
+  const existingRomFiles = tables
+    .map((table) => table.romFilePath)
+    .filter(Boolean) as Array<string>;
+
+  // find tables with missing files (vpx and rom)
+  //    these are tablesWithMissingFiles
+  const tablesWithMissingFiles = findTablesWithMissingFiles(tables);
+
+  // save rom paths of each table that has a missing vpx file, but existing rom file
+  //    remove those rompaths from existing rom files set
+  const unmatchedRomsInDatabase = tablesWithMissingFiles
+    .filter(
+      (item) =>
+        item.table.romFile && item.missingVpxFile && !item.missingRomFile,
+    )
+    .map((item) => item.table.romFilePath)
+    .filter(Boolean) as Array<string>;
+  const existingRomFilesWithTables = existingRomFiles.filter(
+    (romFile) => !unmatchedRomsInDatabase.includes(romFile),
+  );
+
+  // scan vpx roms directory for rom files
+  const scannedRoms = scanNewRoms(
+    romsDirectoryPath,
+    existingRomFilesWithTables,
+  );
+
+  // scan vpx tables directory for vpx files
+  //    these are newTables
+  const scannedTables = scanNewTables(
+    tablesDirectoryPath,
+    existingVpxFiles,
+    scannedRoms,
+  );
+
+  // from scanned vpx tables filter out ones that have been added to newly scanned tables
+  //    these are unmatchedRoms
+  const unmatchedRoms = scannedRoms.filter(
+    (scannedRom) =>
+      !scannedTables.some((table) => table.rom?.path === scannedRom.path),
+  );
+
+  // TODO: remove
+  console.log({
+    tablesWithMissingFiles: tablesWithMissingFiles.map((item) => ({
+      tableName: item.table.name,
+      vpxFile: item.table.vpxFilePath,
+      romFile: item.table.romFilePath,
+      missingVpxFile: item.missingVpxFile,
+      missingRomFile: item.missingRomFile,
+    })),
+    existingVpxFiles,
+    existingRomFiles,
+    existingRomFilesWithTables,
+    unmatchedRomsInDatabase,
+    scannedRoms,
+    scannedTables: scannedTables.map((table) => ({
+      name: table.name,
+      vpxFilePath: table.filePath,
+      romFilePath: table.rom?.path,
+      expectedRomName: table.expectedRomName,
+    })),
+    unmatchedRoms,
+  });
+
+  return apiSuccess({
+    newTables: scannedTables,
+    unmatchedRoms,
+    tablesWithMissingFiles,
+  });
 }
 
-export function registerTableFiles(tables: Array<TableFile>): ApiResult<null> {
+function registerTableFiles(tables: Array<TableFile>): void {
+  const existingVpxPaths = new Set(
+    tablesDb
+      .getAll()
+      .map((table) =>
+        table.vpxFilePath.trim().toLowerCase().replace(/\\/g, '/'),
+      ),
+  );
+
+  tables.forEach((tableFile) => {
+    const normalizedVpxPath = tableFile.filePath
+      .trim()
+      .toLowerCase()
+      .replace(/\\/g, '/');
+
+    if (existingVpxPaths.has(normalizedVpxPath)) {
+      return;
+    }
+
+    const nextTable: Table = {
+      id: uuidv4(),
+      name: tableFile.name,
+      vpxFile: tableFile.fileName,
+      romFile: tableFile.rom?.name,
+      vpxFilePath: tableFile.filePath,
+      romFilePath: tableFile.rom?.path,
+      isFavorite: false,
+      dateAddedTimestamp: Date.now(),
+    };
+
+    tablesDb.create(nextTable);
+    existingVpxPaths.add(normalizedVpxPath);
+  });
+}
+
+function deleteUnusedRoms(roms: Array<FileSystemItem>): void {}
+
+function cleanTablesWithMissingFiles(
+  data: Array<{
+    table: Table;
+    missingVpxFile: boolean;
+    missingRomFile: boolean;
+  }>,
+): void {}
+
+export function applyScanResult(scanResult: ScanResult): ApiResult<null> {
   try {
-    const existingVpxPaths = new Set(
-      tablesDb
-        .getAll()
-        .map((table) =>
-          table.vpxFilePath.trim().toLowerCase().replace(/\\/g, '/'),
-        ),
-    );
-
-    tables.forEach((tableFile) => {
-      const normalizedVpxPath = tableFile.filePath
-        .trim()
-        .toLowerCase()
-        .replace(/\\/g, '/');
-
-      if (existingVpxPaths.has(normalizedVpxPath)) {
-        return;
-      }
-
-      const nextTable: Table = {
-        id: uuidv4(),
-        name: tableFile.name,
-        vpxFile: tableFile.fileName,
-        romFile: tableFile.rom?.name,
-        vpxFilePath: tableFile.filePath,
-        romFilePath: tableFile.rom?.path,
-        isFavorite: false,
-        dateAddedTimestamp: Date.now(),
-      };
-
-      tablesDb.create(nextTable);
-      existingVpxPaths.add(normalizedVpxPath);
-    });
+    registerTableFiles(scanResult.newTables);
+    deleteUnusedRoms(scanResult.unmatchedRoms);
+    cleanTablesWithMissingFiles(scanResult.tablesWithMissingFiles);
 
     return apiSuccess(null);
   } catch (error) {
@@ -281,7 +384,8 @@ export function exportTables(destinationPath: string): ApiResult<null> {
 
     tables.forEach((table) => {
       const tableDirectoryPath = path.join(destinationPath, table.name);
-      const tableDirectoryReady = createDirectoryIfNotExists(tableDirectoryPath);
+      const tableDirectoryReady =
+        createDirectoryIfNotExists(tableDirectoryPath);
 
       if (!tableDirectoryReady) {
         throw new Error(

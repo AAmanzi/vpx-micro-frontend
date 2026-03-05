@@ -1,6 +1,6 @@
 import { Config } from './config';
 import { FileSystemItem, TableFile } from './file';
-import { Table } from './table';
+import { ScanResult, Table } from './table';
 
 export interface ApiError {
   code: string;
@@ -31,8 +31,8 @@ export interface Api {
   ) => Promise<ApiResult<null>>;
   startTable: (tableId: string) => Promise<ApiResult<null>>;
   clearTables: () => Promise<ApiResult<null>>;
-  scanVpxLibrary: () => Promise<ApiResult<Array<TableFile>>>;
-  registerTableFiles: (tables: Array<TableFile>) => Promise<ApiResult<null>>;
+  scanVpxLibrary: () => Promise<ApiResult<ScanResult>>;
+  applyScanResult: (scanResult: ScanResult) => Promise<ApiResult<null>>;
   exportTables: (destinationPath: string) => Promise<ApiResult<null>>;
 
   // FileSystem

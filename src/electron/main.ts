@@ -5,6 +5,7 @@ import http from 'http';
 import path from 'path';
 
 import type { TableFile } from 'src/types/file';
+import type { ScanResult } from 'src/types/table';
 
 import * as api from './api';
 import * as db from './database/tables';
@@ -130,9 +131,8 @@ app.whenReady().then(async () => {
   );
   ipcMain.handle('api:clearTables', async () => api.clearTables());
   ipcMain.handle('api:scanVpxLibrary', async () => api.scanVpxLibrary());
-  ipcMain.handle(
-    'api:registerTableFiles',
-    async (_, tables: Array<TableFile>) => api.registerTableFiles(tables),
+  ipcMain.handle('api:applyScanResult', async (_, scanResult: ScanResult) =>
+    api.applyScanResult(scanResult),
   );
   ipcMain.handle('api:exportTables', async (_, destinationPath: string) =>
     api.exportTables(destinationPath),
