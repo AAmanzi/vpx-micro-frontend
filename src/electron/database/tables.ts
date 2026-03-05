@@ -64,3 +64,7 @@ export function seed(items: Table[]) {
   store.set('tables', map);
   return Object.keys(map).length;
 }
+
+export function clear(): void {
+  store.set('tables', {});
+}

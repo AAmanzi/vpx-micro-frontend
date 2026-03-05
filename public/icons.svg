@@ -97,6 +97,9 @@
   <symbol id="icon-chevron-down" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
     <path d="m6 9 6 6 6-6"/>
   </symbol>
+  <symbol id="icon-chevron-right" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+    <path d="m9 6 6 6-6 6"/>
+  </symbol>
   <symbol id="icon-circle-checkmark" viewBox="0 0 12 12">
     <g stroke-linecap="round" stroke-linejoin="round" clip-path="url(#a)">
       <path d="M5.998 10.996a4.998 4.998 0 1 0 0-9.996 4.998 4.998 0 0 0 0 9.996"/>
@@ -114,5 +117,27 @@
   <symbol id="icon-circle-cross" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
     <circle cx="12" cy="12" r="10"/>
     <path d="m15 9-6 6M9 9l6 6"/>
+  </symbol>
+  <symbol id="icon-database" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+    <ellipse cx="12" cy="5" rx="9" ry="3"/>
+    <path d="M3 5v14a9 3 0 0 0 18 0V5"/>
+    <path d="M3 12a9 3 0 0 0 18 0"/>
+  </symbol>
+  <symbol id="icon-scan-search" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+    <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/>
+    <circle cx="12" cy="12" r="3"/>
+    <path d="m16 16-1.9-1.9"/>
+  </symbol>
+  <symbol id="icon-package-cross" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+    <path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14M7.5 4.27l9 5.15"/>
+    <path d="M3.29 7 12 12l8.71-5M12 22V12M17 13l5 5m-5 0 5-5"/>
+  </symbol>
+  <symbol id="icon-folder-export" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+    <path d="M2 7.5V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-1.5M2 13h10"/>
+    <path d="m5 10-3 3 3 3"/>
+  </symbol>
+  <symbol id="icon-shield-checkmark" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+    <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>
+    <path d="m9 12 2 2 4-4"/>
   </symbol>
 </svg>

@@ -1,7 +1,10 @@
 import classNames from 'classnames';
 import { FunctionComponent, useState } from 'react';
 
-import Button, { Size as ButtonSize } from 'src/components/Button';
+import Button, {
+  Size as ButtonSize,
+  Type as ButtonType,
+} from 'src/components/Button';
 import Icon from 'src/components/Icon';
 import api from 'src/consts';
 import { useTablesContext } from 'src/providers/tables';
@@ -79,6 +82,7 @@ const TableCard: FunctionComponent<Props> = ({
           icon='play'
           onClick={handlePlay}
           size={ButtonSize.large}
+          type={ButtonType.secondary}
         />
       </div>
 

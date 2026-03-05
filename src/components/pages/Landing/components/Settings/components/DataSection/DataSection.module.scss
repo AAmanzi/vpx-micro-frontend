@@ -1,0 +1,88 @@
+.optionsWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: transparent;
+  border: thin solid var(--gray);
+  padding: 16px;
+  border-radius: 14px;
+  transition:
+    background-color 200ms ease-in,
+    border-color 200ms ease-in;
+}
+
+.purple {
+  .iconContainer {
+    background-color: rgba(var(--purple-rgb), 0.1);
+  }
+
+  .icon {
+    color: var(--purple);
+  }
+
+  &:hover {
+    border-color: var(--purple);
+    background-color: rgba(var(--purple-rgb), 0.1);
+
+    .iconContainer {
+      background-color: rgba(var(--purple-rgb), 0.2);
+    }
+
+    .chevron {
+      color: var(--purple);
+    }
+  }
+}
+
+.blue {
+  .iconContainer {
+    background-color: rgba(var(--blue-rgb), 0.1);
+  }
+
+  .icon {
+    color: var(--blue);
+  }
+
+  &:hover {
+    border-color: var(--blue);
+    background-color: rgba(var(--blue-rgb), 0.1);
+
+    .iconContainer {
+      background-color: rgba(var(--blue-rgb), 0.2);
+    }
+
+    .chevron {
+      color: var(--blue);
+    }
+  }
+}
+
+.iconContainer {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background-color 200ms ease-in;
+}
+
+.chevronWrapper {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.chevron {
+  color: var(--mid-gray);
+  transition: color 200ms ease-in;
+}

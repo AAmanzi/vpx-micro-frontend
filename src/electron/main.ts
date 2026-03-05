@@ -51,7 +51,7 @@ function waitForServer(port: number, timeout = 30000, interval = 300) {
 
 const createWindow = () => {
   const win = new BrowserWindow({
-    width: 800,
+    width: 900,
     height: 600,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -127,6 +127,15 @@ app.whenReady().then(async () => {
   );
   ipcMain.handle('api:startTable', async (_, tableId: string) =>
     api.startTable(tableId),
+  );
+  ipcMain.handle('api:clearTables', async () => api.clearTables());
+  ipcMain.handle('api:scanVpxLibrary', async () => api.scanVpxLibrary());
+  ipcMain.handle(
+    'api:registerTableFiles',
+    async (_, tables: Array<TableFile>) => api.registerTableFiles(tables),
+  );
+  ipcMain.handle('api:exportTables', async (_, destinationPath: string) =>
+    api.exportTables(destinationPath),
   );
 
   createWindow();

@@ -207,3 +207,61 @@ export function startTable(tableId: string): ApiResult<null> {
     return apiFailure(error);
   }
 }
+
+export function clearTables(): ApiResult<null> {
+  try {
+    tablesDb.clear();
+    return apiSuccess(null);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}
+
+export function scanVpxLibrary(): ApiResult<Array<TableFile>> {
+  return apiSuccess([]);
+}
+
+export function registerTableFiles(tables: Array<TableFile>): ApiResult<null> {
+  try {
+    const existingVpxPaths = new Set(
+      tablesDb
+        .getAll()
+        .map((table) =>
+          table.vpxFilePath.trim().toLowerCase().replace(/\\/g, '/'),
+        ),
+    );
+
+    tables.forEach((tableFile) => {
+      const normalizedVpxPath = tableFile.filePath
+        .trim()
+        .toLowerCase()
+        .replace(/\\/g, '/');
+
+      if (existingVpxPaths.has(normalizedVpxPath)) {
+        return;
+      }
+
+      const nextTable: Table = {
+        id: uuidv4(),
+        name: tableFile.name,
+        vpxFile: tableFile.fileName,
+        romFile: tableFile.rom?.name,
+        vpxFilePath: tableFile.filePath,
+        romFilePath: tableFile.rom?.path,
+        isFavorite: false,
+        dateAddedTimestamp: Date.now(),
+      };
+
+      tablesDb.create(nextTable);
+      existingVpxPaths.add(normalizedVpxPath);
+    });
+
+    return apiSuccess(null);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}
+
+export function exportTables(destinationPath: string): ApiResult<null> {
+  return apiSuccess(null);
+}

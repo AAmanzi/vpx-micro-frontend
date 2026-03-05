@@ -31,6 +31,10 @@ var frontendApi = {
     acceptedExtensions
   ),
   importTables: (tables, deleteAfterImport) => invoke("api:importTables", tables, deleteAfterImport),
+  clearTables: () => invoke("api:clearTables"),
+  scanVpxLibrary: () => invoke("api:scanVpxLibrary"),
+  registerTableFiles: (tables) => invoke("api:registerTableFiles", tables),
+  exportTables: (destinationPath) => invoke("api:exportTables"),
   getConfig: () => invoke("api:getConfig"),
   updateVpxRootPath: (path) => invoke("api:updateVpxRootPath", path),
   updateRomsDirectoryPath: (path) => invoke("api:updateRomsDirectoryPath", path),

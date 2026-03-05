@@ -30,6 +30,10 @@ export interface Api {
     deleteAfterImport: boolean,
   ) => Promise<ApiResult<null>>;
   startTable: (tableId: string) => Promise<ApiResult<null>>;
+  clearTables: () => Promise<ApiResult<null>>;
+  scanVpxLibrary: () => Promise<ApiResult<Array<TableFile>>>;
+  registerTableFiles: (tables: Array<TableFile>) => Promise<ApiResult<null>>;
+  exportTables: (destinationPath: string) => Promise<ApiResult<null>>;
 
   // FileSystem
   getPathForFile: (file: File) => ApiResult<string>;

@@ -2,7 +2,7 @@ import { contextBridge, ipcRenderer, webUtils } from 'electron';
 
 import type { Api, ApiResult } from 'src/types/api';
 import type { Config } from 'src/types/config';
-import type { FileSystemItem } from 'src/types/file';
+import type { FileSystemItem, TableFile } from 'src/types/file';
 import type { Table } from 'src/types/table';
 
 const invoke = <T>(channel: string, ...args: any[]): Promise<T> =>
@@ -51,6 +51,14 @@ const frontendApi: Api = {
     ),
   importTables: (tables, deleteAfterImport): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:importTables', tables, deleteAfterImport),
+  clearTables: (): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:clearTables'),
+  scanVpxLibrary: (): Promise<ApiResult<Array<TableFile>>> =>
+    invoke<ApiResult<Array<TableFile>>>('api:scanVpxLibrary'),
+  registerTableFiles: (tables: Array<TableFile>): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:registerTableFiles', tables),
+  exportTables: (destinationPath: string): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:exportTables'),
   getConfig: (): Promise<ApiResult<Config>> =>
     invoke<ApiResult<Config>>('api:getConfig'),
   updateVpxRootPath: (path: string): Promise<ApiResult<null>> =>

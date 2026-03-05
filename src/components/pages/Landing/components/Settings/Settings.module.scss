@@ -36,6 +36,24 @@
   &:not(:last-child) {
     margin-bottom: 32px;
   }
+
+  &.filePathsSection {
+    .sectionIcon {
+      color: var(--primary);
+    }
+  }
+
+  &.dataSection {
+    .sectionIcon {
+      color: var(--purple);
+    }
+  }
+
+  &.maintenanceSection {
+    .sectionIcon {
+      color: var(--red);
+    }
+  }
 }
 
 .sectionHeader {
@@ -43,24 +61,4 @@
   align-items: center;
   gap: 12px;
   margin-bottom: 24px;
-}
-
-.vpxDirectoryWrapper {
-  margin-bottom: 32px;
-
-  & .note {
-    margin-top: 8px;
-  }
-}
-
-.settingOption {
-  &:not(:last-child) {
-    margin-bottom: 16px;
-  }
-}
-
-.lockedSettingsWrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
 }

@@ -1,70 +1,14 @@
 import classNames from 'classnames';
-import { FunctionComponent, useState } from 'react';
+import { FunctionComponent } from 'react';
 
-import Button from 'src/components/Button';
 import Icon from 'src/components/Icon';
-import Input from 'src/components/Input';
-import api from 'src/consts';
-import { useConfigContext } from 'src/providers/config';
-import { useToastContext } from 'src/providers/toast';
-import { getDefaultRomsDirectory, getDefaultTablesDirectory } from 'src/utils';
 
 import style from './Settings.module.scss';
-import LockedSetting from './components/LockedSetting';
+import DataSection from './components/DataSection';
+import FilePathsSection from './components/FilePathsSection';
+import MaintenanceSection from './components/MaintenanceSection';
 
 const Settings: FunctionComponent = () => {
-  const { config, fetchConfig } = useConfigContext();
-  const { showErrorToast } = useToastContext();
-
-  const [_vpxRootPath, setVpxRootPath] = useState('');
-  const [_romsDirectory, setRomsDirectory] = useState('');
-  const [_tablesDirectory, setTablesDirectory] = useState('');
-
-  const vpxRootPath = _vpxRootPath || config?.vpxRootPath || '';
-  const romsDirectory = _romsDirectory || config?.romsDirectory || '';
-  const tablesDirectory = _tablesDirectory || config?.tablesDirectory || '';
-
-  const defaultRomsDirectory = getDefaultRomsDirectory(vpxRootPath);
-  const defaultTablesDirectory = getDefaultTablesDirectory(vpxRootPath);
-
-  const handleUpdateVpxRootPath = async () => {
-    const { error } = await api.updateVpxRootPath(vpxRootPath);
-
-    if (error) {
-      showErrorToast(error.message || 'Failed to update VPX root path');
-
-      return;
-    }
-
-    fetchConfig();
-  };
-
-  const handleSaveRomsDirectory = async (newValue: string) => {
-    setRomsDirectory(newValue);
-    const { error } = await api.updateRomsDirectoryPath(newValue);
-
-    if (error) {
-      showErrorToast(error.message || 'Failed to update ROMs directory');
-
-      return;
-    }
-
-    fetchConfig();
-  };
-
-  const handleSaveTablesDirectory = async (newValue: string) => {
-    setTablesDirectory(newValue);
-    const { error } = await api.updateTablesDirectoryPath(newValue);
-
-    if (error) {
-      showErrorToast(error.message || 'Failed to update tables directory');
-
-      return;
-    }
-
-    fetchConfig();
-  };
-
   return (
     <div className={style.wrapper}>
       <div className={style.container}>
@@ -86,49 +30,48 @@ const Settings: FunctionComponent = () => {
             </p>
           </div>
         </div>
-        <div className={style.section}>
+        <div className={classNames(style.section, style.filePathsSection)}>
           <div className={style.sectionHeader}>
             <Icon
-              className='accent-primary-text-color'
+              className={style.sectionIcon}
               icon='folder'
               width={20}
               height={20}
             />
             <h2 className='primary-text-color title-h4-bold'>File Paths</h2>
           </div>
-          <div className={style.vpxDirectoryWrapper}>
-            <Input
-              label='VPX Root Directory'
-              value={vpxRootPath}
-              onChange={setVpxRootPath}
-              onBlur={handleUpdateVpxRootPath}
-            />
-            <div
-              className={classNames(
-                'secondary-text-color',
-                'caption-small-regular',
-                style.note,
-              )}>
-              Primary directory containing <strong>VPinballX.exe.</strong>
-            </div>
+          <div>
+            <FilePathsSection />
           </div>
-          <div className={style.lockedSettingsWrapper}>
-            <LockedSetting
-              label='ROMs Directory'
-              value={romsDirectory}
-              defaultValue={defaultRomsDirectory}
-              onSave={handleSaveRomsDirectory}
-              lockedNote='Auto-syncing with Root'
-              lockedNoteIcon='reload'
+        </div>
+        <div className={classNames(style.section, style.dataSection)}>
+          <div className={style.sectionHeader}>
+            <Icon
+              className={style.sectionIcon}
+              icon='database'
+              width={20}
+              height={20}
             />
-            <LockedSetting
-              label='Tables Directory'
-              value={tablesDirectory}
-              defaultValue={defaultTablesDirectory}
-              onSave={handleSaveTablesDirectory}
-              lockedNote='Auto-syncing with Root'
-              lockedNoteIcon='reload'
+            <h2 className='primary-text-color title-h4-bold'>
+              Data Management
+            </h2>
+          </div>
+          <div>
+            <DataSection />
+          </div>
+        </div>
+        <div className={classNames(style.section, style.maintenanceSection)}>
+          <div className={style.sectionHeader}>
+            <Icon
+              className={style.sectionIcon}
+              icon='shield-checkmark'
+              width={20}
+              height={20}
             />
+            <h2 className='primary-text-color title-h4-bold'>Maintenance</h2>
+          </div>
+          <div>
+            <MaintenanceSection />
           </div>
         </div>
       </div>

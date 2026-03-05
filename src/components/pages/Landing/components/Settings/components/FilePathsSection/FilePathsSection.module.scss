@@ -1,0 +1,19 @@
+.vpxDirectoryWrapper {
+  margin-bottom: 32px;
+
+  & .note {
+    margin-top: 8px;
+  }
+}
+
+.settingOption {
+  &:not(:last-child) {
+    margin-bottom: 16px;
+  }
+}
+
+.lockedSettingsWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
