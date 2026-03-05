@@ -66,6 +66,7 @@ const FilePathsSection: FunctionComponent = () => {
   return (
     <>
       <div className={style.vpxDirectoryWrapper}>
+        {/* TODO: folder picker */}
         <Input
           label='VPX Root Directory'
           value={vpxRootPath}
@@ -82,6 +83,7 @@ const FilePathsSection: FunctionComponent = () => {
         </div>
       </div>
       <div className={style.lockedSettingsWrapper}>
+        {/* TODO: folder picker */}
         <LockedSetting
           label='ROMs Directory'
           value={romsDirectory}
@@ -90,6 +92,7 @@ const FilePathsSection: FunctionComponent = () => {
           lockedNote='Auto-syncing with Root'
           lockedNoteIcon='reload'
         />
+        {/* TODO: folder picker */}
         <LockedSetting
           label='Tables Directory'
           value={tablesDirectory}

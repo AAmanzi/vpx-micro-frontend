@@ -26,7 +26,7 @@ const Toast: FunctionComponent<Props> = ({
     }
 
     startTime.current = Date.now();
-    // timeoutId.current = window.setTimeout(close, remainingTime.current);
+    timeoutId.current = window.setTimeout(close, remainingTime.current);
   };
 
   const pauseTimer = () => {

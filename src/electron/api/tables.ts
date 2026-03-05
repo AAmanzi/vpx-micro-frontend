@@ -11,6 +11,7 @@ import * as configDb from '../database/config';
 import * as tablesDb from '../database/tables';
 import {
   copyFile,
+  createDirectoryIfNotExists,
   deleteFile,
   moveFile,
   removeEmptyParentDirectories,
@@ -263,5 +264,42 @@ export function registerTableFiles(tables: Array<TableFile>): ApiResult<null> {
 }
 
 export function exportTables(destinationPath: string): ApiResult<null> {
-  return apiSuccess(null);
+  try {
+    const result = createDirectoryIfNotExists(destinationPath);
+
+    if (!result) {
+      return {
+        success: false,
+        error: {
+          code: 'EXPORT_FAILED',
+          message: `Failed to create destination directory: ${destinationPath}`,
+        },
+      };
+    }
+
+    const tables = tablesDb.getAll();
+
+    tables.forEach((table) => {
+      const tableDirectoryPath = path.join(destinationPath, table.name);
+      const tableDirectoryReady = createDirectoryIfNotExists(tableDirectoryPath);
+
+      if (!tableDirectoryReady) {
+        throw new Error(
+          `Failed to create table destination directory: ${tableDirectoryPath}`,
+        );
+      }
+
+      const vpxTargetPath = path.join(tableDirectoryPath, table.vpxFile);
+      copyFile(table.vpxFilePath, vpxTargetPath);
+
+      if (table.romFilePath && table.romFile) {
+        const romTargetPath = path.join(tableDirectoryPath, table.romFile);
+        copyFile(table.romFilePath, romTargetPath);
+      }
+    });
+
+    return apiSuccess(null);
+  } catch (error) {
+    return apiFailure(error);
+  }
 }

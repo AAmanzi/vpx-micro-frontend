@@ -136,3 +136,34 @@ export const removeEmptyParentDirectories = (sourcePath: string): void => {
     }
   }
 };
+
+export const createDirectoryIfNotExists = (directoryPath: string): boolean => {
+  const resolvedDirectoryPath = path.resolve(resolveUserPath(directoryPath));
+  const parentDirectory = path.dirname(resolvedDirectoryPath);
+
+  try {
+    const directoryStat = fs.statSync(resolvedDirectoryPath);
+    return directoryStat.isDirectory();
+  } catch (error: any) {
+    if (error?.code !== 'ENOENT') {
+      return false;
+    }
+  }
+
+  try {
+    const parentStat = fs.statSync(parentDirectory);
+
+    if (!parentStat.isDirectory()) {
+      return false;
+    }
+  } catch {
+    return false;
+  }
+
+  try {
+    fs.mkdirSync(resolvedDirectoryPath);
+    return true;
+  } catch {
+    return false;
+  }
+};

@@ -1,0 +1,70 @@
+.content {
+  margin: 24px;
+}
+
+.note {
+  margin-top: 8px;
+  margin-bottom: 24px;
+}
+
+.summary {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  border-radius: 14px;
+  background-color: rgba(var(--blue-rgb), 0.05);
+  border: thin solid rgba(var(--blue-rgb), 0.3);
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.iconWrapper {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: rgba(var(--blue-rgb), 0.1);
+
+  & > svg {
+    color: var(--blue);
+  }
+}
+
+.tablesList {
+  margin-top: 12px;
+  max-height: 192px;
+  overflow-y: auto;
+}
+
+.tableItem {
+  border-radius: 14px;
+  background-color: rgba(var(--gray-rgb), 0.3);
+  border: thin solid var(--gray);
+  padding: 12px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+
+  &:not(:last-child) {
+    margin-bottom: 8px;
+  }
+}
+
+.tableIcon {
+  width: 48px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  opacity: 0.8;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+  margin-left: 24px;
+  margin-right: 24px;
+  gap: 12px;
+}

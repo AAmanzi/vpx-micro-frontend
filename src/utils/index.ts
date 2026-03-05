@@ -1,4 +1,5 @@
 import { VPX_DEFAULT_ROM_PATH, VPX_DEFAULT_TABLES_PATH } from 'src/consts/vpx';
+import { Table } from 'src/types/table';
 
 export const getDefaultRomsDirectory = (vpxRootPath: string): string => {
   return `${vpxRootPath}/${VPX_DEFAULT_ROM_PATH}`;
@@ -69,4 +70,12 @@ export const getDeterministicVariant = (
   }
 
   return hash % variantsCount;
+};
+
+export const getTableGradientVariant = (table: Table): string => {
+  const variant = getDeterministicVariant(
+    table?.romFile || table.vpxFile || table.id,
+    8,
+  );
+  return `tableGradient${variant}`;
 };

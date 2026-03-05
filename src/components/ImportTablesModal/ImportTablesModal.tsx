@@ -42,6 +42,9 @@ const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
     const filteredFiles = filterExistingFiles({ tables, files });
 
     try {
+      // TODO: infer table names from folder names if
+      //    folder is dropped and contains a single .vpx file
+
       const result = await buildImportSelectionResult({
         currentTables: tablesToImport,
         currentUnassignedRoms: unassignedRoms,

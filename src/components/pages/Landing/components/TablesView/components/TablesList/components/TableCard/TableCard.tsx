@@ -13,7 +13,7 @@ import { Table } from 'src/types/table';
 import {
   displayDate,
   displayRelativeDate,
-  getDeterministicVariant,
+  getTableGradientVariant,
 } from 'src/utils';
 
 import style from './TableCard.module.scss';
@@ -37,6 +37,7 @@ const TableCard: FunctionComponent<Props> = ({
 
   const handlePlay = async () => {
     const { error } = await api.startTable(id);
+    fetchTables();
 
     if (error) {
       showErrorToast(error.message || 'Failed to start table');
@@ -68,14 +69,12 @@ const TableCard: FunctionComponent<Props> = ({
     setIsSettingsOpen(false);
   };
 
-  const playAreaVariant = getDeterministicVariant(romFile || vpxFile || id, 8);
-
   return (
     <div className={style.card}>
       <div
         className={classNames(
           style.playArea,
-          style[`playAreaVariant${playAreaVariant}`],
+          getTableGradientVariant({ romFile, vpxFile, id } as Table),
         )}>
         <Button
           circle

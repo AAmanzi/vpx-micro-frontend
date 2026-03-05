@@ -59,3 +59,51 @@ h5 {
 h6 {
   @include title-h6-regular-mixin;
 }
+
+.tableGradient0 {
+  background-image:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.84) 100%),
+    linear-gradient(135deg, #8dff00 0%, #00c95a 100%);
+}
+
+.tableGradient1 {
+  background-image:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.84) 100%),
+    linear-gradient(135deg, #ffb000 0%, #ff4e00 100%);
+}
+
+.tableGradient2 {
+  background-image:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0.86) 100%),
+    linear-gradient(135deg, #1ac6ff 0%, #3f6dff 100%);
+}
+
+.tableGradient3 {
+  background-image:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0.86) 100%),
+    linear-gradient(135deg, #9a63ff 0%, #d84dff 100%);
+}
+
+.tableGradient4 {
+  background-image:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.24) 0%, rgba(0, 0, 0, 0.88) 100%),
+    linear-gradient(135deg, #ff5a8a 0%, #ff2f5a 100%);
+}
+
+.tableGradient5 {
+  background-image:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0.86) 100%),
+    linear-gradient(135deg, #00ffe0 0%, #00b8ff 100%);
+}
+
+.tableGradient6 {
+  background-image:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0.86) 100%),
+    linear-gradient(135deg, #ffed00 0%, #ff8a00 100%);
+}
+
+.tableGradient7 {
+  background-image:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0.86) 100%),
+    linear-gradient(135deg, #5dff8b 0%, #00e0b6 100%);
+}

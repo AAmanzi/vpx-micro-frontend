@@ -58,7 +58,7 @@ const frontendApi: Api = {
   registerTableFiles: (tables: Array<TableFile>): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:registerTableFiles', tables),
   exportTables: (destinationPath: string): Promise<ApiResult<null>> =>
-    invoke<ApiResult<null>>('api:exportTables'),
+    invoke<ApiResult<null>>('api:exportTables', destinationPath),
   getConfig: (): Promise<ApiResult<Config>> =>
     invoke<ApiResult<Config>>('api:getConfig'),
   updateVpxRootPath: (path: string): Promise<ApiResult<null>> =>
