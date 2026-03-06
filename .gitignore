@@ -8,3 +8,4 @@
 *.log
 tsconfig.tsbuildinfo
 /gitignore
+/src/electron/preload.js
