@@ -1,0 +1,59 @@
+.container {
+  padding: 16px;
+}
+
+.yellow {
+  background-color: rgba(var(--yellow-rgb), 0.1);
+
+  .icon,
+  .warningText,
+  .selectAllButton {
+    color: var(--yellow);
+  }
+}
+
+.blue {
+  background-color: rgba(var(--blue-rgb), 0.1);
+
+  .icon,
+  .warningText,
+  .selectAllButton {
+    color: var(--blue);
+  }
+}
+
+.red {
+  background-color: rgba(var(--red-rgb), 0.1);
+
+  .icon,
+  .warningText,
+  .selectAllButton {
+    color: var(--red);
+  }
+}
+
+.warning {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.spacer {
+  width: 8px;
+  height: 8px;
+  background-color: var(--light-gray);
+  border-radius: 50%;
+}

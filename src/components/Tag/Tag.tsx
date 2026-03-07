@@ -11,6 +11,7 @@ const Tag: FunctionComponent<Props> = ({ label, icon, type = Type.info }) => {
       className={classNames(style.container, {
         [style.info]: type === Type.info,
         [style.success]: type === Type.success,
+        [style.warning]: type === Type.warning,
       })}>
       {icon && <Icon icon={icon} width={10} height={10} />}
       <span className='caption-small-bold'>{label}</span>

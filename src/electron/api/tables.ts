@@ -4,11 +4,16 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { VPX_DEFAULT_EXECUTABLE } from 'src/consts/vpx';
 import type { ApiResult } from 'src/types/api';
-import type { FileSystemItem, TableFile } from 'src/types/file';
+import type { TableFile } from 'src/types/file';
 import type { ScanResult, Table } from 'src/types/table';
 
 import * as configDb from '../database/config';
 import * as tablesDb from '../database/tables';
+import {
+  cleanTablesWithMissingFiles,
+  deleteUnusedRoms,
+  registerTableFiles,
+} from '../utils/applyScanResult';
 import {
   copyFile,
   createDirectoryIfNotExists,
@@ -101,6 +106,7 @@ export function renameTable(id: string, newName: string): ApiResult<null> {
 
 export function importTables(
   tableFiles: Array<TableFile>,
+  // TODO: check if this works -- seems like it deleted origin files when flag was false
   deleteAfterImport: boolean,
 ): ApiResult<null> {
   try {
@@ -279,29 +285,6 @@ export function scanVpxLibrary(): ApiResult<ScanResult> {
       !scannedTables.some((table) => table.rom?.path === scannedRom.path),
   );
 
-  // TODO: remove
-  console.log({
-    tablesWithMissingFiles: tablesWithMissingFiles.map((item) => ({
-      tableName: item.table.name,
-      vpxFile: item.table.vpxFilePath,
-      romFile: item.table.romFilePath,
-      missingVpxFile: item.missingVpxFile,
-      missingRomFile: item.missingRomFile,
-    })),
-    existingVpxFiles,
-    existingRomFiles,
-    existingRomFilesWithTables,
-    unmatchedRomsInDatabase,
-    scannedRoms,
-    scannedTables: scannedTables.map((table) => ({
-      name: table.name,
-      vpxFilePath: table.filePath,
-      romFilePath: table.rom?.path,
-      expectedRomName: table.expectedRomName,
-    })),
-    unmatchedRoms,
-  });
-
   return apiSuccess({
     newTables: scannedTables,
     unmatchedRoms,
@@ -309,53 +292,9 @@ export function scanVpxLibrary(): ApiResult<ScanResult> {
   });
 }
 
-function registerTableFiles(tables: Array<TableFile>): void {
-  const existingVpxPaths = new Set(
-    tablesDb
-      .getAll()
-      .map((table) =>
-        table.vpxFilePath.trim().toLowerCase().replace(/\\/g, '/'),
-      ),
-  );
-
-  tables.forEach((tableFile) => {
-    const normalizedVpxPath = tableFile.filePath
-      .trim()
-      .toLowerCase()
-      .replace(/\\/g, '/');
-
-    if (existingVpxPaths.has(normalizedVpxPath)) {
-      return;
-    }
-
-    const nextTable: Table = {
-      id: uuidv4(),
-      name: tableFile.name,
-      vpxFile: tableFile.fileName,
-      romFile: tableFile.rom?.name,
-      vpxFilePath: tableFile.filePath,
-      romFilePath: tableFile.rom?.path,
-      isFavorite: false,
-      dateAddedTimestamp: Date.now(),
-    };
-
-    tablesDb.create(nextTable);
-    existingVpxPaths.add(normalizedVpxPath);
-  });
-}
-
-function deleteUnusedRoms(roms: Array<FileSystemItem>): void {}
-
-function cleanTablesWithMissingFiles(
-  data: Array<{
-    table: Table;
-    missingVpxFile: boolean;
-    missingRomFile: boolean;
-  }>,
-): void {}
-
 export function applyScanResult(scanResult: ScanResult): ApiResult<null> {
   try {
+    // TODO: toast warning if some files failed
     registerTableFiles(scanResult.newTables);
     deleteUnusedRoms(scanResult.unmatchedRoms);
     cleanTablesWithMissingFiles(scanResult.tablesWithMissingFiles);
@@ -368,6 +307,8 @@ export function applyScanResult(scanResult: ScanResult): ApiResult<null> {
 
 export function exportTables(destinationPath: string): ApiResult<null> {
   try {
+    // TODO: finish export even if some files fail
+    // TODO: toast warning if some files failed
     const result = createDirectoryIfNotExists(destinationPath);
 
     if (!result) {

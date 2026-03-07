@@ -1,0 +1,35 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+}
+
+.row {
+  border: thin solid var(--gray);
+  border-radius: 14px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(var(--gray-rgb), 0.2);
+  transition:
+    border-color 200ms ease-in,
+    background 200ms ease-in;
+
+  &.selected {
+    border-color: var(--blue);
+    background: rgba(var(--blue-rgb), 0.1);
+  }
+}
+
+.content {
+  flex: 1;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}

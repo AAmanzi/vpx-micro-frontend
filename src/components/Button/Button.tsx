@@ -29,6 +29,8 @@ const Button: FunctionComponent<Props> = ({
         [style.secondary]: type === Type.secondary,
         [style.transparent]: type === Type.transparent,
         [style.danger]: type === Type.danger,
+        [style.primaryAlt]: type === Type.primaryAlt,
+        [style.primaryAltTransparent]: type === Type.primaryAltTransparent,
         [style.small]: size === Size.small,
         [style.medium]: size === Size.medium,
         [style.large]: size === Size.large,
@@ -39,9 +41,7 @@ const Button: FunctionComponent<Props> = ({
           <Icon icon={icon} className={style.icon} />
         </div>
       )}
-      <span className={classNames('button-text-16', 'primary-text-color')}>
-        {label}
-      </span>
+      <span className={classNames('button-text-16', style.label)}>{label}</span>
     </div>
   );
 

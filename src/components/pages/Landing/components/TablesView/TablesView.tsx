@@ -89,8 +89,10 @@ const TablesView: FunctionComponent<Props> = ({
         </div>
       </div>
       <div className={style.container}>
-        <h1>{title}</h1>
-        <p>{displayedDescription}</p>
+        <h1 className='primary-text-color title-h4-bold'>{title}</h1>
+        <p className='secondary-text-color caption-big-regular'>
+          {displayedDescription}
+        </p>
 
         <div className={style.tablesWrapper}>
           {hasResults && <TablesList tables={filteredTables} />}{' '}

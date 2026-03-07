@@ -125,6 +125,7 @@ const Modal: FunctionComponent<Props> = ({
           className={classNames(style.modal, modalClassName, {
             [style.small]: size === Size.small,
             [style.medium]: size === Size.medium,
+            [style.large]: size === Size.large,
           })}
           onClick={stopBubbling}>
           {hasHeader && (

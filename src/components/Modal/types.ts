@@ -3,6 +3,7 @@ import { Type as ButtonType } from 'src/components/Button';
 export enum Size {
   small = 'small',
   medium = 'medium',
+  large = 'large',
   unset = 'unset',
 }
 

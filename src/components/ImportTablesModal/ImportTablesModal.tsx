@@ -133,7 +133,8 @@ const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
     <Modal
       onExitClick={onClose}
       title='Import Tables & ROMs'
-      description='Drag folders or individual .vpx and .zip files'>
+      description='Drag folders or individual .vpx and .zip files'
+      headerClassName={style.header}>
       <Form submit={handleSubmit}>
         <div className={style.content}>
           <FileUpload

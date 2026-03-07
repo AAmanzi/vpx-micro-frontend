@@ -24,3 +24,12 @@
     color: var(--green);
   }
 }
+
+.warning {
+  background-color: rgba(var(--yellow-rgb), 0.1);
+
+  & > span,
+  & > svg {
+    color: var(--yellow);
+  }
+}

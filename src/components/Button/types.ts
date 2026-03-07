@@ -5,6 +5,8 @@ export enum Type {
   secondary = 'secondary',
   transparent = 'transparent',
   danger = 'danger',
+  primaryAlt = 'primaryAlt',
+  primaryAltTransparent = 'primaryAltTransparent',
 }
 
 export enum Size {

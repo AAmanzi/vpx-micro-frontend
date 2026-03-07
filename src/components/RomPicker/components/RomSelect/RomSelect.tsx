@@ -7,13 +7,13 @@ import useClickOutside from 'src/utils/useClickOutside';
 import style from './RomSelect.module.scss';
 
 interface Props {
-  unassignedRoms: Array<FileSystemItem>;
+  options: Array<FileSystemItem>;
   onSelect: (rom: FileSystemItem) => void;
   onClose: () => void;
 }
 
 const RomSelect: FunctionComponent<Props> = ({
-  unassignedRoms,
+  options,
   onSelect,
   onClose,
 }) => {
@@ -37,7 +37,7 @@ const RomSelect: FunctionComponent<Props> = ({
         Select ROM
       </div>
       <div>
-        {unassignedRoms.map((rom) => (
+        {options.map((rom) => (
           <button
             type='button'
             key={rom.path}

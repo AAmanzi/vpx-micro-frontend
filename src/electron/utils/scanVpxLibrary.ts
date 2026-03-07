@@ -172,7 +172,14 @@ export const scanNewTables = (
 
       visitedTableFileNames.add(normalizedFileName);
 
-      const expectedRomName = getExpectedRomNameFromVpxFile(entryPath);
+      let expectedRomName: string | null = null;
+
+      try {
+        expectedRomName = getExpectedRomNameFromVpxFile(entryPath);
+      } catch {
+        expectedRomName = null;
+      }
+
       const normalizedExpectedRomName = expectedRomName?.trim().toLowerCase();
       const matchedRom = normalizedExpectedRomName
         ? romsByName.get(normalizedExpectedRomName)

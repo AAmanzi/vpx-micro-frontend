@@ -57,6 +57,31 @@
   }
 }
 
+.primaryAlt {
+  background-color: var(--purple);
+  color: var(--white);
+  box-shadow:
+    0px 4px 6px -4px rgba(var(--purple-rgb), 0.2),
+    0px 10px 15px -3px rgba(var(--purple-rgb), 0.2);
+
+  &:hover {
+    background-color: rgba(var(--purple-rgb), 0.8);
+  }
+}
+
+.primaryAltTransparent {
+  background-color: rgba(var(--purple-rgb), 0.1);
+  color: var(--purple);
+
+  .icon {
+    color: var(--purple);
+  }
+
+  &:hover {
+    background-color: rgba(var(--purple-rgb), 0.2);
+  }
+}
+
 .small {
   height: 36px;
   padding-left: 24px;
@@ -102,6 +127,10 @@
   .iconWrapper {
     margin-right: 0;
   }
+}
+
+.label {
+  color: inherit;
 }
 
 .iconWrapper {
