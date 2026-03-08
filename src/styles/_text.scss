@@ -1,285 +1,181 @@
-@mixin title-h1-bold-mixin {
-  font-family: 'Nunito', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-weight: 700;
-  font-size: 41px;
-  line-height: 48px;
-  letter-spacing: -1px;
-}
-
-.title-h1-bold {
-  @include title-h1-bold-mixin;
-}
-
-.title-h1-regular {
-  font-family: 'Nunito', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-weight: 400;
-  font-size: 41px;
-  line-height: 48px;
-  letter-spacing: -1px;
-}
-
-@mixin title-h2-bold-mixin {
-  font-family: 'Nunito', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+@mixin heading-2-bold-mixin {
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: 700;
   font-size: 36px;
   line-height: 44px;
   letter-spacing: -0.5px;
 }
 
-.title-h2-bold {
-  @include title-h2-bold-mixin;
+.heading-2-bold {
+  @include heading-2-bold-mixin;
 }
 
-.title-h2-regular {
-  font-family: 'Nunito', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-weight: 400;
-  font-size: 36px;
-  line-height: 44px;
-  letter-spacing: -0.5px;
-}
-
-@mixin title-h3-bold-mixin {
-  font-family: 'Nunito', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-weight: 700;
-  font-size: 28px;
-  line-height: 36px;
-  letter-spacing: -0.34px;
-}
-
-.title-h3-bold {
-  @include title-h3-bold-mixin;
-}
-
-@mixin title-h4-bold-mixin {
-  font-family: 'Nunito', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+@mixin heading-4-bold-mixin {
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: 700;
   font-size: 24px;
   line-height: 32px;
   letter-spacing: normal;
 }
 
-.title-h4-bold {
-  @include title-h4-bold-mixin;
+.heading-4-bold {
+  @include heading-4-bold-mixin;
 }
 
-@mixin title-h4-regular-mixin {
-  font-family: 'Nunito', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-weight: 400;
-  font-size: 24px;
-  line-height: 32px;
-  letter-spacing: normal;
-}
-
-.title-h4-regular {
-  @include title-h4-regular-mixin;
-}
-
-@mixin title-h5-bold-mixin {
-  font-family: 'Nunito', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+@mixin heading-5-bold-mixin {
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: 700;
   font-size: 20px;
   line-height: 28px;
   letter-spacing: -0.2px;
 }
 
-.title-h5-bold {
-  @include title-h5-bold-mixin;
+.heading-5-bold {
+  @include heading-5-bold-mixin;
 }
 
-@mixin title-h6-regular-mixin {
-  font-family: 'Nunito', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-weight: 400;
-  font-size: 18px;
-  line-height: 26px;
-  letter-spacing: -0.22px;
-}
-
-.title-h6-regular {
-  @include title-h6-regular-mixin;
-}
-
-@mixin title-h6-bold-mixin {
-  font-family: 'Nunito', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+@mixin heading-6-bold-mixin {
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: 700;
   font-size: 18px;
   line-height: 26px;
   letter-spacing: -0.22px;
 }
 
-.title-h6-bold {
-  @include title-h6-bold-mixin;
+.heading-6-bold {
+  @include heading-6-bold-mixin;
 }
 
-@mixin text-regular-mixin {
-  font-family: 'Nunito', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+@mixin body-lg-regular-mixin {
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: 400;
   font-size: 18px;
   line-height: 26px;
   letter-spacing: -0.2px;
 }
 
-.text-regular {
-  @include text-regular-mixin;
+.body-lg-regular {
+  @include body-lg-regular-mixin;
 }
 
-@mixin button-text-16-mixin {
-  font-family: 'Nunito', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+@mixin label-md-bold-mixin {
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: 800;
   font-size: 16px;
   line-height: 24px;
   letter-spacing: normal;
 }
 
-.button-text-16 {
-  @include button-text-16-mixin;
+.label-md-bold {
+  @include label-md-bold-mixin;
 }
 
-@mixin button-text-14-mixin {
-  font-family: 'Nunito', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-weight: 800;
-  font-size: 14px;
-  line-height: 20px;
-  letter-spacing: normal;
-}
-
-.button-text-14 {
-  @include button-text-14-mixin;
-}
-
-@mixin subtitle-extrabold-mixin {
-  font-family: 'Nunito', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-weight: 800;
-  font-size: 18px;
-  line-height: 28px;
-  letter-spacing: -0.4px;
-}
-
-.subtitle-extrabold {
-  @include subtitle-extrabold-mixin;
-}
-
-.subtitle-bold {
-  font-family: 'Nunito', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-weight: 700;
-  font-size: 12px;
-  line-height: 20px;
-  letter-spacing: normal;
-}
-
-@mixin caption-big-regular-mixin {
-  font-family: 'Nunito', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+@mixin body-md-regular-mixin {
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: 400;
   font-size: 16px;
   line-height: 24px;
   letter-spacing: 0.2px;
 }
 
-.caption-big-regular {
-  @include caption-big-regular-mixin;
+.body-md-regular {
+  @include body-md-regular-mixin;
 }
 
-@mixin caption-big-semibold-mixin {
-  font-family: 'Nunito', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+@mixin body-md-semibold-mixin {
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: 600;
   font-size: 16px;
   line-height: 24px;
   letter-spacing: 0.2px;
 }
 
-.caption-big-semibold {
-  @include caption-big-semibold-mixin;
+.body-md-semibold {
+  @include body-md-semibold-mixin;
 }
 
-@mixin caption-big-bold-mixin {
-  font-family: 'Nunito', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+@mixin body-md-bold-mixin {
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: 700;
   font-size: 16px;
   line-height: 24px;
   letter-spacing: 0.2px;
 }
 
-.caption-big-bold {
-  @include caption-big-bold-mixin;
+.body-md-bold {
+  @include body-md-bold-mixin;
 }
 
-@mixin caption-medium-regular-mixin {
-  font-family: 'Nunito', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+@mixin body-sm-regular-mixin {
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
   letter-spacing: normal;
 }
 
-.caption-medium-regular {
-  @include caption-medium-regular-mixin;
+.body-sm-regular {
+  @include body-sm-regular-mixin;
 }
 
-@mixin caption-medium-semibold-mixin {
-  font-family: 'Nunito', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+@mixin body-sm-semibold-mixin {
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: 600;
   font-size: 14px;
   line-height: 20px;
   letter-spacing: normal;
 }
 
-.caption-medium-semibold {
-  @include caption-medium-semibold-mixin;
+.body-sm-semibold {
+  @include body-sm-semibold-mixin;
 }
 
-@mixin caption-medium-bold-mixin {
-  font-family: 'Nunito', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+@mixin body-sm-bold-mixin {
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: 700;
   font-size: 14px;
   line-height: 20px;
   letter-spacing: normal;
 }
 
-.caption-medium-bold {
-  @include caption-medium-bold-mixin;
+.body-sm-bold {
+  @include body-sm-bold-mixin;
 }
 
-@mixin caption-small-regular-mixin {
-  font-family: 'Nunito', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+@mixin body-xs-regular-mixin {
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: 400;
   font-size: 12px;
   line-height: 16px;
   letter-spacing: normal;
 }
 
-.caption-small-regular {
-  @include caption-small-regular-mixin;
+.body-xs-regular {
+  @include body-xs-regular-mixin;
 }
 
-@mixin caption-small-semibold-mixin {
-  font-family: 'Nunito', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+@mixin body-xs-semibold-mixin {
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: 600;
   font-size: 12px;
   line-height: 16px;
   letter-spacing: normal;
 }
 
-.caption-small-semibold {
-  @include caption-small-semibold-mixin;
+.body-xs-semibold {
+  @include body-xs-semibold-mixin;
 }
 
-@mixin caption-small-bold-mixin {
-  font-family: 'Nunito', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+@mixin body-xs-bold-mixin {
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: 700;
   font-size: 12px;
   line-height: 16px;
   letter-spacing: normal;
 }
 
-.caption-small-bold {
-  @include caption-small-bold-mixin;
-}
-
-.caption-extra-small-semibold {
-  font-family: 'Nunito', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-weight: 600;
-  font-size: 10px;
-  line-height: 12px;
-  letter-spacing: normal;
+.body-xs-bold {
+  @include body-xs-bold-mixin;
 }
 
 .uppercase {

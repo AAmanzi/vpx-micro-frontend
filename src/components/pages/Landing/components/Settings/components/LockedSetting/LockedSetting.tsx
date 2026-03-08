@@ -63,7 +63,7 @@ const LockedSetting: FunctionComponent<Props> = ({
       <div className={style.header}>
         <span
           className={classNames(
-            'caption-medium-regular',
+            'body-sm-regular',
             'secondary-text-color',
           )}>
           {label}
@@ -98,7 +98,7 @@ const LockedSetting: FunctionComponent<Props> = ({
               className='secondary-text-color'
             />
           )}
-          <span className='caption-small-regular secondary-text-color'>
+          <span className='body-xs-regular secondary-text-color'>
             <i>{lockedNote}</i>
           </span>
         </div>

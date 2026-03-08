@@ -30,7 +30,7 @@ const RomSelect: FunctionComponent<Props> = ({
       <div
         className={classNames(
           'secondary-text-color',
-          'caption-small-semibold',
+          'body-xs-semibold',
           'uppercase',
           style.title,
         )}>
@@ -43,7 +43,7 @@ const RomSelect: FunctionComponent<Props> = ({
             key={rom.path}
             className={style.option}
             onClick={handleSelect(rom)}>
-            <span className='primary-text-color caption-big-semibold'>
+            <span className='primary-text-color body-md-semibold'>
               {rom.name}
             </span>
           </button>

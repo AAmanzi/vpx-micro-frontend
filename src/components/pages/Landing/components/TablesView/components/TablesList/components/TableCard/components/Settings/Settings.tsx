@@ -52,7 +52,7 @@ const Settings: FunctionComponent<Props> = ({
         <div className={style.iconWrapper}>
           <Icon icon='edit' className={style.icon} />
         </div>
-        <span className={classNames('caption-medium-semibold', style.label)}>
+        <span className={classNames('body-sm-semibold', style.label)}>
           Rename Table
         </span>
       </button>
@@ -62,7 +62,7 @@ const Settings: FunctionComponent<Props> = ({
         <div className={style.iconWrapper}>
           <Icon icon='trash' className={style.icon} />
         </div>
-        <span className={classNames('caption-medium-semibold', style.label)}>
+        <span className={classNames('body-sm-semibold', style.label)}>
           Delete table
         </span>
       </button>

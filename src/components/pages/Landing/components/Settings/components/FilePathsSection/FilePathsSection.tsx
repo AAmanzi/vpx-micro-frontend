@@ -76,7 +76,7 @@ const FilePathsSection: FunctionComponent = () => {
         <div
           className={classNames(
             'secondary-text-color',
-            'caption-small-regular',
+            'body-xs-regular',
             style.note,
           )}>
           Primary directory containing <strong>VPinballX.exe.</strong>

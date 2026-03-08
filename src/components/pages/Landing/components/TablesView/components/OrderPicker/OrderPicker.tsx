@@ -64,7 +64,7 @@ const OrderPicker: FunctionComponent<Props> = ({
         <span
           className={classNames(
             'secondary-text-color',
-            'caption-big-regular',
+            'body-md-regular',
             style.selectedLabel,
           )}>
           {selectedLabel}
@@ -84,7 +84,7 @@ const OrderPicker: FunctionComponent<Props> = ({
           <div
             className={classNames(
               'secondary-text-color',
-              'caption-small-semibold',
+              'body-xs-semibold',
               'uppercase',
               style.title,
             )}>
@@ -99,7 +99,7 @@ const OrderPicker: FunctionComponent<Props> = ({
                   [style.selected]: option.value === order,
                 })}
                 onClick={handleSelectOrder(option.value)}>
-                <span className='primary-text-color caption-big-semibold'>
+                <span className='primary-text-color body-md-semibold'>
                   {option.label}
                 </span>
               </button>
@@ -107,7 +107,7 @@ const OrderPicker: FunctionComponent<Props> = ({
           </div>
 
           <div className={style.switchRow}>
-            <span className='secondary-text-color caption-medium-regular'>
+            <span className='secondary-text-color body-sm-regular'>
               Keep favorites on top
             </span>
             <CheckboxSwitch

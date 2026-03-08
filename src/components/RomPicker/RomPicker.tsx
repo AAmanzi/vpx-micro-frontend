@@ -68,7 +68,7 @@ const RomPicker: FunctionComponent<Props> = ({
           width={10}
           height={10}
         />
-        <span className='caption-small-bold'>
+        <span className='body-xs-bold'>
           {expectedRomName
             ? `Expected: ${expectedRomName}.zip`
             : 'No ROM expected'}

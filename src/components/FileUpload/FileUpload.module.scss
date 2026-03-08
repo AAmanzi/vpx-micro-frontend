@@ -33,12 +33,12 @@
 }
 
 .label {
-  @include title-h5-bold-mixin;
+  @include heading-5-bold-mixin;
   text-align: center;
 }
 
 .description {
-  @include caption-big-regular-mixin;
+  @include body-md-regular-mixin;
   color: var(--secondary);
   text-align: center;
 }
@@ -60,7 +60,7 @@
   padding: 0.75rem 1rem;
   background-color: rgba(255, 255, 255, 0.05);
   border-radius: 4px;
-  @include caption-big-semibold-mixin;
+  @include body-md-semibold-mixin;
 
   .itemName {
     flex: 1;

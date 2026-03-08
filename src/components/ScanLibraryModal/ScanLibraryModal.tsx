@@ -329,7 +329,7 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
       <div className={style.content}>
         {!isLoading && scanErrorMessage && (
           <div className={style.errorWrapper}>
-            <p className='accent-error-text-color caption-medium-regular'>
+            <p className='accent-error-text-color body-sm-regular'>
               {scanErrorMessage}
             </p>
           </div>
@@ -345,10 +345,10 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
                   width={36}
                   height={36}
                 />
-                <p className='primary-text-color caption-big-semibold'>
+                <p className='primary-text-color body-md-semibold'>
                   Library is in sync
                 </p>
-                <p className='secondary-text-color caption-medium-regular'>
+                <p className='secondary-text-color body-sm-regular'>
                   Database and files are already aligned. No changes to apply.
                 </p>
               </div>
@@ -418,7 +418,7 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
               <p
                 className={classNames(
                   'secondary-text-color',
-                  'caption-small-regular',
+                  'body-xs-regular',
                   style.footerMeta,
                 )}>
                 {selectedNewTablesCount} Tables to import •{' '}
@@ -465,12 +465,12 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
             <p
               className={classNames(
                 'primary-text-color',
-                'title-h4-bold',
+                'heading-4-bold',
                 style.loadingTitle,
               )}>
               Scanning VPX library
             </p>
-            <p className='secondary-text-color caption-medium-regular'>
+            <p className='secondary-text-color body-sm-regular'>
               Analyzing tables and ROMs...
             </p>
           </div>

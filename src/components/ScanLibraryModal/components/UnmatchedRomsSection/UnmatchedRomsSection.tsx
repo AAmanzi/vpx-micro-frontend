@@ -51,7 +51,7 @@ const UnmatchedRomsSection: FunctionComponent<Props> = ({
                 color='yellow'
               />
               <div className={style.info}>
-                <span className='primary-text-color caption-big-semibold'>
+                <span className='primary-text-color body-md-semibold'>
                   {rom.name}
                 </span>
               </div>

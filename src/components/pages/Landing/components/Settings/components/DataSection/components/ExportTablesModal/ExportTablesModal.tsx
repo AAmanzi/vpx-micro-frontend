@@ -71,7 +71,7 @@ const ExportTablesModal: FunctionComponent<Props> = ({ close }) => {
         <p
           className={classNames(
             'secondary-text-color',
-            'caption-small-regular',
+            'body-xs-regular',
             style.note,
           )}>
           Each table will be exported with its VPX file and ROM to a dedicated
@@ -82,22 +82,22 @@ const ExportTablesModal: FunctionComponent<Props> = ({ close }) => {
             <Icon icon='circle-checkmark' width={20} height={20} />
           </div>
           <div>
-            <h3 className='primary-text-color caption-medium-semibold'>
+            <h3 className='primary-text-color body-sm-semibold'>
               Export Summary
             </h3>
-            <p className='secondary-text-color caption-small-regular'>
+            <p className='secondary-text-color body-xs-regular'>
               • {numberOfTables} Table{numberOfTables !== 1 ? 's' : ''} will be
               exported
             </p>
-            <p className='secondary-text-color caption-small-regular'>
+            <p className='secondary-text-color body-xs-regular'>
               • Each table + ROM will be in its own folder
             </p>
-            <p className='secondary-text-color caption-small-regular'>
+            <p className='secondary-text-color body-xs-regular'>
               • Original files will remain in your library
             </p>
           </div>
         </div>
-        <p className='secondary-text-color caption-medium-bold uppercase'>
+        <p className='secondary-text-color body-sm-bold uppercase'>
           Tables to Export [{numberOfTables}]
         </p>
         <div className={style.tablesList}>
@@ -110,10 +110,10 @@ const ExportTablesModal: FunctionComponent<Props> = ({ close }) => {
                 )}
               />
               <div>
-                <p className='primary-text-color caption-medium-semibold'>
+                <p className='primary-text-color body-sm-semibold'>
                   {table.name}
                 </p>
-                <p className='secondary-text-color caption-small-regular'>
+                <p className='secondary-text-color body-xs-regular'>
                   {table.vpxFile} {table.romFile ? `• ${table.romFile}` : ''}
                 </p>
               </div>

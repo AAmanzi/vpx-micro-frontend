@@ -22,10 +22,10 @@ const Settings: FunctionComponent = () => {
             />
           </div>
           <div>
-            <h1 className='primary-text-color title-h2-bold'>
+            <h1 className='primary-text-color heading-2-bold'>
               Application Settings
             </h1>
-            <p className='secondary-text-color text-body-regular'>
+            <p className='secondary-text-color body-lg-regular'>
               Configure your Visual Pinball X environment
             </p>
           </div>
@@ -38,7 +38,7 @@ const Settings: FunctionComponent = () => {
               width={20}
               height={20}
             />
-            <h2 className='primary-text-color title-h4-bold'>File Paths</h2>
+            <h2 className='primary-text-color heading-4-bold'>File Paths</h2>
           </div>
           <div>
             <FilePathsSection />
@@ -52,7 +52,7 @@ const Settings: FunctionComponent = () => {
               width={20}
               height={20}
             />
-            <h2 className='primary-text-color title-h4-bold'>
+            <h2 className='primary-text-color heading-4-bold'>
               Data Management
             </h2>
           </div>
@@ -68,7 +68,7 @@ const Settings: FunctionComponent = () => {
               width={20}
               height={20}
             />
-            <h2 className='primary-text-color title-h4-bold'>Maintenance</h2>
+            <h2 className='primary-text-color heading-4-bold'>Maintenance</h2>
           </div>
           <div>
             <MaintenanceSection />

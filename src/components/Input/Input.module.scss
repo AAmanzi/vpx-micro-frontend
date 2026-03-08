@@ -71,7 +71,7 @@
 }
 
 .message {
-  @include caption-medium-semibold-mixin;
+  @include body-sm-semibold-mixin;
   position: absolute;
   top: 8px;
   left: 0;

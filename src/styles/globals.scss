@@ -1,3 +1,4 @@
+@use 'src/styles/font-faces';
 @use 'src/styles/reset';
 
 body {
@@ -10,54 +11,6 @@ body {
   max-width: 800px;
   margin: 6rem auto;
   padding: 2rem;
-}
-
-p,
-a,
-button,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-div,
-span {
-  color: var(--white);
-}
-
-p,
-div,
-span {
-  @include text-regular-mixin;
-}
-
-button {
-  @include button-text-16-mixin;
-}
-
-h1 {
-  @include title-h1-bold-mixin;
-}
-
-h2 {
-  @include title-h2-bold-mixin;
-}
-
-h3 {
-  @include title-h3-bold-mixin;
-}
-
-h4 {
-  @include title-h4-bold-mixin;
-}
-
-h5 {
-  @include title-h5-bold-mixin;
-}
-
-h6 {
-  @include title-h6-regular-mixin;
 }
 
 .tableGradient0 {

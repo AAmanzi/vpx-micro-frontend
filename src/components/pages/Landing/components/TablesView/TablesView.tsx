@@ -149,8 +149,8 @@ const TablesView: FunctionComponent<Props> = ({
       <div className={style.container}>
         <div className={style.titleRow}>
           <div>
-            <h1 className='primary-text-color title-h4-bold'>{title}</h1>
-            <p className='secondary-text-color caption-big-regular'>
+            <h1 className='primary-text-color heading-4-bold'>{title}</h1>
+            <p className='secondary-text-color body-md-regular'>
               {displayedDescription}
             </p>
           </div>
@@ -181,7 +181,7 @@ const TablesView: FunctionComponent<Props> = ({
               <h2
                 className={classNames(
                   'primary-text-color',
-                  'title-h4-bold',
+                  'heading-4-bold',
                   style.noDataTitle,
                 )}>
                 No tables found
@@ -189,7 +189,7 @@ const TablesView: FunctionComponent<Props> = ({
               <p
                 className={classNames(
                   'secondary-text-color',
-                  'caption-big-regular',
+                  'body-md-regular',
                   style.noDataDescription,
                 )}>
                 We couldn't find any tables matching your current filter or
@@ -216,7 +216,7 @@ const TablesView: FunctionComponent<Props> = ({
                 <h2
                   className={classNames(
                     'primary-text-color',
-                    'title-h4-bold',
+                    'heading-4-bold',
                     style.noDataTitle,
                   )}>
                   Your library is empty
@@ -224,7 +224,7 @@ const TablesView: FunctionComponent<Props> = ({
                 <p
                   className={classNames(
                     'secondary-text-color',
-                    'caption-big-regular',
+                    'body-md-regular',
                     style.noDataDescription,
                   )}>
                   Start your collection by importing .vpx table files and their

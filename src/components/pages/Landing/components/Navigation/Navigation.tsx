@@ -48,7 +48,7 @@ const Navigation: FunctionComponent<Props> = ({
           <div className={style.section}>
             <h3
               className={classNames(
-                'caption-small-semibold',
+                'body-xs-semibold',
                 'secondary-text-color',
                 'uppercase',
                 style.sectionTitle,
@@ -63,7 +63,7 @@ const Navigation: FunctionComponent<Props> = ({
               <div className={style.iconWrapper}>
                 <Icon icon='grid' className={style.icon} />
               </div>
-              <span className={classNames('button-text-16', style.label)}>
+              <span className={classNames('label-md-bold', style.label)}>
                 All Tables
               </span>
             </button>
@@ -75,7 +75,7 @@ const Navigation: FunctionComponent<Props> = ({
               <div className={style.iconWrapper}>
                 <Icon icon='star' className={style.icon} />
               </div>
-              <span className={classNames('button-text-16', style.label)}>
+              <span className={classNames('label-md-bold', style.label)}>
                 Favorites
               </span>
             </button>
@@ -87,7 +87,7 @@ const Navigation: FunctionComponent<Props> = ({
               <div className={style.iconWrapper}>
                 <Icon icon='clock-recent' className={style.icon} />
               </div>
-              <span className={classNames('button-text-16', style.label)}>
+              <span className={classNames('label-md-bold', style.label)}>
                 Recent
               </span>
             </button>
@@ -95,7 +95,7 @@ const Navigation: FunctionComponent<Props> = ({
           <div className={style.section}>
             <h3
               className={classNames(
-                'caption-small-semibold',
+                'body-xs-semibold',
                 'secondary-text-color',
                 style.sectionTitle,
               )}>
@@ -109,7 +109,7 @@ const Navigation: FunctionComponent<Props> = ({
               <div className={style.iconWrapper}>
                 <Icon icon='cog' className={style.icon} />
               </div>
-              <span className={classNames('button-text-16', style.label)}>
+              <span className={classNames('label-md-bold', style.label)}>
                 Settings
               </span>
             </button>
@@ -123,14 +123,14 @@ const Navigation: FunctionComponent<Props> = ({
               height={14}
               className='secondary-text-color'
             />
-            <span className='caption-small-semibold secondary-text-color'>
+            <span className='body-xs-semibold secondary-text-color'>
               VPX PATH
             </span>
           </div>
           <div className={style.metaPathWrapper}>
             <span
               className={classNames(
-                'caption-small-regular',
+                'body-xs-regular',
                 'secondary-text-color',
                 style.metaPath,
               )}>
@@ -139,7 +139,7 @@ const Navigation: FunctionComponent<Props> = ({
             {fullVpxPath && (
               <span
                 className={classNames(
-                  'caption-small-regular',
+                  'body-xs-regular',
                   style.metaPathTooltip,
                 )}>
                 {fullVpxPath}
@@ -147,10 +147,10 @@ const Navigation: FunctionComponent<Props> = ({
             )}
           </div>
           <div className={style.metaStat}>
-            <span className='caption-small-semibold secondary-text-color'>
+            <span className='body-xs-semibold secondary-text-color'>
               LIBRARY SIZE
             </span>
-            <span className='caption-small-regular secondary-text-color'>
+            <span className='body-xs-regular secondary-text-color'>
               {librarySize} Tables
             </span>
           </div>

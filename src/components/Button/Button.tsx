@@ -41,7 +41,7 @@ const Button: FunctionComponent<Props> = ({
           <Icon icon={icon} className={style.icon} />
         </div>
       )}
-      <span className={classNames('button-text-16', style.label)}>{label}</span>
+      <span className={classNames('label-md-bold', style.label)}>{label}</span>
     </div>
   );
 

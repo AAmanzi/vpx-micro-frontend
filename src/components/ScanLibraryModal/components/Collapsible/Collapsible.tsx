@@ -37,16 +37,16 @@ const Collapsible: FunctionComponent<Props> = ({
           <h4
             className={classNames(
               'primary-text-color',
-              'caption-medium-semibold',
+              'body-sm-semibold',
             )}>
             {title}
           </h4>
-          <p className='secondary-text-color caption-small-regular'>
+          <p className='secondary-text-color body-xs-regular'>
             {description}
           </p>
         </div>
         <div className={style.countAndChevronWrapper}>
-          <div className={classNames('caption-medium-bold', style.count)}>
+          <div className={classNames('body-sm-bold', style.count)}>
             {count}
           </div>
           <Icon

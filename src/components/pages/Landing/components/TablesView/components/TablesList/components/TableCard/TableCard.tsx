@@ -104,7 +104,7 @@ const TableCard: FunctionComponent<Props> = ({
           <h3
             className={classNames(
               'primary-text-color',
-              'title-h5-bold',
+              'heading-5-bold',
               style.title,
             )}>
             {name}
@@ -129,13 +129,13 @@ const TableCard: FunctionComponent<Props> = ({
         </div>
 
         <div className={style.meta}>
-          <p className='secondary-text-color caption-small-semibold'>
+          <p className='secondary-text-color body-xs-semibold'>
             {vpxFile}
           </p>
           {romFile && (
             <div className={style.romPill}>
               <span className={style.romDot} />
-              <p className='secondary-text-color caption-small-semibold'>
+              <p className='secondary-text-color body-xs-semibold'>
                 {romFile}
               </p>
             </div>
@@ -143,18 +143,18 @@ const TableCard: FunctionComponent<Props> = ({
 
           <div className={style.datesGrid}>
             <div className={style.dateItem}>
-              <p className='secondary-text-color caption-small-semibold uppercase'>
+              <p className='secondary-text-color body-xs-semibold uppercase'>
                 Added
               </p>
-              <p className='secondary-text-color caption-small-semibold uppercase'>
+              <p className='secondary-text-color body-xs-semibold uppercase'>
                 {displayDate(dateAddedTimestamp)}
               </p>
             </div>
             <div className={style.dateItem}>
-              <p className='secondary-text-color caption-small-semibold uppercase'>
+              <p className='secondary-text-color body-xs-semibold uppercase'>
                 Last Played
               </p>
-              <p className='secondary-text-color caption-small-semibold uppercase'>
+              <p className='secondary-text-color body-xs-semibold uppercase'>
                 {displayRelativeDate(lastPlayedTimestamp)}
               </p>
             </div>

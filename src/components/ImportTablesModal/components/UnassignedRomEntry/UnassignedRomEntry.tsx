@@ -21,7 +21,7 @@ const UnassignedRomEntry: FunctionComponent<Props> = ({ onRemove, rom }) => {
           height={14}
         />
       </div>
-      <div className='secondary-text-color caption-medium-regular'>
+      <div className='secondary-text-color body-sm-regular'>
         {rom.name}
       </div>
       <button

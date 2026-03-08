@@ -79,7 +79,7 @@ const Input: FunctionComponent<Props> = ({
           className={classNames(
             style.input,
             'secondary-text-color',
-            `caption-big-${fontWeight}`,
+            `body-md-${fontWeight}`,
           )}
           placeholder={placeholder}
           value={value}
@@ -111,7 +111,7 @@ const Input: FunctionComponent<Props> = ({
       <label className={classNames(style.label)}>
         <span
           className={classNames(
-            'caption-medium-regular',
+            'body-sm-regular',
             'secondary-text-color',
             style.labelText,
           )}>

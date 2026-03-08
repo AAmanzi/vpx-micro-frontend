@@ -43,10 +43,10 @@ const DataSection: FunctionComponent = () => {
             />
           </div>
           <div>
-            <h3 className='primary-text-color caption-big-semibold'>
+            <h3 className='primary-text-color body-md-semibold'>
               Scan VPX Library
             </h3>
-            <p className='secondary-text-color caption-small-regular'>
+            <p className='secondary-text-color body-xs-regular'>
               Discover your VPX tables and ROMs automatically by scanning your
               VPX directory.
             </p>
@@ -73,10 +73,10 @@ const DataSection: FunctionComponent = () => {
             />
           </div>
           <div>
-            <h3 className='primary-text-color caption-big-semibold'>
+            <h3 className='primary-text-color body-md-semibold'>
               Export Tables
             </h3>
-            <p className='secondary-text-color caption-small-regular'>
+            <p className='secondary-text-color body-xs-regular'>
               Create a bundle of tables and their ROMs to share or use on
               another VPX setup.
             </p>

@@ -96,10 +96,10 @@ const Toast: FunctionComponent<Props> = ({
       </div>
       <div>
         <div
-          className={classNames('primary-text-color', 'caption-medium-bold')}>
+          className={classNames('primary-text-color', 'body-sm-bold')}>
           {getTitle()}
         </div>
-        <div className='secondary-text-color caption-small-semibold'>
+        <div className='secondary-text-color body-xs-semibold'>
           {message}
         </div>
       </div>

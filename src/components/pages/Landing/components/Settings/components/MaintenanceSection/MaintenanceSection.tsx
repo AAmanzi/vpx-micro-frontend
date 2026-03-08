@@ -42,10 +42,10 @@ const MaintenanceSection: FunctionComponent = () => {
     <>
       <div className={style.clearLibraryWrapper}>
         <div>
-          <p className='accent-error-text-color caption-big-semibold'>
+          <p className='accent-error-text-color body-md-semibold'>
             Clear Library Data
           </p>
-          <p className='secondary-text-color caption-small-regular'>
+          <p className='secondary-text-color body-xs-regular'>
             This will reset your table list but won't delete actual files.
           </p>
         </div>

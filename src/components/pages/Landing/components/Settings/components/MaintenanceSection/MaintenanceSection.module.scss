@@ -18,7 +18,7 @@
 }
 
 .text {
-  @include caption-medium-semibold-mixin;
+  @include body-sm-semibold-mixin;
   color: var(--primary-text-color);
   margin: 0;
 }
@@ -32,7 +32,7 @@
 }
 
 .fileItem {
-  @include caption-big-semibold-mixin;
+  @include body-md-semibold-mixin;
   color: var(--secondary-text-color);
   word-break: break-word;
 }

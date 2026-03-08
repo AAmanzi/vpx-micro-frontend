@@ -57,7 +57,7 @@ const MissingFilesSection: FunctionComponent<Props> = ({
               type='button'>
               <Checkbox checked={isIncluded} onChange={() => {}} color='red' />
               <div className={style.info}>
-                <span className='primary-text-color caption-big-semibold'>
+                <span className='primary-text-color body-md-semibold'>
                   {item.table.name}
                 </span>
                 <div className={style.tags}>

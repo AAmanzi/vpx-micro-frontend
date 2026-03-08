@@ -142,7 +142,7 @@ const Modal: FunctionComponent<Props> = ({
                 {title && (
                   <h2
                     className={classNames(
-                      'title-h6-bold',
+                      'heading-6-bold',
                       'primary-text-color',
                       titleClassName,
                     )}>
@@ -152,7 +152,7 @@ const Modal: FunctionComponent<Props> = ({
                 {description && (
                   <p
                     className={classNames(
-                      'caption-small-regular',
+                      'body-xs-regular',
                       'secondary-text-color',
                     )}>
                     {description}

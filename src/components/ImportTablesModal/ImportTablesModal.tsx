@@ -161,10 +161,10 @@ const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
           {tablesToImport.length > 0 && (
             <div className={style.section}>
               <div className={style.sectionHeader}>
-                <h4 className='secondary-text-color caption-big-semibold uppercase'>
+                <h4 className='secondary-text-color body-md-semibold uppercase'>
                   Tables to import
                 </h4>
-                <span className='secondary-text-color caption-medium-regular'>
+                <span className='secondary-text-color body-sm-regular'>
                   {tablesToImport.length} Detected
                 </span>
               </div>
@@ -186,10 +186,10 @@ const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
           {unassignedRoms.length > 0 && (
             <div className={style.section}>
               <div className={style.sectionHeader}>
-                <h4 className='secondary-text-color caption-big-semibold uppercase'>
+                <h4 className='secondary-text-color body-md-semibold uppercase'>
                   Unassigned ROMs
                 </h4>
-                <span className='secondary-text-color caption-medium-regular'>
+                <span className='secondary-text-color body-sm-regular'>
                   {unassignedRoms.length} Files
                 </span>
               </div>
@@ -211,13 +211,13 @@ const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
               <div
                 className={classNames(
                   'secondary-text-color',
-                  'caption-small-semibold',
+                  'body-xs-semibold',
                   'uppercase',
                   style.metaLabel,
                 )}>
                 Detected
               </div>
-              <div className='primary-text-color caption-medium-bold'>
+              <div className='primary-text-color body-sm-bold'>
                 {tablesToImport.length} Tables
               </div>
             </div>
@@ -226,12 +226,12 @@ const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
                 <div
                   className={classNames(
                     'secondary-text-color',
-                    'caption-small-semibold',
+                    'body-xs-semibold',
                     'uppercase',
                   )}>
                   Source management
                 </div>
-                <div className='primary-text-color caption-medium-bold'>
+                <div className='primary-text-color body-sm-bold'>
                   Delete original files after import
                 </div>
               </div>

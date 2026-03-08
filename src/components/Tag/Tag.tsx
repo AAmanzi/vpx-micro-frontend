@@ -14,7 +14,7 @@ const Tag: FunctionComponent<Props> = ({ label, icon, type = Type.info }) => {
         [style.warning]: type === Type.warning,
       })}>
       {icon && <Icon icon={icon} width={10} height={10} />}
-      <span className='caption-small-bold'>{label}</span>
+      <span className='body-xs-bold'>{label}</span>
     </div>
   );
 };
