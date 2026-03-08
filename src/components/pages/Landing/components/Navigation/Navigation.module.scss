@@ -55,6 +55,10 @@
       background-color: rgba(var(--purple-rgb), 0.1);
     }
 
+    &.green {
+      background-color: rgba(var(--green-rgb), 0.1);
+    }
+
     & .icon,
     & .label {
       color: var(--white);
@@ -74,6 +78,10 @@
 
     &.purple {
       background-color: rgba(var(--purple-rgb), 0.2);
+    }
+
+    &.green {
+      background-color: rgba(var(--green-rgb), 0.2);
     }
 
     & .icon,

@@ -29,7 +29,8 @@ export type Icon =
   | 'scan-search'
   | 'package-cross'
   | 'folder-export'
-  | 'shield-checkmark';
+  | 'shield-checkmark'
+  | 'clock-recent';
 
 export interface Props {
   icon: Icon;

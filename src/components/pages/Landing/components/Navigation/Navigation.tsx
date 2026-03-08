@@ -16,7 +16,11 @@ interface Props {
   librarySize: number;
 }
 
-const Navigation: FunctionComponent<Props> = ({ view, setView, librarySize }) => {
+const Navigation: FunctionComponent<Props> = ({
+  view,
+  setView,
+  librarySize,
+}) => {
   const { fetchTables } = useTablesContext();
   const { config } = useConfigContext();
   const fullVpxPath = config?.vpxRootPath || '';
@@ -73,6 +77,18 @@ const Navigation: FunctionComponent<Props> = ({ view, setView, librarySize }) =>
               </div>
               <span className={classNames('button-text-16', style.label)}>
                 Favorites
+              </span>
+            </button>
+            <button
+              onClick={() => setView(View.recentlyPlayed)}
+              className={classNames(style.button, style.green, {
+                [style.active]: view === View.recentlyPlayed,
+              })}>
+              <div className={style.iconWrapper}>
+                <Icon icon='clock-recent' className={style.icon} />
+              </div>
+              <span className={classNames('button-text-16', style.label)}>
+                Recent
               </span>
             </button>
           </div>

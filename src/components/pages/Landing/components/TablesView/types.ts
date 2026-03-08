@@ -1,3 +1,4 @@
+import { Order } from 'src/types/config';
 import { Table } from 'src/types/table';
 
 export interface Props {
@@ -5,4 +6,5 @@ export interface Props {
   description: string;
   tables: Array<Table>;
   librarySize: number;
+  defaultOrder?: Order;
 }

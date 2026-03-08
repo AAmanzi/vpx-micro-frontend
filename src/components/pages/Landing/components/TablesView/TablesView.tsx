@@ -25,6 +25,7 @@ const TablesView: FunctionComponent<Props> = ({
   librarySize,
   title,
   description,
+  defaultOrder,
 }) => {
   const { fetchTables } = useTablesContext();
   const { config, fetchConfig } = useConfigContext();
@@ -34,7 +35,7 @@ const TablesView: FunctionComponent<Props> = ({
   const [query, setQuery] = useState('');
 
   const favoritesOnTop = config?.keepFavoritesOnTop ?? true;
-  const order = config?.order ?? Order.dateAddedDesc;
+  const order = defaultOrder ?? config?.order ?? Order.dateAddedDesc;
 
   const handleCloseImportModal = () => {
     setIsImportModalOpen(false);
