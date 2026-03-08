@@ -1,11 +1,5 @@
 import classNames from 'classnames';
-import {
-  FunctionComponent,
-  MouseEvent,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { FunctionComponent, MouseEvent, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import Icon from 'src/components/Icon';
@@ -26,36 +20,34 @@ const Modal: FunctionComponent<Props> = ({
   size = Size.medium,
   color,
 }) => {
-  const ref = useRef<Element | null>(null);
-  const scrollPosition = useRef<number | null>(null);
-  const didManipulateBody = useRef<boolean>(false);
-  const previousBodyStyle = useRef<{
-    touchAction: string | undefined;
-    overflowY: string | undefined;
-  } | null>(null);
-  const [, setTick] = useState(0);
-  const forceUpdate = () => setTick((tick) => tick + 1);
+  const [portalRoot, setPortalRoot] = useState<Element | null>(null);
 
   useEffect(() => {
-    ref.current = document.querySelector('#modal') || null;
+    setPortalRoot(document.querySelector('#modal'));
+  }, []);
 
-    if (ref.current?.childElementCount === 0) {
-      didManipulateBody.current = true;
-      previousBodyStyle.current = {
-        touchAction: document.body.style.touchAction,
-        overflowY: document.body.style.overflowY,
-      };
+  useEffect(() => {
+    if (!portalRoot) {
+      return;
+    }
 
-      document.body.style.overflow = 'hidden';
-      document.body.style.touchAction = 'none';
-      document.body.style.width = '100%';
+    const shouldLockBody = portalRoot.childElementCount === 0;
+    const bodyStyle = document.body.style;
+    const previousBodyStyle = {
+      overflow: bodyStyle.overflow,
+      touchAction: bodyStyle.touchAction,
+      width: bodyStyle.width,
+      position: bodyStyle.position,
+      top: bodyStyle.top,
+    };
+    const scrollPosition = window.pageYOffset;
 
-      scrollPosition.current = window.pageYOffset;
-
-      if (scrollPosition.current !== null) {
-        document.body.style.position = 'fixed';
-        document.body.style.top = `-${scrollPosition.current}px`;
-      }
+    if (shouldLockBody) {
+      bodyStyle.overflow = 'hidden';
+      bodyStyle.touchAction = 'none';
+      bodyStyle.width = '100%';
+      bodyStyle.position = 'fixed';
+      bodyStyle.top = `-${scrollPosition}px`;
     }
 
     const onKeyDown = (event: KeyboardEvent) => {
@@ -66,42 +58,20 @@ const Modal: FunctionComponent<Props> = ({
 
     window.addEventListener('keydown', onKeyDown);
 
-    if (ref.current) {
-      forceUpdate();
-    }
-
     return () => {
-      if (didManipulateBody.current) {
-        document.body.style.removeProperty('overflow');
+      if (shouldLockBody) {
+        bodyStyle.overflow = previousBodyStyle.overflow;
+        bodyStyle.touchAction = previousBodyStyle.touchAction;
+        bodyStyle.width = previousBodyStyle.width;
+        bodyStyle.position = previousBodyStyle.position;
+        bodyStyle.top = previousBodyStyle.top;
 
-        document.body.style.removeProperty('width');
-        document.body.style.removeProperty('position');
-        document.body.style.removeProperty('top');
-
-        if (previousBodyStyle.current?.touchAction) {
-          document.body.style.touchAction =
-            previousBodyStyle.current.touchAction;
-        } else {
-          document.body.style.removeProperty('touch-action');
-        }
-
-        if (previousBodyStyle.current?.overflowY) {
-          document.body.style.overflowY = previousBodyStyle.current.overflowY;
-        }
-
-        if (scrollPosition.current && document.scrollingElement) {
-          const htmlStyle = document.documentElement.style;
-
-          document.documentElement.style.scrollBehavior = 'unset';
-          window.scrollTo(0, scrollPosition.current);
-          document.documentElement.style.scrollBehavior =
-            htmlStyle.scrollBehavior || 'auto';
-        }
+        window.scrollTo(0, scrollPosition);
       }
 
       window.removeEventListener('keydown', onKeyDown);
     };
-  }, []);
+  }, [portalRoot, onExitClick]);
 
   const stopBubbling = (event: MouseEvent) => {
     event.stopPropagation();
@@ -115,23 +85,26 @@ const Modal: FunctionComponent<Props> = ({
 
   const hasHeader = title || (onExitClick && showExitButton);
   const hasBorder = title !== undefined || description !== undefined;
+  const sizeClassName = style[size];
+  const colorClassName = color ? style[color] : undefined;
 
-  const getModal = () => {
-    const content = (
+  if (!portalRoot) {
+    return null;
+  }
+
+  return createPortal(
+    <div className={style.outerWrapper} onClick={handleOutsideClick}>
       <div
         className={classNames(style.innerWrapper, {
           [style.allowOverflow]: allowOverflow,
         })}>
         <div
-          className={classNames(style.modal, modalClassName, {
-            [style.small]: size === Size.small,
-            [style.medium]: size === Size.medium,
-            [style.large]: size === Size.large,
-            [style.yellow]: color === 'yellow',
-            [style.blue]: color === 'blue',
-            [style.red]: color === 'red',
-            [style.purple]: color === 'purple',
-          })}
+          className={classNames(
+            style.modal,
+            modalClassName,
+            sizeClassName,
+            colorClassName,
+          )}
           onClick={stopBubbling}>
           {hasHeader && (
             <div
@@ -180,16 +153,9 @@ const Modal: FunctionComponent<Props> = ({
           {children}
         </div>
       </div>
-    );
-
-    return (
-      <div className={style.outerWrapper} onClick={handleOutsideClick}>
-        {content}
-      </div>
-    );
-  };
-
-  return ref.current ? createPortal(getModal(), ref.current) : null;
+    </div>,
+    portalRoot,
+  );
 };
 
 export default Modal;

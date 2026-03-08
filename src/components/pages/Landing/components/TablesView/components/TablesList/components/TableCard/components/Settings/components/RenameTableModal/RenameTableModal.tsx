@@ -45,7 +45,7 @@ const RenameTableModal: FunctionComponent<Props> = ({
       size={ModalSize.small}
       color='blue'>
       <div className={style.content}>
-        <Input value={name} onChange={setName} />
+        <Input value={name} onChange={setName} autoFocus />
       </div>
       <div className={style.footer}>
         <Button

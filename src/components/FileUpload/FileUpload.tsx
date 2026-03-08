@@ -158,8 +158,22 @@ const FileUpload: FunctionComponent<Props> = ({
         onDrop={handleDrop}>
         {!loading ? (
           <>
-            <div className={style.label}>{label}</div>
-            <div className={style.description}>{description}</div>
+            <div
+              className={classNames(
+                'primary-text-color',
+                'heading-5-bold',
+                style.label,
+              )}>
+              {label}
+            </div>
+            <div
+              className={classNames(
+                'secondary-text-color',
+                'body-md-regular',
+                style.description,
+              )}>
+              {description}
+            </div>
           </>
         ) : (
           <Spinner />

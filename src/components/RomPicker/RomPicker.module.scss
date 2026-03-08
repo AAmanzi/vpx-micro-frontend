@@ -4,6 +4,11 @@
   gap: 4px;
 }
 
+.removeButton {
+  display: flex;
+  align-items: center;
+}
+
 .assignButton {
   padding: 4px 8px;
   border-radius: 10px;

@@ -1,9 +1,18 @@
 .container {
   position: relative;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+
+  &:not(.disabled):hover {
+    .slider {
+      background-color: rgba(var(--gray-500-rgb), 0.45);
+    }
+  }
 
   &.disabled {
     cursor: default;
+    opacity: 0.75;
   }
 }
 
@@ -16,6 +25,12 @@
     & ~ .circle {
       background-color: var(--white);
       transform: translateX(18px);
+    }
+  }
+
+  &:focus-visible {
+    & + .slider {
+      box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.45);
     }
   }
 
@@ -65,22 +80,27 @@
 }
 
 .slider {
-  width: 38px;
-  height: 20px;
+  width: 40px;
+  height: 22px;
   position: relative;
   border-radius: 40px;
-  background-color: var(--gray);
-  transition: background-color 300ms ease-out;
+  background-color: rgba(var(--gray-500-rgb), 0.35);
+  border: thin solid rgba(var(--gray-100-rgb), 0.2);
+  transition:
+    background-color 300ms ease-out,
+    border-color 300ms ease-out,
+    box-shadow 200ms ease-out;
 }
 
 .circle {
   position: absolute;
   top: 2px;
   left: 2px;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background-color: var(--gray-300);
+  box-shadow: 0 1px 2px rgba(var(--black-rgb), 0.25);
   transition:
     transform 300ms ease-out,
     background-color 300ms ease-out;

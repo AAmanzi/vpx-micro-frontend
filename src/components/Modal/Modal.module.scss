@@ -5,22 +5,29 @@
   left: 0;
   right: 0;
   z-index: 6;
-  backdrop-filter: blur(8px);
+  background:
+    radial-gradient(
+      circle at 50% 45%,
+      rgba(var(--gray-500-rgb), 0.2) 0%,
+      rgba(var(--black-rgb), 0.55) 70%
+    ),
+    rgba(var(--black-rgb), 0.35);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   overscroll-behavior: contain;
-
-  &:first-child {
-    background-color: rgba(0, 0, 0, 0.4);
-  }
 }
 
 .innerWrapper {
   position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
   max-height: 100%;
   overflow: auto;
-  transform: translate(-50%, -50%);
-  top: 50%;
-  left: 50%;
-  padding: 10vh 24px 24px 24px;
+  padding: 24px;
+  box-sizing: border-box;
 
   &.allowOverflow {
     overflow: visible;

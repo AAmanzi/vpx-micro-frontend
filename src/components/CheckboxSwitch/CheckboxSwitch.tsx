@@ -12,20 +12,24 @@ const CheckboxSwitch: FunctionComponent<Props> = ({
   color = 'blue',
 }) => {
   const handleChange = () => {
-    if (onChange && !disabled) {
-      onChange();
+    if (disabled) {
+      return;
     }
+
+    onChange();
   };
+
+  const colorClassName = style[color];
 
   return (
     <label
-      className={classNames(style.container, {
-        [style.disabled]: disabled,
-        [style.blue]: color === 'blue',
-        [style.red]: color === 'red',
-        [style.green]: color === 'green',
-        [style.yellow]: color === 'yellow',
-      })}>
+      className={classNames(
+        style.container,
+        {
+          [style.disabled]: disabled,
+        },
+        colorClassName,
+      )}>
       <input
         type='checkbox'
         checked={checked}
@@ -34,6 +38,8 @@ const CheckboxSwitch: FunctionComponent<Props> = ({
           [style.showDisabled]: showDisabled,
         })}
         disabled={disabled}
+        role='switch'
+        aria-checked={checked}
       />
       <div className={style.slider} />
       <div className={style.circle} />

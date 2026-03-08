@@ -8,7 +8,8 @@ import {
   useRef,
 } from 'react';
 
-import Icon from '../Icon';
+import Icon from 'src/components/Icon';
+
 import style from './Input.module.scss';
 import { Props, Size } from './types';
 

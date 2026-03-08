@@ -33,13 +33,10 @@
 }
 
 .label {
-  @include heading-5-bold-mixin;
   text-align: center;
 }
 
 .description {
-  @include body-md-regular-mixin;
-  color: var(--secondary);
   text-align: center;
 }
 

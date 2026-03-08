@@ -42,7 +42,7 @@ const RomPicker: FunctionComponent<Props> = ({
           className={classNames(style.removeButton, style.small)}
           onClick={onRemoveRom}>
           <Icon
-            className={style.removeIcon}
+            className={classNames('secondary-text-color', style.removeIcon)}
             icon='cross'
             width={14}
             height={14}
