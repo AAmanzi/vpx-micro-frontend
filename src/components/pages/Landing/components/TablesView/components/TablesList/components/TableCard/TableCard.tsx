@@ -109,11 +109,13 @@ const TableCard: FunctionComponent<Props> = ({
             )}>
             {name}
           </h3>
-          <button
-            type='button'
-            className={style.settingsButton}
-            onClick={openSettings}>
-            <Icon className='secondary-text-color' icon='kebab' />
+          <div className={style.settingsButton}>
+            <button
+              type='button'
+              className={style.settingsTrigger}
+              onClick={openSettings}>
+              <Icon className='secondary-text-color' icon='kebab' />
+            </button>
             {isSettingsOpen && (
               <div className={style.settingsContainer}>
                 <Settings
@@ -125,7 +127,7 @@ const TableCard: FunctionComponent<Props> = ({
                 />
               </div>
             )}
-          </button>
+          </div>
         </div>
 
         <div className={style.meta}>

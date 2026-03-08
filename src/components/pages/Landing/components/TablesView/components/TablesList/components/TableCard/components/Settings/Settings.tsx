@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { FunctionComponent, use, useRef, useState } from 'react';
+import { FunctionComponent, useRef, useState } from 'react';
 
 import Icon from 'src/components/Icon';
 import { useTablesContext } from 'src/providers/tables';
