@@ -1,12 +1,13 @@
-import type { ApiError, ApiResult } from 'src/types/api';
+import type { ApiError, ApiResult, ApiWarning } from 'src/types/api';
 
 export * from './config';
 export * from './fileSystem';
 export * from './tables';
 
-export const apiSuccess = <T>(data: T): ApiResult<T> => ({
+export const apiSuccess = <T>(data: T, warning?: ApiWarning): ApiResult<T> => ({
   success: true,
   data,
+  warning,
 });
 
 const isApiError = (error: unknown): error is ApiError => {

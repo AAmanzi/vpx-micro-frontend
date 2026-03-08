@@ -20,7 +20,8 @@ interface Props {
 }
 
 const ExportTablesModal: FunctionComponent<Props> = ({ close }) => {
-  const { showErrorToast, showSuccessToast } = useToastContext();
+  const { showErrorToast, showSuccessToast, showWarningToast } =
+    useToastContext();
   const { tables } = useTablesContext();
   const { config } = useConfigContext();
 
@@ -39,7 +40,11 @@ const ExportTablesModal: FunctionComponent<Props> = ({ close }) => {
     const result = await window.api.exportTables(exportPath);
 
     if (result.success) {
-      showSuccessToast('Tables exported successfully!');
+      if (result.warning) {
+        showWarningToast(result.warning.message || 'Some tables failed to export');
+      } else {
+        showSuccessToast('Tables exported successfully!');
+      }
       // TODO: offer to open the export folder
       close();
     } else {

@@ -111,6 +111,7 @@ export function importTables(
   try {
     const transferFile = deleteAfterImport ? moveFile : copyFile;
     const movedSourceFilePaths = new Set<string>();
+    let missingSourceFailures = 0;
     const tablesDirectoryPath = configDb.getTablesDirectoryPath();
     const romsDirectoryPath = configDb.getRomsDirectoryPath();
 
@@ -123,63 +124,86 @@ export function importTables(
     );
 
     tableFiles.forEach((tableFile) => {
-      const vpxSourceFilePath = tableFile.filePath;
-      const romSourceFilePath = tableFile.rom?.path;
+      try {
+        const vpxSourceFilePath = tableFile.filePath;
+        const romSourceFilePath = tableFile.rom?.path;
 
-      const vpxDestinationFilePath = path.join(
-        tablesDirectoryPath,
-        tableFile.fileName,
-      );
-      const romDestinationFilePath = tableFile.rom
-        ? path.join(romsDirectoryPath, tableFile.rom.name)
-        : undefined;
+        const vpxDestinationFilePath = path.join(
+          tablesDirectoryPath,
+          tableFile.fileName,
+        );
+        const romDestinationFilePath = tableFile.rom
+          ? path.join(romsDirectoryPath, tableFile.rom.name)
+          : undefined;
 
-      const normalizedDestinationPath = vpxDestinationFilePath
-        .trim()
-        .toLowerCase()
-        .replace(/\\/g, '/');
+        const normalizedDestinationPath = vpxDestinationFilePath
+          .trim()
+          .toLowerCase()
+          .replace(/\\/g, '/');
 
-      if (existingVpxPaths.has(normalizedDestinationPath)) {
-        return;
-      }
-
-      if (vpxSourceFilePath !== vpxDestinationFilePath) {
-        transferFile(vpxSourceFilePath, vpxDestinationFilePath);
-
-        if (deleteAfterImport) {
-          movedSourceFilePaths.add(vpxSourceFilePath);
+        if (existingVpxPaths.has(normalizedDestinationPath)) {
+          return;
         }
-      }
 
-      if (romSourceFilePath && romDestinationFilePath) {
-        if (romSourceFilePath !== romDestinationFilePath) {
-          transferFile(romSourceFilePath, romDestinationFilePath);
+        if (vpxSourceFilePath !== vpxDestinationFilePath) {
+          transferFile(vpxSourceFilePath, vpxDestinationFilePath);
 
           if (deleteAfterImport) {
-            movedSourceFilePaths.add(romSourceFilePath);
+            movedSourceFilePaths.add(vpxSourceFilePath);
           }
         }
+
+        if (romSourceFilePath && romDestinationFilePath) {
+          if (romSourceFilePath !== romDestinationFilePath) {
+            transferFile(romSourceFilePath, romDestinationFilePath);
+
+            if (deleteAfterImport) {
+              movedSourceFilePaths.add(romSourceFilePath);
+            }
+          }
+        }
+
+        const nextTable: Table = {
+          id: uuidv4(),
+          name: tableFile.name,
+          vpxFile: tableFile.fileName,
+          romFile: tableFile.rom?.name,
+          isFavorite: false,
+          vpxFilePath: vpxDestinationFilePath,
+          romFilePath: romDestinationFilePath,
+          dateAddedTimestamp: Date.now(),
+        };
+
+        tablesDb.create(nextTable);
+        existingVpxPaths.add(normalizedDestinationPath);
+      } catch (error) {
+        if (
+          error &&
+          typeof error === 'object' &&
+          'message' in error &&
+          typeof error.message === 'string' &&
+          error.message.includes('does not exist')
+        ) {
+          missingSourceFailures += 1;
+        }
       }
-
-      const nextTable: Table = {
-        id: uuidv4(),
-        name: tableFile.name,
-        vpxFile: tableFile.fileName,
-        romFile: tableFile.rom?.name,
-        isFavorite: false,
-        vpxFilePath: vpxDestinationFilePath,
-        romFilePath: romDestinationFilePath,
-        dateAddedTimestamp: Date.now(),
-      };
-
-      tablesDb.create(nextTable);
-      existingVpxPaths.add(normalizedDestinationPath);
     });
 
     if (deleteAfterImport) {
       Array.from(movedSourceFilePaths).forEach((sourceFilePath) => {
         removeEmptyParentDirectories(sourceFilePath);
       });
+    }
+
+    if (missingSourceFailures > 0) {
+      return {
+        success: true,
+        data: null,
+        warning: {
+          code: 'IMPORT_MISSING_SOURCE_FILES',
+          message: `${missingSourceFailures} table(s) failed to import because source files were missing`,
+        },
+      };
     }
 
     return apiSuccess(null);
@@ -293,7 +317,6 @@ export function scanVpxLibrary(): ApiResult<ScanResult> {
 
 export function applyScanResult(scanResult: ScanResult): ApiResult<null> {
   try {
-    // TODO: toast warning if some files failed
     registerTableFiles(scanResult.newTables);
     deleteUnusedRoms(scanResult.unmatchedRoms);
     cleanTablesWithMissingFiles(scanResult.tablesWithMissingFiles);
@@ -306,8 +329,6 @@ export function applyScanResult(scanResult: ScanResult): ApiResult<null> {
 
 export function exportTables(destinationPath: string): ApiResult<null> {
   try {
-    // TODO: finish export even if some files fail
-    // TODO: toast warning if some files failed
     const result = createDirectoryIfNotExists(destinationPath);
 
     if (!result) {
@@ -321,26 +342,41 @@ export function exportTables(destinationPath: string): ApiResult<null> {
     }
 
     const tables = tablesDb.getAll();
+    const failedTables: string[] = [];
 
     tables.forEach((table) => {
-      const tableDirectoryPath = path.join(destinationPath, table.name);
-      const tableDirectoryReady =
-        createDirectoryIfNotExists(tableDirectoryPath);
+      try {
+        const tableDirectoryPath = path.join(destinationPath, table.name);
+        const tableDirectoryReady =
+          createDirectoryIfNotExists(tableDirectoryPath);
 
-      if (!tableDirectoryReady) {
-        throw new Error(
-          `Failed to create table destination directory: ${tableDirectoryPath}`,
-        );
-      }
+        if (!tableDirectoryReady) {
+          failedTables.push(table.name);
+          return;
+        }
 
-      const vpxTargetPath = path.join(tableDirectoryPath, table.vpxFile);
-      copyFile(table.vpxFilePath, vpxTargetPath);
+        const vpxTargetPath = path.join(tableDirectoryPath, table.vpxFile);
+        copyFile(table.vpxFilePath, vpxTargetPath);
 
-      if (table.romFilePath && table.romFile) {
-        const romTargetPath = path.join(tableDirectoryPath, table.romFile);
-        copyFile(table.romFilePath, romTargetPath);
+        if (table.romFilePath && table.romFile) {
+          const romTargetPath = path.join(tableDirectoryPath, table.romFile);
+          copyFile(table.romFilePath, romTargetPath);
+        }
+      } catch (error) {
+        failedTables.push(table.name);
       }
     });
+
+    if (failedTables.length > 0) {
+      return {
+        success: true,
+        data: null,
+        warning: {
+          code: 'EXPORT_PARTIAL_FAILURE',
+          message: `Failed to export ${failedTables.length} table(s) because of missing files`,
+        },
+      };
+    }
 
     return apiSuccess(null);
   } catch (error) {

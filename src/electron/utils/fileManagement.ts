@@ -34,6 +34,15 @@ export const copyFile = (sourcePath: string, destinationPath: string): void => {
   const resolvedSourcePath = resolveUserPath(sourcePath);
   const resolvedDestinationPath = resolveUserPath(destinationPath);
 
+  if (!fs.existsSync(resolvedSourcePath)) {
+    throw new Error(`Source file does not exist: ${resolvedSourcePath}`);
+  }
+
+  const stat = fs.statSync(resolvedSourcePath);
+  if (!stat.isFile()) {
+    throw new Error(`Source path is not a file: ${resolvedSourcePath}`);
+  }
+
   ensureDestinationDirectory(destinationPath);
   fs.copyFileSync(resolvedSourcePath, resolvedDestinationPath);
 };

@@ -7,16 +7,23 @@ export interface ApiError {
   message?: string;
 }
 
+export interface ApiWarning {
+  code: string;
+  message?: string;
+}
+
 export type ApiResult<T> =
   | {
       success: true;
       data: T;
       error?: never;
+      warning?: ApiWarning;
     }
   | {
       success: false;
       data?: never;
       error: ApiError;
+      warning?: never;
     };
 
 export interface Api {

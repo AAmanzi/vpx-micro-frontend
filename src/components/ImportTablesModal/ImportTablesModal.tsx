@@ -21,7 +21,8 @@ import { buildImportSelectionResult, filterExistingFiles } from './utils';
 const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
   const { tables } = useTablesContext();
   const { config, fetchConfig } = useConfigContext();
-  const { showErrorToast, showWarningToast } = useToastContext();
+  const { showErrorToast, showWarningToast, showSuccessToast } =
+    useToastContext();
 
   const [isLoading, setIsLoading] = useState(false);
   const [tablesToImport, setTablesToImport] = useState<Array<TableFile>>([]);
@@ -105,15 +106,20 @@ const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
   };
 
   const handleSubmit = async () => {
-    const { error: importTablesError } = await api.importTables(
-      tablesToImport,
-      deleteAfterImport,
-    );
+    const { error: importTablesError, warning: importTablesWarning } =
+      await api.importTables(tablesToImport, deleteAfterImport);
 
     if (importTablesError) {
       showErrorToast(importTablesError.message || 'Failed to import tables');
 
       return;
+    }
+
+    if (importTablesWarning) {
+      showWarningToast(
+        importTablesWarning.message ||
+          'Some tables failed to import because source files were missing',
+      );
     }
 
     const { error: updateDeleteAfterImportError } =
@@ -130,6 +136,9 @@ const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
 
     fetchConfig();
 
+    if (!importTablesWarning) {
+      showSuccessToast('Tables imported successfully!');
+    }
     onClose();
   };
 
