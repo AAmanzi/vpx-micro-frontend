@@ -50,6 +50,46 @@
   width: min(768px, calc(100vw - 48px));
 }
 
+.yellow {
+  .headerWrapper {
+    background: linear-gradient(
+      135deg,
+      rgba(var(--yellow-rgb), 0.1) 0%,
+      rgba(var(--yellow-rgb), 0.3) 100%
+    );
+  }
+}
+
+.blue {
+  .headerWrapper {
+    background: linear-gradient(
+      135deg,
+      rgba(var(--blue-rgb), 0.1) 0%,
+      rgba(var(--blue-rgb), 0.3) 100%
+    );
+  }
+}
+
+.red {
+  .headerWrapper {
+    background: linear-gradient(
+      135deg,
+      rgba(var(--red-rgb), 0.1) 0%,
+      rgba(var(--red-rgb), 0.3) 100%
+    );
+  }
+}
+
+.purple {
+  .headerWrapper {
+    background: linear-gradient(
+      135deg,
+      rgba(var(--purple-rgb), 0.1) 0%,
+      rgba(var(--purple-rgb), 0.3) 100%
+    );
+  }
+}
+
 .headerWrapper {
   position: relative;
   padding-top: 24px;

@@ -29,7 +29,6 @@ const RenameTableModal: FunctionComponent<Props> = ({
     const { error } = await api.renameTable(id, name);
 
     if (error) {
-
       showErrorToast(error.message || 'Failed to rename table');
 
       return;
@@ -43,7 +42,8 @@ const RenameTableModal: FunctionComponent<Props> = ({
       title='Rename Table'
       modalClassName={style.modal}
       onExitClick={close}
-      size={ModalSize.small}>
+      size={ModalSize.small}
+      color='blue'>
       <div className={style.content}>
         <Input value={name} onChange={setName} />
       </div>

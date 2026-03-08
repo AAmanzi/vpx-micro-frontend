@@ -325,7 +325,7 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
       description={modalDescription}
       onExitClick={close}
       size={ModalSize.large}
-      headerClassName={style.header}>
+      color='purple'>
       <div className={style.content}>
         {!isLoading && scanErrorMessage && (
           <div className={style.errorWrapper}>

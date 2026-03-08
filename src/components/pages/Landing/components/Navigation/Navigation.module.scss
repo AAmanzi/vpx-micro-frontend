@@ -43,6 +43,18 @@
   &:hover {
     background-color: rgba(var(--gray-rgb), 0.5);
 
+    &.blue {
+      background-color: rgba(var(--blue-rgb), 0.1);
+    }
+
+    &.yellow {
+      background-color: rgba(var(--yellow-rgb), 0.1);
+    }
+
+    &.purple {
+      background-color: rgba(var(--purple-rgb), 0.1);
+    }
+
     & .icon,
     & .label {
       color: var(--white);
@@ -51,6 +63,18 @@
 
   &.active {
     background-color: var(--gray);
+
+    &.blue {
+      background-color: rgba(var(--blue-rgb), 0.2);
+    }
+
+    &.yellow {
+      background-color: rgba(var(--yellow-rgb), 0.2);
+    }
+
+    &.purple {
+      background-color: rgba(var(--purple-rgb), 0.2);
+    }
 
     & .icon,
     & .label {

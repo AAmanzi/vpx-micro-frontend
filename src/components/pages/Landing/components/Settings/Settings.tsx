@@ -15,7 +15,7 @@ const Settings: FunctionComponent = () => {
         <div className={style.header}>
           <div className={style.headerIconWrapper}>
             <Icon
-              className='accent-primary-text-color'
+              className={style.headerIcon}
               icon='cog'
               width={28}
               height={28}

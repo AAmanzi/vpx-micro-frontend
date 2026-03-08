@@ -29,7 +29,6 @@ const DeleteTableModal: FunctionComponent<Props> = ({
     const { error } = await api.deleteTable(id);
 
     if (error) {
-
       showErrorToast(error.message || 'Failed to delete table');
 
       return;
@@ -44,7 +43,8 @@ const DeleteTableModal: FunctionComponent<Props> = ({
       description='Are you sure you want to delete this table?'
       modalClassName={style.modal}
       onExitClick={close}
-      size={ModalSize.small}>
+      size={ModalSize.small}
+      color='red'>
       <div className={style.content}>
         <p className={style.text}>These files will be deleted:</p>
         <ul className={style.filesList}>

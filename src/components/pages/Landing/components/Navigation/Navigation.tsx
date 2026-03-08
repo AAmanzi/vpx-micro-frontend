@@ -51,7 +51,7 @@ const Navigation: FunctionComponent<Props> = ({ view, setView }) => {
             </h3>
             <button
               onClick={() => setView(View.allTables)}
-              className={classNames(style.button, {
+              className={classNames(style.button, style.blue, {
                 [style.active]: view === View.allTables,
               })}>
               <div className={style.iconWrapper}>
@@ -63,7 +63,7 @@ const Navigation: FunctionComponent<Props> = ({ view, setView }) => {
             </button>
             <button
               onClick={() => setView(View.favorites)}
-              className={classNames(style.button, {
+              className={classNames(style.button, style.yellow, {
                 [style.active]: view === View.favorites,
               })}>
               <div className={style.iconWrapper}>
@@ -85,7 +85,7 @@ const Navigation: FunctionComponent<Props> = ({ view, setView }) => {
             </h3>
             <button
               onClick={() => setView(View.settings)}
-              className={classNames(style.button, {
+              className={classNames(style.button, style.purple, {
                 [style.active]: view === View.settings,
               })}>
               <div className={style.iconWrapper}>

@@ -24,6 +24,7 @@ const Modal: FunctionComponent<Props> = ({
   allowOverflow = false,
   children,
   size = Size.medium,
+  color,
 }) => {
   const ref = useRef<Element | null>(null);
   const scrollPosition = useRef<number | null>(null);
@@ -126,6 +127,10 @@ const Modal: FunctionComponent<Props> = ({
             [style.small]: size === Size.small,
             [style.medium]: size === Size.medium,
             [style.large]: size === Size.large,
+            [style.yellow]: color === 'yellow',
+            [style.blue]: color === 'blue',
+            [style.red]: color === 'red',
+            [style.purple]: color === 'purple',
           })}
           onClick={stopBubbling}>
           {hasHeader && (

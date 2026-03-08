@@ -65,7 +65,8 @@ const MaintenanceSection: FunctionComponent = () => {
           description='Are you sure you want to clear your library data?'
           modalClassName={style.modal}
           onExitClick={closeConfirmation}
-          size={ModalSize.small}>
+          size={ModalSize.small}
+          color='red'>
           <div className={style.content}>
             <p className={style.text}>
               This will reset your table list but won't delete actual files.

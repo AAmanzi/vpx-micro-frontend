@@ -53,7 +53,8 @@ const ExportTablesModal: FunctionComponent<Props> = ({ close }) => {
     <Modal
       title='Export Tables'
       description='Create backup bundles with tables and ROMs'
-      onExitClick={close}>
+      onExitClick={close}
+      color='blue'>
       <div className={style.content}>
         {/* TODO: folder picker */}
         <Input
