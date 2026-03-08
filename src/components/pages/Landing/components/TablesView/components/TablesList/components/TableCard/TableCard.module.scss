@@ -1,6 +1,6 @@
 .card {
   position: relative;
-  background-color: var(--dark-gray);
+  background-color: var(--gray-800);
   border: thin solid var(--gray);
   border-radius: 32px;
   transition: all 0.2s ease;
@@ -40,7 +40,7 @@
   transition: all 200ms ease-in;
 
   & .favoriteIcon {
-    color: var(--light-gray);
+    color: var(--gray-300);
     fill: transparent;
     transition:
       fill 200ms ease-in,

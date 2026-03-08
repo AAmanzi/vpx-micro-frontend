@@ -32,15 +32,15 @@
     background-color: rgba(var(--gray-rgb), 0.8);
 
     & > span {
-      color: var(--mid-gray);
+      color: var(--gray-500);
     }
 
     .assignIcon {
-      color: var(--mid-gray);
+      color: var(--gray-500);
     }
 
     .chevronIcon {
-      color: var(--mid-gray);
+      color: var(--gray-500);
     }
   }
 }

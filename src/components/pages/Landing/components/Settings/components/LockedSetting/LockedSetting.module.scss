@@ -1,7 +1,7 @@
 .container {
   padding: 16px;
   border-radius: 12px;
-  background-color: var(--dark-gray);
+  background-color: var(--gray-800);
   border: thin solid var(--gray);
   transition: border-color 300ms ease-out;
 
@@ -50,7 +50,7 @@
 }
 
 .defaultBadge {
-  color: var(--light-gray);
+  color: var(--gray-300);
   font-style: italic;
   flex-shrink: 0;
 }

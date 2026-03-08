@@ -5,7 +5,7 @@
   top: 0;
   left: 0;
   height: 100vh;
-  background-color: var(--dark-gray);
+  background-color: var(--gray-800);
   padding: 24px 16px 16px 16px;
   width: 256px;
   overflow-y: auto;
@@ -97,12 +97,12 @@
 }
 
 .icon {
-  color: var(--light-gray);
+  color: var(--gray-300);
   transition: color 200ms ease-out;
 }
 
 .label {
-  color: var(--light-gray);
+  color: var(--gray-300);
   transition: color 200ms ease-out;
 }
 
@@ -154,7 +154,7 @@
   padding: 8px 10px;
   border-radius: 12px;
   border: thin solid var(--gray);
-  background-color: var(--dark-gray);
+  background-color: var(--gray-800);
   color: var(--white);
   white-space: normal;
   word-break: break-word;

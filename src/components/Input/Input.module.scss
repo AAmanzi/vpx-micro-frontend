@@ -7,7 +7,7 @@
   transition:
     border-color 300ms ease-out,
     opacity 300ms ease-out;
-  background-color: var(--dark-gray);
+  background-color: var(--gray-800);
 
   &:focus-within {
     border-color: var(--white);
@@ -55,13 +55,13 @@
   }
 
   &::placeholder {
-    color: var(--mid-gray);
+    color: var(--gray-500);
   }
 
   // chrome autofill micanje ruzne pozadine
   &:-webkit-autofill,
   :-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0px 24px var(--mega-light-gray) inset;
+    -webkit-box-shadow: 0 0 0px 24px var(--gray-100) inset;
     -webkit-text-fill-color: var(--primary-text-color);
   }
 }

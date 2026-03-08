@@ -3,7 +3,7 @@
   top: calc(100% + 8px);
   left: 0;
   z-index: 10;
-  background-color: var(--dark-gray);
+  background-color: var(--gray-800);
   border: thin solid var(--gray);
   padding-top: 8px;
   padding-bottom: 8px;
@@ -27,6 +27,6 @@
   align-items: center;
 
   &:hover {
-    background-color: rgba(var(--mid-gray-rgb), 0.1);
+    background-color: rgba(var(--gray-500-rgb), 0.1);
   }
 }

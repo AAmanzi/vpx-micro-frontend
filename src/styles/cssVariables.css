@@ -1,15 +1,11 @@
 .default-mode {
-  /* --primary: #2563eb;
-  --primary-rgb: 37, 99, 235;
-  --primary-vanished: #eaf1ff; */
-
   --primary: #4338ca;
   --primary-rgb: 67, 56, 202;
-  --primary-vanished: #e6e8ff;
+  --primary-subtle: #e6e8ff;
 
   --yellow: #fbbf24;
   --yellow-rgb: 251, 191, 36;
-  --yellow-vanished: #fff8e6;
+  --yellow-subtle: #fff8e6;
 
   --dark: #0d0d0d;
   --dark-rgb: 27, 27, 27;
@@ -17,29 +13,29 @@
   --gray: #2f2f2f;
   --gray-rgb: 47, 47, 47;
 
-  --dark-gray: #1b1b1b;
-  --dark-gray-rgb: 27, 27, 27;
-  --mid-gray: #7a7a7a;
-  --mid-gray-rgb: 122, 122, 122;
-  --light-gray: #bfbfbf;
-  --mega-light-gray: #e5e5e5;
-  --mega-light-gray-rgb: 229, 229, 229;
+  --gray-800: #1b1b1b;
+  --gray-800-rgb: 27, 27, 27;
+  --gray-500: #7a7a7a;
+  --gray-500-rgb: 122, 122, 122;
+  --gray-300: #bfbfbf;
+  --gray-100: #e5e5e5;
+  --gray-100-rgb: 229, 229, 229;
 
   --blue: #5b5df0;
   --blue-rgb: 91, 93, 240;
-  --blue-vanished: #eef0ff;
+  --blue-subtle: #eef0ff;
 
   --green: #22c55e;
   --green-rgb: 34, 197, 94;
-  --green-vanished: #eafaf0;
+  --green-subtle: #eafaf0;
 
   --red: #ef4444;
   --red-rgb: 239, 68, 68;
-  --red-vanished: #ffecec;
+  --red-subtle: #ffecec;
 
   --purple: #a855f7;
   --purple-rgb: 168, 85, 247;
-  --purple-vanished: #f5e6ff;
+  --purple-subtle: #f5e6ff;
 
   --white: #ffffff;
   --white-rgb: 255, 255, 255;
@@ -51,13 +47,13 @@
 html {
   --primary-text-color: var(--white);
   --primary-text-color-rgb: var(--white-rgb);
-  --secondary-text-color: var(--light-gray);
+  --secondary-text-color: var(--gray-300);
   --accent-primary-text-color: var(--primary);
-  --accent-succes-text-color: var(--green);
+  --accent-success-text-color: var(--green);
   --accent-info-text-color: var(--blue);
   --accent-error-text-color: var(--red);
-  --accent-disabled-text-color: var(--light-gray);
-  --body-text-color: var(--mega-light-gray);
+  --accent-disabled-text-color: var(--gray-300);
+  --text-body: var(--gray-100);
 }
 
 .primary-text-color {
@@ -68,20 +64,20 @@ html {
   color: var(--secondary-text-color);
 }
 
-.body-text-color {
-  color: var(--body-text-color);
+.text-body-color {
+  color: var(--text-body);
 }
 
-.mid-gray-text-color {
-  color: var(--mid-gray);
+.gray-500-text-color {
+  color: var(--gray-500);
 }
 
 .accent-primary-text-color {
   color: var(--accent-primary-text-color);
 }
 
-.accent-succes-text-color {
-  color: var(--accent-succes-text-color);
+.accent-success-text-color {
+  color: var(--accent-success-text-color);
 }
 
 .accent-error-text-color {

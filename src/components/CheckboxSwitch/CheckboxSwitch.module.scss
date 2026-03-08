@@ -22,11 +22,11 @@
   &.showDisabled {
     &:disabled {
       & + .slider {
-        background-color: var(--light-gray);
+        background-color: var(--gray-300);
       }
 
       & ~ .circle {
-        background-color: var(--mega-light-gray);
+        background-color: var(--gray-100);
       }
     }
   }
@@ -80,7 +80,7 @@
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background-color: var(--light-gray);
+  background-color: var(--gray-300);
   transition:
     transform 300ms ease-out,
     background-color 300ms ease-out;
