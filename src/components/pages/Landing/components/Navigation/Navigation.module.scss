@@ -8,10 +8,15 @@
   background-color: var(--dark-gray);
   padding: 24px 16px 16px 16px;
   width: 256px;
+  overflow-y: auto;
 }
 
 .importButtonWrapper {
   margin-bottom: 24px;
+}
+
+.navigation {
+  margin-bottom: 16px;
 }
 
 .section {

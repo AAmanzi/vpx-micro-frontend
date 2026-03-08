@@ -44,7 +44,7 @@ const Navigation: FunctionComponent<Props> = ({
             fill
           />
         </div>
-        <div>
+        <div className={style.navigation}>
           <div className={style.section}>
             <h3
               className={classNames(
