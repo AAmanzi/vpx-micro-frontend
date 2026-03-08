@@ -33,14 +33,13 @@ const Landing: FunctionComponent<Props> = () => {
             description='Manage your Visual Pinball library'
           />
         );
-      // TODO: no favorites display something
       case View.favorites:
         return (
           <TablesView
             tables={tables.filter((table) => table.isFavorite)}
             librarySize={tables.length}
             title='Favorites'
-            description='Manage your favorite Visual Pinball tables'
+            emptyStateVariant='favorites'
           />
         );
       case View.recentlyPlayed:
@@ -50,18 +49,18 @@ const Landing: FunctionComponent<Props> = () => {
             new Date(a.lastPlayedTimestamp || 0).getTime()
           );
         });
-        const recentlyPlayedTables = sortedTables.slice(
-          0,
-          NUMBER_OF_RECENTLY_PLAYED_TABLES,
-        );
+        const recentlyPlayedTables = sortedTables
+          .filter((table) => Boolean(table.lastPlayedTimestamp))
+          .slice(0, NUMBER_OF_RECENTLY_PLAYED_TABLES);
 
         return (
           <TablesView
             tables={recentlyPlayedTables}
             librarySize={tables.length}
             title='Recently Played'
-            description='Manage your recently played Visual Pinball tables'
             defaultOrder={Order.recentlyPlayed}
+            emptyStateVariant='recentlyPlayed'
+              isOrderPickerDisabled
           />
         );
       case View.settings:

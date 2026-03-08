@@ -40,24 +40,18 @@ const SectionHeader: FunctionComponent<Props> = ({
               height={16}
             />
           )}
-          <span
-            className={classNames('body-sm-regular', style.warningText)}>
+          <span className={classNames('body-sm-regular', style.warningText)}>
             {warningText}
           </span>
         </div>
       )}
       <div className={style.content}>
-        <div className='secondary-text-color body-sm-regular'>
-          {title}
-        </div>
+        <div className='secondary-text-color body-sm-regular'>{title}</div>
         <div className={style.actions}>
           <button
             type='button'
             onClick={onSelectAll}
-            className={classNames(
-              'body-sm-regular',
-              style.selectAllButton,
-            )}>
+            className={classNames('body-sm-regular', style.selectAllButton)}>
             Select All
           </button>
           <div className={style.spacer} />
@@ -66,6 +60,7 @@ const SectionHeader: FunctionComponent<Props> = ({
             onClick={onDeselectAll}
             className={classNames(
               'body-sm-regular',
+              'primary-text-color',
               style.deselectAllButton,
             )}>
             Deselect All

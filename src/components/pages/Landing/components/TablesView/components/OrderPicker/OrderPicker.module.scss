@@ -18,6 +18,10 @@
   &.open {
     border-color: var(--blue);
   }
+
+  &.disabled {
+    cursor: default;
+  }
 }
 
 .chevron {

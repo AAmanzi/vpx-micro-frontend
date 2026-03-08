@@ -22,6 +22,7 @@ interface Props {
   onFavoritesOnTopChange: (favoritesOnTop: boolean) => void;
   order: Order;
   onOrderChange: (order: Order) => void;
+  disabled?: boolean;
 }
 
 const OrderPicker: FunctionComponent<Props> = ({
@@ -29,6 +30,7 @@ const OrderPicker: FunctionComponent<Props> = ({
   onFavoritesOnTopChange,
   order,
   onOrderChange,
+  disabled = false,
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
 
@@ -43,8 +45,20 @@ const OrderPicker: FunctionComponent<Props> = ({
   );
 
   const handleSelectOrder = (value: Order) => () => {
+    if (disabled) {
+      return;
+    }
+
     onOrderChange(value);
     setIsOpen(false);
+  };
+
+  const handleToggleOpen = () => {
+    if (disabled) {
+      return;
+    }
+
+    setIsOpen((prev) => !prev);
   };
 
   return (
@@ -53,8 +67,9 @@ const OrderPicker: FunctionComponent<Props> = ({
         type='button'
         className={classNames(style.trigger, {
           [style.open]: isOpen,
+          [style.disabled]: disabled,
         })}
-        onClick={() => setIsOpen((prev) => !prev)}>
+        onClick={handleToggleOpen}>
         <Icon
           icon='arrow-up-down'
           className='secondary-text-color'
@@ -69,17 +84,19 @@ const OrderPicker: FunctionComponent<Props> = ({
           )}>
           {selectedLabel}
         </span>
-        <Icon
-          icon='chevron-down'
-          className={classNames('secondary-text-color', style.chevron, {
-            [style.open]: isOpen,
-          })}
-          width={14}
-          height={14}
-        />
+        {!disabled && (
+          <Icon
+            icon='chevron-down'
+            className={classNames('secondary-text-color', style.chevron, {
+              [style.open]: isOpen,
+            })}
+            width={14}
+            height={14}
+          />
+        )}
       </button>
 
-      {isOpen && (
+      {isOpen && !disabled && (
         <div className={style.dropdown}>
           <div
             className={classNames(

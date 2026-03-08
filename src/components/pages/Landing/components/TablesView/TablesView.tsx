@@ -26,6 +26,8 @@ const TablesView: FunctionComponent<Props> = ({
   title,
   description,
   defaultOrder,
+  emptyStateVariant,
+  isOrderPickerDisabled = false,
 }) => {
   const { fetchTables } = useTablesContext();
   const { config, fetchConfig } = useConfigContext();
@@ -125,6 +127,31 @@ const TablesView: FunctionComponent<Props> = ({
   const hasResults = !isLibraryEmpty && filteredTables.length > 0;
   const hasNoSearchResults =
     !isLibraryEmpty && filteredTables.length === 0 && query;
+  const hasNoViewResults =
+    !isLibraryEmpty && !query && tables.length === 0 && emptyStateVariant;
+
+  const getEmptyViewContent = () => {
+    switch (emptyStateVariant) {
+      case 'favorites':
+        return {
+          icon: 'star' as const,
+          title: 'No favorites yet',
+          description:
+            'Mark tables as favorites to quickly access them from this view.',
+        };
+      case 'recentlyPlayed':
+        return {
+          icon: 'clock-recent' as const,
+          title: 'No recently played tables',
+          description:
+            'Play a table and it will appear here for quick access next time.',
+        };
+      default:
+        return null;
+    }
+  };
+
+  const emptyViewContent = getEmptyViewContent();
 
   return (
     <>
@@ -143,22 +170,29 @@ const TablesView: FunctionComponent<Props> = ({
             onFavoritesOnTopChange={handleFavoritesOnTopChange}
             order={order}
             onOrderChange={handleOrderChange}
+            disabled={isOrderPickerDisabled}
           />
         </div>
       </div>
       <div className={style.container}>
         <div className={style.titleRow}>
           <div>
-            <h1 className='primary-text-color heading-4-bold'>{title}</h1>
-            <p className='secondary-text-color body-md-regular'>
-              {displayedDescription}
-            </p>
+            <h1 className='primary-text-color heading-5-bold'>{title}</h1>
+            {displayedDescription && (
+              <p className='secondary-text-color body-sm-regular'>
+                {displayedDescription}
+              </p>
+            )}
           </div>
           <div className={style.scanButtonWrapper}>
             <Button
               icon='scan-search'
               label='Scan Library'
-              type={ButtonType.primaryAltTransparent}
+              type={
+                isLibraryEmpty
+                  ? ButtonType.primaryAlt
+                  : ButtonType.primaryAltTransparent
+              }
               size={ButtonSize.medium}
               onClick={() => setIsScanLibraryModalOpen(true)}
               fill
@@ -236,6 +270,34 @@ const TablesView: FunctionComponent<Props> = ({
                   onClick={() => setIsImportModalOpen(true)}
                 />
               </div>
+            </div>
+          )}
+          {hasNoViewResults && emptyViewContent && (
+            <div className={style.noData}>
+              <div className={style.noDataIconWrapper}>
+                <Icon
+                  className='secondary-text-color'
+                  icon={emptyViewContent.icon}
+                  width={40}
+                  height={40}
+                />
+              </div>
+              <h2
+                className={classNames(
+                  'primary-text-color',
+                  'heading-4-bold',
+                  style.noDataTitle,
+                )}>
+                {emptyViewContent.title}
+              </h2>
+              <p
+                className={classNames(
+                  'secondary-text-color',
+                  'body-md-regular',
+                  style.noDataDescription,
+                )}>
+                {emptyViewContent.description}
+              </p>
             </div>
           )}
         </div>
