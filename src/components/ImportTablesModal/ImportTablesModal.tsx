@@ -21,7 +21,7 @@ import { buildImportSelectionResult, filterExistingFiles } from './utils';
 const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
   const { tables } = useTablesContext();
   const { config, fetchConfig } = useConfigContext();
-  const { showErrorToast } = useToastContext();
+  const { showErrorToast, showWarningToast } = useToastContext();
 
   const [isLoading, setIsLoading] = useState(false);
   const [tablesToImport, setTablesToImport] = useState<Array<TableFile>>([]);
@@ -40,11 +40,15 @@ const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
     setIsLoading(true);
 
     const filteredFiles = filterExistingFiles({ tables, files });
+    const skippedExistingFilesCount = files.length - filteredFiles.length;
+
+    if (skippedExistingFilesCount > 0) {
+      showWarningToast(
+        `${skippedExistingFilesCount} file${skippedExistingFilesCount === 1 ? '' : 's'} skipped because ${skippedExistingFilesCount === 1 ? 'it already exists' : 'they already exist'} in your library`,
+      );
+    }
 
     try {
-      // TODO: infer table names from folder names if
-      //    folder is dropped and contains a single .vpx file
-
       const result = await buildImportSelectionResult({
         currentTables: tablesToImport,
         currentUnassignedRoms: unassignedRoms,

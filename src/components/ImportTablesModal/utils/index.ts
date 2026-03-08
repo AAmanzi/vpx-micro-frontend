@@ -1,3 +1,5 @@
+import path from 'path';
+
 import { api } from 'src/consts';
 import { FileSystemItem, TableFile } from 'src/types/file';
 import { Table } from 'src/types/table';
@@ -11,7 +13,10 @@ const isVpxFile = (file: FileSystemItem): boolean =>
 const isRomFile = (file: FileSystemItem): boolean =>
   file.name.toLowerCase().endsWith('.zip');
 
-const createTableFile = async (file: FileSystemItem): Promise<TableFile> => {
+const createTableFile = async (
+  file: FileSystemItem,
+  vpxCountByDirectoryPath: Map<string, number>,
+): Promise<TableFile> => {
   let expectedRomName: string | undefined;
 
   try {
@@ -21,8 +26,15 @@ const createTableFile = async (file: FileSystemItem): Promise<TableFile> => {
     expectedRomName = undefined;
   }
 
+  const defaultName = file.name.replace(/\.vpx$/i, '').trim();
+  const directoryPath = path.dirname(file.path);
+  const directoryName = path.basename(directoryPath).trim();
+  const shouldUseDirectoryName =
+    vpxCountByDirectoryPath.get(directoryPath) === 1 &&
+    directoryName.length > 0;
+
   return {
-    name: file.name.replace(/\.vpx$/i, '').trim(),
+    name: shouldUseDirectoryName ? directoryName : defaultName,
     filePath: file.path,
     fileName: file.name,
     expectedRomName,
@@ -44,11 +56,24 @@ export const buildImportSelectionResult = async ({
     ...currentTables.map((table) => table.rom?.path).filter(Boolean),
   ]);
 
+  const incomingVpxFiles = incomingFiles
+    .filter(isVpxFile)
+    .filter((file) => !knownTablePaths.has(file.path));
+
+  const vpxCountByDirectoryPath = incomingVpxFiles.reduce<
+    Map<string, number>
+  >((acc, file) => {
+    const directoryPath = path.dirname(file.path);
+
+    acc.set(directoryPath, (acc.get(directoryPath) || 0) + 1);
+
+    return acc;
+  }, new Map<string, number>());
+
   const newTables = await Promise.all(
-    incomingFiles
-      .filter(isVpxFile)
-      .filter((file) => !knownTablePaths.has(file.path))
-      .map(createTableFile),
+    incomingVpxFiles.map((file) =>
+      createTableFile(file, vpxCountByDirectoryPath),
+    ),
   );
 
   const newRoms = incomingFiles

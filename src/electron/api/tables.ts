@@ -106,7 +106,6 @@ export function renameTable(id: string, newName: string): ApiResult<null> {
 
 export function importTables(
   tableFiles: Array<TableFile>,
-  // TODO: check if this works -- seems like it deleted origin files when flag was false
   deleteAfterImport: boolean,
 ): ApiResult<null> {
   try {
