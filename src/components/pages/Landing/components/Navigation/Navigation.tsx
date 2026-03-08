@@ -97,6 +97,7 @@ const Navigation: FunctionComponent<Props> = ({
               className={classNames(
                 'body-xs-semibold',
                 'secondary-text-color',
+                'uppercase',
                 style.sectionTitle,
               )}>
               System

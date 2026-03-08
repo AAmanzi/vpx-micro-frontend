@@ -177,7 +177,7 @@ const TablesView: FunctionComponent<Props> = ({
       <div className={style.container}>
         <div className={style.titleRow}>
           <div>
-            <h1 className='primary-text-color heading-5-bold'>{title}</h1>
+            <h1 className='primary-text-color heading-6-bold'>{title}</h1>
             {displayedDescription && (
               <p className='secondary-text-color body-sm-regular'>
                 {displayedDescription}
