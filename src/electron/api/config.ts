@@ -50,3 +50,23 @@ export function updateDeleteFilesAfterImport(
     return apiFailure(error);
   }
 }
+
+export function updateKeepFavoritesOnTop(
+  keepFavoritesOnTop: boolean,
+): ApiResult<null> {
+  try {
+    configDb.updateKeepFavoritesOnTop(keepFavoritesOnTop);
+    return apiSuccess(null);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}
+
+export function updateOrder(order: Config['order']): ApiResult<null> {
+  try {
+    configDb.updateOrder(order);
+    return apiSuccess(null);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}

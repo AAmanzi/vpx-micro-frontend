@@ -13,11 +13,13 @@ import style from './Navigation.module.scss';
 interface Props {
   view: View;
   setView: (view: View) => void;
+  librarySize: number;
 }
 
-const Navigation: FunctionComponent<Props> = ({ view, setView }) => {
+const Navigation: FunctionComponent<Props> = ({ view, setView, librarySize }) => {
   const { fetchTables } = useTablesContext();
   const { config } = useConfigContext();
+  const fullVpxPath = config?.vpxRootPath || '';
 
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
@@ -109,9 +111,33 @@ const Navigation: FunctionComponent<Props> = ({ view, setView }) => {
               VPX PATH
             </span>
           </div>
-          <span className='caption-small-semibold secondary-text-color'>
-            {config?.vpxRootPath}
-          </span>
+          <div className={style.metaPathWrapper}>
+            <span
+              className={classNames(
+                'caption-small-regular',
+                'secondary-text-color',
+                style.metaPath,
+              )}>
+              {fullVpxPath}
+            </span>
+            {fullVpxPath && (
+              <span
+                className={classNames(
+                  'caption-small-regular',
+                  style.metaPathTooltip,
+                )}>
+                {fullVpxPath}
+              </span>
+            )}
+          </div>
+          <div className={style.metaStat}>
+            <span className='caption-small-semibold secondary-text-color'>
+              LIBRARY SIZE
+            </span>
+            <span className='caption-small-regular secondary-text-color'>
+              {librarySize} Tables
+            </span>
+          </div>
         </div>
       </div>
       {isImportModalOpen && (

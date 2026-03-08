@@ -15,6 +15,7 @@ export type Icon =
   | 'unlocked'
   | 'search'
   | 'reload'
+  | 'arrow-up-down'
   | 'archive'
   | 'file-code'
   | 'package'

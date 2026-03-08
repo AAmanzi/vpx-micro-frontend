@@ -1,9 +1,10 @@
 .header {
   display: flex;
   justify-content: space-between;
+
+  border-bottom: thin solid var(--gray);
   align-items: center;
   height: 80px;
-  border-bottom: thin solid var(--gray);
   padding-left: 32px;
   padding-right: 32px;
 }
@@ -20,6 +21,18 @@
 
 .container {
   margin: 24px 32px 0;
+}
+
+.titleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.scanButtonWrapper {
+  width: 200px;
+  flex-shrink: 0;
 }
 
 .tablesWrapper {

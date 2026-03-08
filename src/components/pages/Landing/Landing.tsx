@@ -30,6 +30,7 @@ const Landing: FunctionComponent<Props> = () => {
             description='Manage your Visual Pinball library'
           />
         );
+      // TODO: no favorites display something
       case View.favorites:
         return (
           <TablesView
@@ -46,7 +47,11 @@ const Landing: FunctionComponent<Props> = () => {
 
   return (
     <div className={style.container}>
-      <Navigation view={view} setView={handleChangeView} />
+      <Navigation
+        view={view}
+        setView={handleChangeView}
+        librarySize={tables.length}
+      />
       <div className={style.content}>{getView()}</div>
     </div>
   );

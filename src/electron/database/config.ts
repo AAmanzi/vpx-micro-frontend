@@ -1,26 +1,33 @@
 import Store from 'electron-store';
 
 import { VPX_DEFAULT_ROOT_PATH } from 'src/consts/vpx';
-import type { Config } from 'src/types/config';
+import { Config, Order } from 'src/types/config';
 import { getDefaultRomsDirectory, getDefaultTablesDirectory } from 'src/utils';
 
 type ConfigStoreSchema = {
   config: Config;
 };
 
+const defaultConfig: Config = {
+  vpxRootPath: VPX_DEFAULT_ROOT_PATH,
+  deleteFilesAfterImport: false,
+  romsDirectory: '',
+  tablesDirectory: '',
+  keepFavoritesOnTop: false,
+  order: Order.dateAddedDesc,
+};
+
 const store = new Store<ConfigStoreSchema>({
   name: 'app-config',
   defaults: {
-    config: {
-      vpxRootPath: VPX_DEFAULT_ROOT_PATH,
-      deleteFilesAfterImport: false,
-      romsDirectory: '',
-      tablesDirectory: '',
-    },
+    config: defaultConfig,
   },
 });
 
-const getStoredConfig = (): Config => store.get('config');
+const getStoredConfig = (): Config => ({
+  ...defaultConfig,
+  ...store.get('config'),
+});
 
 export function getConfig(): Config {
   return getStoredConfig();
@@ -71,5 +78,19 @@ export function updateDeleteFilesAfterImport(deleteAfterImport: boolean): void {
   store.set('config', {
     ...getStoredConfig(),
     deleteFilesAfterImport: deleteAfterImport,
+  });
+}
+
+export function updateKeepFavoritesOnTop(keepFavoritesOnTop: boolean): void {
+  store.set('config', {
+    ...getStoredConfig(),
+    keepFavoritesOnTop,
+  });
+}
+
+export function updateOrder(order: Config['order']): void {
+  store.set('config', {
+    ...getStoredConfig(),
+    order,
   });
 }

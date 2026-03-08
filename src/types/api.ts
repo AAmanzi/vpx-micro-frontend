@@ -53,6 +53,10 @@ export interface Api {
   updateDeleteFilesAfterImport: (
     deleteAfterImport: boolean,
   ) => Promise<ApiResult<null>>;
+  updateKeepFavoritesOnTop: (
+    keepFavoritesOnTop: boolean,
+  ) => Promise<ApiResult<null>>;
+  updateOrder: (order: Config['order']) => Promise<ApiResult<null>>;
 }
 
 declare global {

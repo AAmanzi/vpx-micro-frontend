@@ -74,6 +74,15 @@ const frontendApi: Api = {
       'api:updateDeleteFilesAfterImport',
       deleteAfterImport,
     ),
+  updateKeepFavoritesOnTop: (
+    keepFavoritesOnTop: boolean,
+  ): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>(
+      'api:updateKeepFavoritesOnTop',
+      keepFavoritesOnTop,
+    ),
+  updateOrder: (order: Config['order']): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:updateOrder', order),
   startTable: (tableId: string): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:startTable', tableId),
 };

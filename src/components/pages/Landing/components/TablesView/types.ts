@@ -1,0 +1,8 @@
+import { Table } from 'src/types/table';
+
+export interface Props {
+  title: string;
+  description: string;
+  tables: Array<Table>;
+  librarySize: number;
+}

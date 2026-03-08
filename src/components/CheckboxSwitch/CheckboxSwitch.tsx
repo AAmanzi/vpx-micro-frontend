@@ -1,14 +1,15 @@
-import { FunctionComponent } from 'react';
 import classNames from 'classnames';
+import { FunctionComponent } from 'react';
 
-import { Props } from './types';
 import style from './CheckboxSwitch.module.scss';
+import { Props } from './types';
 
 const CheckboxSwitch: FunctionComponent<Props> = ({
   checked,
   onChange,
   disabled = false,
   showDisabled = false,
+  color = 'blue',
 }) => {
   const handleChange = () => {
     if (onChange && !disabled) {
@@ -20,6 +21,10 @@ const CheckboxSwitch: FunctionComponent<Props> = ({
     <label
       className={classNames(style.container, {
         [style.disabled]: disabled,
+        [style.blue]: color === 'blue',
+        [style.red]: color === 'red',
+        [style.green]: color === 'green',
+        [style.yellow]: color === 'yellow',
       })}>
       <input
         type='checkbox'

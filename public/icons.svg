@@ -78,6 +78,11 @@
     <path d="M3 3v5h5M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
     <path d="M16 16h5v5"/>
   </symbol>
+  <symbol id="icon-arrow-up-down" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+    <path d="m8 7 4-4 4 4"/>
+    <path d="M12 3v18"/>
+    <path d="m16 17-4 4-4-4"/>
+  </symbol>
   <symbol id="icon-archive" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
     <rect width="20" height="5" x="2" y="3" rx="1"/>
     <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8M10 12h4"/>

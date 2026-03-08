@@ -6,6 +6,7 @@ import path from 'path';
 
 import type { TableFile } from 'src/types/file';
 import type { ScanResult } from 'src/types/table';
+import type { Config } from 'src/types/config';
 
 import * as api from './api';
 import * as db from './database/tables';
@@ -125,6 +126,14 @@ app.whenReady().then(async () => {
     'api:updateDeleteFilesAfterImport',
     async (_, deleteAfterImport: boolean) =>
       api.updateDeleteFilesAfterImport(deleteAfterImport),
+  );
+  ipcMain.handle(
+    'api:updateKeepFavoritesOnTop',
+    async (_, keepFavoritesOnTop: boolean) =>
+      api.updateKeepFavoritesOnTop(keepFavoritesOnTop),
+  );
+  ipcMain.handle('api:updateOrder', async (_, order: Config['order']) =>
+    api.updateOrder(order),
   );
   ipcMain.handle('api:startTable', async (_, tableId: string) =>
     api.startTable(tableId),

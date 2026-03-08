@@ -13,10 +13,6 @@
   visibility: hidden;
 
   &:checked {
-    & + .slider {
-      background-color: var(--primary);
-    }
-
     & ~ .circle {
       background-color: var(--white);
       transform: translateX(18px);
@@ -32,6 +28,38 @@
       & ~ .circle {
         background-color: var(--mega-light-gray);
       }
+    }
+  }
+}
+
+.blue {
+  .checkbox:checked {
+    & + .slider {
+      background-color: var(--blue);
+    }
+  }
+}
+
+.red {
+  .checkbox:checked {
+    & + .slider {
+      background-color: var(--red);
+    }
+  }
+}
+
+.green {
+  .checkbox:checked {
+    & + .slider {
+      background-color: var(--green);
+    }
+  }
+}
+
+.yellow {
+  .checkbox:checked {
+    & + .slider {
+      background-color: var(--yellow);
     }
   }
 }

@@ -3,4 +3,5 @@ export interface Props {
   onChange: () => void;
   disabled?: boolean;
   showDisabled?: boolean;
+  color?: 'blue' | 'red' | 'green' | 'yellow';
 }
