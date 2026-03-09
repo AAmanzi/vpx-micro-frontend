@@ -1,10 +1,10 @@
 import fs from 'fs';
-import os from 'os';
 import path from 'path';
 
 import { FileSystemItem, TableFile } from 'src/types/file';
 import { Table } from 'src/types/table';
 
+import { normalizePathForComparison, resolveUserPath } from './path';
 import { getExpectedRomNameFromVpxFile } from './vpxParsing';
 
 export const scanNewRoms = (
@@ -15,9 +15,7 @@ export const scanNewRoms = (
     return [];
   }
 
-  const normalizedDirectoryPath = /^~(?=$|[\\/])/.test(directoryPath.trim())
-    ? path.join(os.homedir(), directoryPath.trim().slice(1))
-    : directoryPath.trim();
+  const normalizedDirectoryPath = resolveUserPath(directoryPath);
 
   if (!normalizedDirectoryPath) {
     return [];
@@ -25,7 +23,7 @@ export const scanNewRoms = (
 
   const existingRomNames = new Set(
     existingRoms
-      .map((rom) => path.basename(rom).trim().toLowerCase())
+      .map((rom) => normalizePathForComparison(path.basename(rom)))
       .filter(Boolean),
   );
 
@@ -68,7 +66,7 @@ export const scanNewRoms = (
         return;
       }
 
-      const normalizedName = entry.name.trim().toLowerCase();
+      const normalizedName = normalizePathForComparison(entry.name);
 
       if (visitedRomNames.has(normalizedName)) {
         return;
@@ -94,9 +92,7 @@ export const scanNewTables = (
     return [];
   }
 
-  const normalizedDirectoryPath = /^~(?=$|[\\/])/.test(directoryPath.trim())
-    ? path.join(os.homedir(), directoryPath.trim().slice(1))
-    : directoryPath.trim();
+  const normalizedDirectoryPath = resolveUserPath(directoryPath);
 
   if (!normalizedDirectoryPath) {
     return [];
@@ -104,17 +100,16 @@ export const scanNewTables = (
 
   const existingTableFileNames = new Set(
     existingVpxFiles
-      .map((filePath) => path.basename(filePath).trim().toLowerCase())
+      .map((filePath) => normalizePathForComparison(path.basename(filePath)))
       .filter(Boolean),
   );
 
   const romsByName = new Map<string, FileSystemItem>();
   roms.forEach((rom) => {
-    const withExtension = rom.name.trim().toLowerCase();
-    const withoutExtension = path
-      .basename(rom.name, path.extname(rom.name))
-      .trim()
-      .toLowerCase();
+    const withExtension = normalizePathForComparison(rom.name);
+    const withoutExtension = normalizePathForComparison(
+      path.basename(rom.name, path.extname(rom.name)),
+    );
 
     if (withExtension && !romsByName.has(withExtension)) {
       romsByName.set(withExtension, rom);
@@ -164,7 +159,7 @@ export const scanNewTables = (
         return;
       }
 
-      const normalizedFileName = entry.name.trim().toLowerCase();
+      const normalizedFileName = normalizePathForComparison(entry.name);
 
       if (visitedTableFileNames.has(normalizedFileName)) {
         return;
@@ -180,7 +175,9 @@ export const scanNewTables = (
         expectedRomName = null;
       }
 
-      const normalizedExpectedRomName = expectedRomName?.trim().toLowerCase();
+      const normalizedExpectedRomName = normalizePathForComparison(
+        expectedRomName || '',
+      );
       const matchedRom = normalizedExpectedRomName
         ? romsByName.get(normalizedExpectedRomName)
         : undefined;
@@ -210,17 +207,13 @@ export const findTablesWithMissingFiles = (
       return null;
     }
 
-    const normalizedPath = filePath.trim();
+    const resolvedPath = resolveUserPath(filePath);
 
-    if (!normalizedPath) {
+    if (!resolvedPath) {
       return null;
     }
 
-    if (/^~(?=$|[\\/])/.test(normalizedPath)) {
-      return path.join(os.homedir(), normalizedPath.slice(1));
-    }
-
-    return normalizedPath;
+    return resolvedPath;
   };
 
   const fileExists = (filePath?: string): boolean => {

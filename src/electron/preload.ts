@@ -17,6 +17,13 @@ const frontendApi: Api = {
     invoke<ApiResult<null>>('api:deleteTable', id),
   renameTable: (id: string, newName: string): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:renameTable', id, newName),
+  getUnmatchedRoms: (): Promise<ApiResult<Array<FileSystemItem>>> =>
+    invoke<ApiResult<Array<FileSystemItem>>>('api:getUnmatchedRoms'),
+  updateTableRom: (
+    tableId: string,
+    rom: FileSystemItem | null,
+  ): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:updateTableRom', tableId, rom),
   getExpectedRomName: (
     vpxFilePath: string,
   ): Promise<ApiResult<string | null>> =>
@@ -77,10 +84,7 @@ const frontendApi: Api = {
   updateKeepFavoritesOnTop: (
     keepFavoritesOnTop: boolean,
   ): Promise<ApiResult<null>> =>
-    invoke<ApiResult<null>>(
-      'api:updateKeepFavoritesOnTop',
-      keepFavoritesOnTop,
-    ),
+    invoke<ApiResult<null>>('api:updateKeepFavoritesOnTop', keepFavoritesOnTop),
   updateOrder: (order: Config['order']): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:updateOrder', order),
   startTable: (tableId: string): Promise<ApiResult<null>> =>

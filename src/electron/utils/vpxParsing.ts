@@ -2,6 +2,8 @@ import CFB from 'cfb';
 import fs from 'fs';
 import path from 'path';
 
+import { resolveUserPath } from './path';
+
 function normalizeContentBuffer(content: unknown): Buffer | null {
   if (!content) {
     return null;
@@ -110,7 +112,7 @@ export function getExpectedRomNameFromVpxFile(
     throw new Error('A VPX file path is required.');
   }
 
-  const resolvedPath = path.resolve(vpxFilePath);
+  const resolvedPath = path.resolve(resolveUserPath(vpxFilePath));
 
   if (!fs.existsSync(resolvedPath)) {
     throw new Error(`File not found: ${resolvedPath}`);

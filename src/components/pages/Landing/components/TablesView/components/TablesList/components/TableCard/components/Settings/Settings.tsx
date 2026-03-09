@@ -7,13 +7,16 @@ import useClickOutside from 'src/utils/useClickOutside';
 
 import style from './Settings.module.scss';
 import DeleteTableModal from './components/DeleteTableModal';
+import EditTableRomModal from './components/EditTableRomModal/EditTableRomModal';
 import RenameTableModal from './components/RenameTableModal';
 
 interface Props {
   id: string;
   name: string;
   romFile?: string;
+  romFilePath?: string;
   vpxFile: string;
+  vpxFilePath: string;
   close: () => void;
 }
 
@@ -21,7 +24,9 @@ const Settings: FunctionComponent<Props> = ({
   id,
   name,
   romFile,
+  romFilePath,
   vpxFile,
+  vpxFilePath,
   close,
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -30,6 +35,7 @@ const Settings: FunctionComponent<Props> = ({
   const { fetchTables } = useTablesContext();
 
   const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
+  const [isEditTableRomModalOpen, setIsEditTableRomModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const closeRenameModal = () => {
@@ -40,6 +46,12 @@ const Settings: FunctionComponent<Props> = ({
 
   const closeDeleteModal = () => {
     setIsDeleteModalOpen(false);
+    fetchTables();
+    close();
+  };
+
+  const closeEditTableRomModal = () => {
+    setIsEditTableRomModalOpen(false);
     fetchTables();
     close();
   };
@@ -57,6 +69,16 @@ const Settings: FunctionComponent<Props> = ({
         </span>
       </button>
       <button
+        onClick={() => setIsEditTableRomModalOpen(true)}
+        className={style.button}>
+        <div className={style.iconWrapper}>
+          <Icon icon='package' className={style.icon} />
+        </div>
+        <span className={classNames('body-sm-semibold', style.label)}>
+          Edit ROM
+        </span>
+      </button>
+      <button
         onClick={() => setIsDeleteModalOpen(true)}
         className={classNames(style.button, style.danger)}>
         <div className={style.iconWrapper}>
@@ -68,6 +90,15 @@ const Settings: FunctionComponent<Props> = ({
       </button>
       {isRenameModalOpen && (
         <RenameTableModal id={id} name={name} close={closeRenameModal} />
+      )}
+      {isEditTableRomModalOpen && (
+        <EditTableRomModal
+          id={id}
+          vpxFilePath={vpxFilePath}
+          currentRomName={romFile}
+          currentRomPath={romFilePath}
+          close={closeEditTableRomModal}
+        />
       )}
       {isDeleteModalOpen && (
         <DeleteTableModal

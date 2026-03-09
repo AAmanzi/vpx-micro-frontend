@@ -32,6 +32,11 @@ export interface Api {
   setTableFavorite: (id: string, fav: boolean) => Promise<ApiResult<null>>;
   deleteTable: (id: string) => Promise<ApiResult<null>>;
   renameTable: (id: string, newName: string) => Promise<ApiResult<null>>;
+  getUnmatchedRoms: () => Promise<ApiResult<Array<FileSystemItem>>>;
+  updateTableRom: (
+    tableId: string,
+    rom: FileSystemItem | null,
+  ) => Promise<ApiResult<null>>;
   importTables: (
     tables: Array<TableFile>,
     deleteAfterImport: boolean,

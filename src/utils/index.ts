@@ -1,6 +1,9 @@
 import { VPX_DEFAULT_ROM_PATH, VPX_DEFAULT_TABLES_PATH } from 'src/consts/vpx';
 import { Table } from 'src/types/table';
 
+export const normalizePathForComparison = (value?: string): string =>
+  (value || '').trim().toLowerCase().replace(/\\/g, '/');
+
 export const getDefaultRomsDirectory = (vpxRootPath: string): string => {
   return `${vpxRootPath}/${VPX_DEFAULT_ROM_PATH}`;
 };

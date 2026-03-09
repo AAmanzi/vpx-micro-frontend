@@ -5,21 +5,17 @@ import type { ScanResult, Table } from 'src/types/table';
 
 import * as tablesDb from '../database/tables';
 import { deleteFile } from './fileManagement';
+import { normalizePathForComparison } from './path';
 
 export function registerTableFiles(tables: Array<TableFile>): void {
   const existingVpxPaths = new Set(
     tablesDb
       .getAll()
-      .map((table) =>
-        table.vpxFilePath.trim().toLowerCase().replace(/\\/g, '/'),
-      ),
+      .map((table) => normalizePathForComparison(table.vpxFilePath)),
   );
 
   tables.forEach((tableFile) => {
-    const normalizedVpxPath = tableFile.filePath
-      .trim()
-      .toLowerCase()
-      .replace(/\\/g, '/');
+    const normalizedVpxPath = normalizePathForComparison(tableFile.filePath);
 
     if (existingVpxPaths.has(normalizedVpxPath)) {
       return;

@@ -4,6 +4,8 @@ import { VPX_DEFAULT_ROOT_PATH } from 'src/consts/vpx';
 import { Config, Order } from 'src/types/config';
 import { getDefaultRomsDirectory, getDefaultTablesDirectory } from 'src/utils';
 
+import { resolveUserPath } from '../utils/path';
+
 type ConfigStoreSchema = {
   config: Config;
 };
@@ -37,20 +39,26 @@ export function getRomsDirectoryPath(): string {
   const config = getStoredConfig();
 
   if (config.romsDirectory) {
-    return config.romsDirectory;
+    return resolveUserPath(config.romsDirectory);
   }
 
-  return getDefaultRomsDirectory(config.vpxRootPath);
+  return resolveUserPath(getDefaultRomsDirectory(config.vpxRootPath));
 }
 
 export function getTablesDirectoryPath(): string {
   const config = getStoredConfig();
 
   if (config.tablesDirectory) {
-    return config.tablesDirectory;
+    return resolveUserPath(config.tablesDirectory);
   }
 
-  return getDefaultTablesDirectory(config.vpxRootPath);
+  return resolveUserPath(getDefaultTablesDirectory(config.vpxRootPath));
+}
+
+export function getVpxRootPath(): string {
+  const config = getStoredConfig();
+
+  return resolveUserPath(config.vpxRootPath);
 }
 
 export function updateVpxRootPath(path: string): void {

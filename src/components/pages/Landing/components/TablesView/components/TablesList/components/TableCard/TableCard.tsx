@@ -26,7 +26,9 @@ const TableCard: FunctionComponent<Props> = ({
   isFavorite,
   name,
   romFile,
+  romFilePath,
   vpxFile,
+  vpxFilePath,
   dateAddedTimestamp,
   lastPlayedTimestamp,
 }) => {
@@ -121,7 +123,9 @@ const TableCard: FunctionComponent<Props> = ({
                 <Settings
                   id={id}
                   name={name}
+                  vpxFilePath={vpxFilePath}
                   vpxFile={vpxFile}
+                  romFilePath={romFilePath}
                   romFile={romFile}
                   close={closeSettings}
                 />
@@ -131,15 +135,11 @@ const TableCard: FunctionComponent<Props> = ({
         </div>
 
         <div className={style.meta}>
-          <p className='secondary-text-color body-xs-semibold'>
-            {vpxFile}
-          </p>
+          <p className='secondary-text-color body-xs-semibold'>{vpxFile}</p>
           {romFile && (
             <div className={style.romPill}>
               <span className={style.romDot} />
-              <p className='secondary-text-color body-xs-semibold'>
-                {romFile}
-              </p>
+              <p className='secondary-text-color body-xs-semibold'>{romFile}</p>
             </div>
           )}
 

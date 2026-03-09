@@ -2,13 +2,7 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 
-const resolveUserPath = (inputPath: string): string => {
-  if (/^~(?=$|[\\/])/.test(inputPath)) {
-    return path.join(os.homedir(), inputPath.slice(1));
-  }
-
-  return inputPath;
-};
+import { resolveUserPath } from './path';
 
 const ensureDestinationDirectory = (destinationPath: string): void => {
   const resolvedDestinationPath = resolveUserPath(destinationPath);

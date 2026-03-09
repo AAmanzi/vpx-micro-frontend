@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { VPX_DEFAULT_EXECUTABLE } from 'src/consts/vpx';
 import type { ApiResult } from 'src/types/api';
-import type { TableFile } from 'src/types/file';
+import type { FileSystemItem, TableFile } from 'src/types/file';
 import type { ScanResult, Table } from 'src/types/table';
 
 import * as configDb from '../database/config';
@@ -21,12 +21,16 @@ import {
   moveFile,
   removeEmptyParentDirectories,
 } from '../utils/fileManagement';
+import { normalizePathForComparison } from '../utils/path';
 import {
   findTablesWithMissingFiles,
   scanNewRoms,
   scanNewTables,
 } from '../utils/scanVpxLibrary';
 import { startVpxTable } from '../utils/startVpxTable';
+
+const isZipFile = (name: string): boolean =>
+  path.extname(name).toLowerCase() === '.zip';
 
 export function getAllTables(): ApiResult<Table[]> {
   try {
@@ -104,6 +108,138 @@ export function renameTable(id: string, newName: string): ApiResult<null> {
   }
 }
 
+export function getUnmatchedRoms(): ApiResult<Array<FileSystemItem>> {
+  try {
+    const tables = tablesDb.getAll();
+    const romsDirectoryPath = configDb.getRomsDirectoryPath();
+    const assignedRomPaths = tables
+      .map((table) => table.romFilePath)
+      .filter(Boolean) as Array<string>;
+
+    const unmatchedRoms = scanNewRoms(romsDirectoryPath, assignedRomPaths);
+
+    return apiSuccess(unmatchedRoms);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}
+
+export function updateTableRom(
+  tableId: string,
+  rom: FileSystemItem | null,
+): ApiResult<null> {
+  try {
+    const table = tablesDb.get(tableId);
+
+    if (!table) {
+      return {
+        success: false,
+        error: {
+          code: 'TABLE_NOT_FOUND',
+          message: `Table not found: ${tableId}`,
+        },
+      };
+    }
+
+    if (rom && !isZipFile(rom.name)) {
+      return {
+        success: false,
+        error: {
+          code: 'INVALID_ROM_FILE',
+          message: 'ROM file must be a .zip file',
+        },
+      };
+    }
+
+    const currentRomPath = table.romFilePath;
+    const currentRomName = table.romFile;
+
+    let nextRomPath: string | undefined;
+    let nextRomName: string | undefined;
+
+    if (rom) {
+      const romsDirectoryPath = configDb.getRomsDirectoryPath();
+      const destinationRomPath = path.join(romsDirectoryPath, rom.name);
+
+      nextRomPath = destinationRomPath;
+      nextRomName = rom.name;
+    }
+
+    const hasRomChanged =
+      normalizePathForComparison(currentRomPath) !==
+      normalizePathForComparison(nextRomPath);
+
+    if (hasRomChanged && nextRomPath) {
+      const isAssignedToAnotherTable = tablesDb.getAll().some((item) => {
+        if (item.id === tableId || !item.romFilePath) {
+          return false;
+        }
+
+        return (
+          normalizePathForComparison(item.romFilePath) ===
+          normalizePathForComparison(nextRomPath)
+        );
+      });
+
+      if (isAssignedToAnotherTable) {
+        return {
+          success: false,
+          error: {
+            code: 'ROM_ALREADY_ASSIGNED',
+            message: 'This ROM is already assigned to another table',
+          },
+        };
+      }
+
+      if (rom) {
+        const normalizedSourceRomPath = normalizePathForComparison(rom.path);
+
+        if (
+          normalizedSourceRomPath !== normalizePathForComparison(nextRomPath)
+        ) {
+          copyFile(rom.path, nextRomPath);
+        }
+      }
+    }
+
+    const updatedTable = tablesDb.update(tableId, {
+      romFile: nextRomName,
+      romFilePath: nextRomPath,
+    });
+
+    if (!updatedTable) {
+      return {
+        success: false,
+        error: {
+          code: 'TABLE_NOT_FOUND',
+          message: `Table not found: ${tableId}`,
+        },
+      };
+    }
+
+    if (hasRomChanged && currentRomPath && currentRomName) {
+      const isCurrentRomStillAssigned = tablesDb.getAll().some((item) => {
+        if (item.id === tableId || !item.romFilePath) {
+          return false;
+        }
+
+        return (
+          normalizePathForComparison(item.romFilePath) ===
+          normalizePathForComparison(currentRomPath)
+        );
+      });
+
+      if (!isCurrentRomStillAssigned) {
+        deleteFile(currentRomPath);
+      }
+    }
+
+    return apiSuccess(null);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}
+
 export function importTables(
   tableFiles: Array<TableFile>,
   deleteAfterImport: boolean,
@@ -118,9 +254,7 @@ export function importTables(
     const existingVpxPaths = new Set(
       tablesDb
         .getAll()
-        .map((table) =>
-          table.vpxFilePath.trim().toLowerCase().replace(/\\/g, '/'),
-        ),
+        .map((table) => normalizePathForComparison(table.vpxFilePath)),
     );
 
     tableFiles.forEach((tableFile) => {
@@ -136,10 +270,9 @@ export function importTables(
           ? path.join(romsDirectoryPath, tableFile.rom.name)
           : undefined;
 
-        const normalizedDestinationPath = vpxDestinationFilePath
-          .trim()
-          .toLowerCase()
-          .replace(/\\/g, '/');
+        const normalizedDestinationPath = normalizePathForComparison(
+          vpxDestinationFilePath,
+        );
 
         if (existingVpxPaths.has(normalizedDestinationPath)) {
           return;
@@ -214,7 +347,7 @@ export function importTables(
 
 export function startTable(tableId: string): ApiResult<null> {
   try {
-    const config = configDb.getConfig();
+    const vpxRootPath = configDb.getVpxRootPath();
     const table = tablesDb.get(tableId);
 
     if (!table) {
@@ -231,11 +364,7 @@ export function startTable(tableId: string): ApiResult<null> {
       lastPlayedTimestamp: Date.now(),
     });
 
-    startVpxTable(
-      table.vpxFilePath,
-      config.vpxRootPath,
-      VPX_DEFAULT_EXECUTABLE,
-    );
+    startVpxTable(table.vpxFilePath, vpxRootPath, VPX_DEFAULT_EXECUTABLE);
 
     return apiSuccess(null);
   } catch (error) {

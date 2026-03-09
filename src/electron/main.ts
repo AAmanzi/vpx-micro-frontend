@@ -4,9 +4,9 @@ import fs from 'fs';
 import http from 'http';
 import path from 'path';
 
+import type { Config } from 'src/types/config';
 import type { TableFile } from 'src/types/file';
 import type { ScanResult } from 'src/types/table';
-import type { Config } from 'src/types/config';
 
 import * as api from './api';
 import * as db from './database/tables';
@@ -98,6 +98,12 @@ app.whenReady().then(async () => {
   );
   ipcMain.handle('api:renameTable', async (_, id: string, newName: string) =>
     api.renameTable(id, newName),
+  );
+  ipcMain.handle('api:getUnmatchedRoms', async () => api.getUnmatchedRoms());
+  ipcMain.handle(
+    'api:updateTableRom',
+    async (_, tableId: string, rom: TableFile['rom'] | null) =>
+      api.updateTableRom(tableId, rom || null),
   );
   ipcMain.handle(
     'api:importTables',
