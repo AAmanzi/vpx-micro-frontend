@@ -105,6 +105,22 @@ const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
     setDeleteAfterImport((prev) => !prev);
   };
 
+  const handleValidate = () => {
+    if (tablesToImport.length === 0) {
+      showErrorToast('Please select at least one table to import');
+
+      return false;
+    }
+
+    if (tablesToImport.some((table) => table.name.trim() === '')) {
+      showErrorToast('Table names cannot be empty');
+
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async () => {
     const { error: importTablesError, warning: importTablesWarning } =
       await api.importTables(tablesToImport, deleteAfterImport);
@@ -148,7 +164,7 @@ const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
       title='Import Tables & ROMs'
       description='Drag folders or individual .vpx and .zip files'
       color='blue'>
-      <Form submit={handleSubmit}>
+      <Form submit={handleSubmit} validate={handleValidate}>
         <div className={style.content}>
           <FileUpload
             label='Select Tables & ROMs'

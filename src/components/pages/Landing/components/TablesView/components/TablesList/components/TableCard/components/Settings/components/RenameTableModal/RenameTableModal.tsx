@@ -4,6 +4,7 @@ import Button, {
   Size as ButtonSize,
   Type as ButtonType,
 } from 'src/components/Button';
+import Form from 'src/components/Form';
 import Input from 'src/components/Input';
 import Modal, { Size as ModalSize } from 'src/components/Modal';
 import api from 'src/consts';
@@ -25,6 +26,16 @@ const RenameTableModal: FunctionComponent<Props> = ({
   const [name, setName] = useState(nameFromProps);
   const { showErrorToast } = useToastContext();
 
+  const handleValidate = () => {
+    if (!name.trim()) {
+      showErrorToast('Table name cannot be empty');
+
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSave = async () => {
     const { error } = await api.renameTable(id, name);
 
@@ -44,18 +55,20 @@ const RenameTableModal: FunctionComponent<Props> = ({
       onExitClick={close}
       size={ModalSize.small}
       color='blue'>
-      <div className={style.content}>
-        <Input value={name} onChange={setName} autoFocus />
-      </div>
-      <div className={style.footer}>
-        <Button
-          size={ButtonSize.small}
-          type={ButtonType.transparent}
-          label='Cancel'
-          onClick={close}
-        />
-        <Button size={ButtonSize.small} label='Save' onClick={handleSave} />
-      </div>
+      <Form submit={handleSave} validate={handleValidate}>
+        <div className={style.content}>
+          <Input value={name} onChange={setName} autoFocus />
+        </div>
+        <div className={style.footer}>
+          <Button
+            size={ButtonSize.small}
+            type={ButtonType.transparent}
+            label='Cancel'
+            onClick={close}
+          />
+          <Button size={ButtonSize.small} label='Save' isSubmit />
+        </div>
+      </Form>
     </Modal>
   );
 };

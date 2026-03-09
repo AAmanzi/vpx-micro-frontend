@@ -6,6 +6,7 @@ import Button, {
   Type as ButtonType,
 } from 'src/components/Button';
 import FileUpload from 'src/components/FileUpload';
+import Form from 'src/components/Form';
 import Modal, { Size as ModalSize } from 'src/components/Modal';
 import RomPicker from 'src/components/RomPicker';
 import api from 'src/consts';
@@ -222,48 +223,50 @@ const EditTableRomModal: FunctionComponent<Props> = ({
       onExitClick={close}
       size={ModalSize.medium}
       color='blue'>
-      <div className={style.content}>
-        <FileUpload
-          label='Drop ROM file'
-          description='Drag and drop a .zip ROM file here'
-          acceptedExtensions={['.zip']}
-          acceptFolders={false}
-          loading={isLoadingData}
-          onFilesSelected={handleFilesSelected}
-        />
-        <div className={style.romPickerWrapper}>
-          <div
-            className={classNames(
-              'secondary-text-color',
-              'body-xs-semibold',
-              'uppercase',
-              style.metaLabel,
-            )}>
-            ROM Assignment
+      <Form submit={handleSave}>
+        <div className={style.content}>
+          <FileUpload
+            label='Drop ROM file'
+            description='Drag and drop a .zip ROM file here'
+            acceptedExtensions={['.zip']}
+            acceptFolders={false}
+            loading={isLoadingData}
+            onFilesSelected={handleFilesSelected}
+          />
+          <div className={style.romPickerWrapper}>
+            <div
+              className={classNames(
+                'secondary-text-color',
+                'body-xs-semibold',
+                'uppercase',
+                style.metaLabel,
+              )}>
+              ROM Assignment
+            </div>
+            <RomPicker
+              selectedRom={selectedRom}
+              options={options}
+              expectedRomName={expectedRomName}
+              onRemoveRom={() => setSelectedRom(null)}
+              onSelect={handleRomSelect}
+            />
           </div>
-          <RomPicker
-            selectedRom={selectedRom}
-            options={options}
-            expectedRomName={expectedRomName}
-            onRemoveRom={() => setSelectedRom(null)}
-            onSelect={handleRomSelect}
+        </div>
+        <div className={style.footer}>
+          <Button
+            size={ButtonSize.small}
+            type={ButtonType.transparent}
+            label='Cancel'
+            onClick={close}
+          />
+          <Button
+            size={ButtonSize.small}
+            label='Save'
+            isSubmit
+            disabled={isSaving || isLoadingData}
           />
         </div>
-      </div>
-      <div className={style.footer}>
-        <Button
-          size={ButtonSize.small}
-          type={ButtonType.transparent}
-          label='Cancel'
-          onClick={close}
-        />
-        <Button
-          size={ButtonSize.small}
-          label='Save'
-          onClick={handleSave}
-          disabled={isSaving || isLoadingData}
-        />
-      </div>
+      </Form>
     </Modal>
   );
 };

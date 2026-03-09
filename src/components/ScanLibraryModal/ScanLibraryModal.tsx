@@ -13,6 +13,7 @@ import { useTablesContext } from 'src/providers/tables';
 import { useToastContext } from 'src/providers/toast';
 import { ScanResult } from 'src/types/table';
 
+import Form from '../Form';
 import style from './ScanLibraryModal.module.scss';
 import Collapsible from './components/Collapsible';
 import MissingFilesSection from './components/MissingFilesSection';
@@ -286,6 +287,21 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
     });
   };
 
+  const handleValidate = () => {
+    if (
+      newTables.some(
+        (table) =>
+          (includedNewTablesByPath[table.filePath] ?? true) &&
+          !table.name.trim(),
+      )
+    ) {
+      showErrorToast('Table names cannot be empty');
+      return false;
+    }
+
+    return true;
+  };
+
   const handleApply = async () => {
     if (isApplying) {
       return;
@@ -336,127 +352,129 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
         )}
 
         {!isLoading && scanResult && !scanErrorMessage && (
-          <div className={style.resultsWrapper}>
-            {isLibraryInSync && (
-              <div className={style.emptyStateWrapper}>
-                <Icon
-                  className={style.shieldIcon}
-                  icon='shield-checkmark'
-                  width={36}
-                  height={36}
-                />
-                <p className='primary-text-color body-md-semibold'>
-                  Library is in sync
-                </p>
-                <p className='secondary-text-color body-sm-regular'>
-                  Database and files are already aligned. No changes to apply.
-                </p>
-              </div>
-            )}
-
-            {newTables.length > 0 && (
-              <Collapsible
-                title='New Tables Found'
-                description='These Tables will be added to your library when you apply changes.'
-                icon='plus'
-                color='blue'
-                count={newTables.length}
-                isOpen={isNewTablesOpen}
-                onToggle={() => setIsNewTablesOpen((prev) => !prev)}>
-                <NewTablesSection
-                  tables={newTables}
-                  availableRoms={unmatchedRoms}
-                  includedByPath={includedNewTablesByPath}
-                  onToggleInclude={toggleNewTableInclude}
-                  onSelectAll={selectAllNewTables}
-                  onDeselectAll={deselectAllNewTables}
-                  onNameChange={handleTableNameChange}
-                  onRomChange={handleTableRomChange}
-                />
-              </Collapsible>
-            )}
-
-            {unmatchedRoms.length > 0 && (
-              <Collapsible
-                title='Unmatched ROMs'
-                description='These ROM files will be deleted when you apply changes.'
-                icon='triangle-alert'
-                color='yellow'
-                count={unmatchedRoms.length}
-                isOpen={isUnmatchedRomsOpen}
-                onToggle={() => setIsUnmatchedRomsOpen((prev) => !prev)}>
-                <UnmatchedRomsSection
-                  roms={unmatchedRoms}
-                  includedByPath={includedUnmatchedRomsByPath}
-                  onToggleInclude={toggleUnmatchedRomInclude}
-                  onSelectAll={selectAllUnmatchedRoms}
-                  onDeselectAll={deselectAllUnmatchedRoms}
-                />
-              </Collapsible>
-            )}
-
-            {tablesWithMissingFiles.length > 0 && (
-              <Collapsible
-                title='Tables With Missing Files'
-                description='These Tables will be adjusted accordingly or deleted from your library when you apply changes.'
-                icon='circle-alert'
-                color='red'
-                count={tablesWithMissingFiles.length}
-                isOpen={isMissingFilesOpen}
-                onToggle={() => setIsMissingFilesOpen((prev) => !prev)}>
-                <MissingFilesSection
-                  items={tablesWithMissingFiles}
-                  includedByTableId={includedMissingFilesByTableId}
-                  onToggleInclude={toggleMissingFileInclude}
-                  onSelectAll={selectAllMissingFiles}
-                  onDeselectAll={deselectAllMissingFiles}
-                />
-              </Collapsible>
-            )}
-
-            {!isLibraryInSync && (
-              <p
-                className={classNames(
-                  'secondary-text-color',
-                  'body-xs-regular',
-                  style.footerMeta,
-                )}>
-                {selectedNewTablesCount} Tables to import •{' '}
-                {selectedUnmatchedRomsCount} ROM files to delete •{' '}
-                {selectedTablesToRemoveCount} Tables to remove •{' '}
-                {selectedRomLinksToClearCount} ROM links to clear
-              </p>
-            )}
-
-            <div className={style.actions}>
-              <div className={style.actionsButtons}>
-                <Button
-                  label={isLibraryInSync ? 'Close' : 'Cancel'}
-                  onClick={close}
-                  type={ButtonType.transparent}
-                  size={ButtonSize.small}
-                />
-                <Button
-                  label='Rescan'
-                  type={ButtonType.primaryAltTransparent}
-                  size={ButtonSize.small}
-                  onClick={handleScanLibrary}
-                  disabled={isApplying || isLoading}
-                  icon='scan-search'
-                />
-                {!isLibraryInSync && (
-                  <Button
-                    label={isApplying ? 'Applying...' : 'Apply Changes'}
-                    type={ButtonType.primaryAlt}
-                    onClick={handleApply}
-                    disabled={isApplying}
-                    size={ButtonSize.small}
-                    icon='circle-checkmark'
+          <Form submit={handleApply} validate={handleValidate}>
+            <div className={style.resultsWrapper}>
+              {isLibraryInSync && (
+                <div className={style.emptyStateWrapper}>
+                  <Icon
+                    className={style.shieldIcon}
+                    icon='shield-checkmark'
+                    width={36}
+                    height={36}
                   />
-                )}
+                  <p className='primary-text-color body-md-semibold'>
+                    Library is in sync
+                  </p>
+                  <p className='secondary-text-color body-sm-regular'>
+                    Database and files are already aligned. No changes to apply.
+                  </p>
+                </div>
+              )}
+
+              {newTables.length > 0 && (
+                <Collapsible
+                  title='New Tables Found'
+                  description='These Tables will be added to your library when you apply changes.'
+                  icon='plus'
+                  color='blue'
+                  count={newTables.length}
+                  isOpen={isNewTablesOpen}
+                  onToggle={() => setIsNewTablesOpen((prev) => !prev)}>
+                  <NewTablesSection
+                    tables={newTables}
+                    availableRoms={unmatchedRoms}
+                    includedByPath={includedNewTablesByPath}
+                    onToggleInclude={toggleNewTableInclude}
+                    onSelectAll={selectAllNewTables}
+                    onDeselectAll={deselectAllNewTables}
+                    onNameChange={handleTableNameChange}
+                    onRomChange={handleTableRomChange}
+                  />
+                </Collapsible>
+              )}
+
+              {unmatchedRoms.length > 0 && (
+                <Collapsible
+                  title='Unmatched ROMs'
+                  description='These ROM files will be deleted when you apply changes.'
+                  icon='triangle-alert'
+                  color='yellow'
+                  count={unmatchedRoms.length}
+                  isOpen={isUnmatchedRomsOpen}
+                  onToggle={() => setIsUnmatchedRomsOpen((prev) => !prev)}>
+                  <UnmatchedRomsSection
+                    roms={unmatchedRoms}
+                    includedByPath={includedUnmatchedRomsByPath}
+                    onToggleInclude={toggleUnmatchedRomInclude}
+                    onSelectAll={selectAllUnmatchedRoms}
+                    onDeselectAll={deselectAllUnmatchedRoms}
+                  />
+                </Collapsible>
+              )}
+
+              {tablesWithMissingFiles.length > 0 && (
+                <Collapsible
+                  title='Tables With Missing Files'
+                  description='These Tables will be adjusted accordingly or deleted from your library when you apply changes.'
+                  icon='circle-alert'
+                  color='red'
+                  count={tablesWithMissingFiles.length}
+                  isOpen={isMissingFilesOpen}
+                  onToggle={() => setIsMissingFilesOpen((prev) => !prev)}>
+                  <MissingFilesSection
+                    items={tablesWithMissingFiles}
+                    includedByTableId={includedMissingFilesByTableId}
+                    onToggleInclude={toggleMissingFileInclude}
+                    onSelectAll={selectAllMissingFiles}
+                    onDeselectAll={deselectAllMissingFiles}
+                  />
+                </Collapsible>
+              )}
+
+              {!isLibraryInSync && (
+                <p
+                  className={classNames(
+                    'secondary-text-color',
+                    'body-xs-regular',
+                    style.footerMeta,
+                  )}>
+                  {selectedNewTablesCount} Tables to import •{' '}
+                  {selectedUnmatchedRomsCount} ROM files to delete •{' '}
+                  {selectedTablesToRemoveCount} Tables to remove •{' '}
+                  {selectedRomLinksToClearCount} ROM links to clear
+                </p>
+              )}
+
+              <div className={style.actions}>
+                <div className={style.actionsButtons}>
+                  <Button
+                    label={isLibraryInSync ? 'Close' : 'Cancel'}
+                    onClick={close}
+                    type={ButtonType.transparent}
+                    size={ButtonSize.small}
+                  />
+                  <Button
+                    label='Rescan'
+                    type={ButtonType.primaryAltTransparent}
+                    size={ButtonSize.small}
+                    onClick={handleScanLibrary}
+                    disabled={isApplying || isLoading}
+                    icon='scan-search'
+                  />
+                  {!isLibraryInSync && (
+                    <Button
+                      label={isApplying ? 'Applying...' : 'Apply Changes'}
+                      type={ButtonType.primaryAlt}
+                      isSubmit
+                      disabled={isApplying}
+                      size={ButtonSize.small}
+                      icon='circle-checkmark'
+                    />
+                  )}
+                </div>
               </div>
             </div>
-          </div>
+          </Form>
         )}
 
         {isLoading && (

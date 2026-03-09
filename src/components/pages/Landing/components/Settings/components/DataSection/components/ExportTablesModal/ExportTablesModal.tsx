@@ -41,7 +41,9 @@ const ExportTablesModal: FunctionComponent<Props> = ({ close }) => {
 
     if (result.success) {
       if (result.warning) {
-        showWarningToast(result.warning.message || 'Some tables failed to export');
+        showWarningToast(
+          result.warning.message || 'Some tables failed to export',
+        );
       } else {
         showSuccessToast('Tables exported successfully!');
       }
@@ -131,6 +133,7 @@ const ExportTablesModal: FunctionComponent<Props> = ({ close }) => {
         <Button
           icon='folder-export'
           size={ButtonSize.small}
+          disabled={numberOfTables === 0}
           label={`Export ${numberOfTables} Table${numberOfTables !== 1 ? 's' : ''}`}
           onClick={handleExport}
         />
