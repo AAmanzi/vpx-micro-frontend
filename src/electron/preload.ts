@@ -24,6 +24,15 @@ const frontendApi: Api = {
     rom: FileSystemItem | null,
   ): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:updateTableRom', tableId, rom),
+  updateTableVpxExecutablePath: (
+    tableId: string,
+    executablePath: string | null,
+  ): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>(
+      'api:updateTableVpxExecutablePath',
+      tableId,
+      executablePath,
+    ),
   getExpectedRomName: (
     vpxFilePath: string,
   ): Promise<ApiResult<string | null>> =>

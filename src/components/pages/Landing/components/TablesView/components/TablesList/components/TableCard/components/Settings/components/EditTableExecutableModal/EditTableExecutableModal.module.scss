@@ -1,0 +1,40 @@
+.modal {
+  padding-bottom: 0;
+}
+
+.content {
+  margin: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.currentExecutable {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 12px;
+  border: thin solid var(--gray);
+  background-color: rgba(var(--gray-rgb), 0.25);
+}
+
+.metaLabel {
+  letter-spacing: 0.04em;
+}
+
+.inputWrapper {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+  margin-left: 24px;
+  margin-right: 24px;
+  margin-bottom: 24px;
+  gap: 12px;
+}

@@ -6,6 +6,7 @@ import { VPX_DEFAULT_EXECUTABLE } from 'src/consts/vpx';
 import type { ApiResult } from 'src/types/api';
 import type { FileSystemItem, TableFile } from 'src/types/file';
 import type { ScanResult, Table } from 'src/types/table';
+import { getDefaultVpxExecutablePath } from 'src/utils';
 
 import * as configDb from '../database/config';
 import * as tablesDb from '../database/tables';
@@ -240,6 +241,44 @@ export function updateTableRom(
   }
 }
 
+export function updateTableVpxExecutablePath(
+  tableId: string,
+  executablePath: string | null,
+): ApiResult<null> {
+  try {
+    const table = tablesDb.get(tableId);
+
+    if (!table) {
+      return {
+        success: false,
+        error: {
+          code: 'TABLE_NOT_FOUND',
+          message: `Table not found: ${tableId}`,
+        },
+      };
+    }
+
+    const normalizedPath = executablePath?.trim();
+    const updatedTable = tablesDb.update(tableId, {
+      vpxExecutablePath: normalizedPath || undefined,
+    });
+
+    if (!updatedTable) {
+      return {
+        success: false,
+        error: {
+          code: 'TABLE_NOT_FOUND',
+          message: `Table not found: ${tableId}`,
+        },
+      };
+    }
+
+    return apiSuccess(null);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}
+
 export function importTables(
   tableFiles: Array<TableFile>,
   deleteAfterImport: boolean,
@@ -364,7 +403,10 @@ export function startTable(tableId: string): ApiResult<null> {
       lastPlayedTimestamp: Date.now(),
     });
 
-    startVpxTable(table.vpxFilePath, vpxRootPath, VPX_DEFAULT_EXECUTABLE);
+    startVpxTable(
+      table.vpxFilePath,
+      table.vpxExecutablePath || getDefaultVpxExecutablePath(vpxRootPath),
+    );
 
     return apiSuccess(null);
   } catch (error) {

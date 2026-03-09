@@ -1,0 +1,43 @@
+.container {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  border-radius: 14px;
+  border: thin solid var(--gray);
+  background-color: rgba(var(--gray-rgb), 0.4);
+  color: var(--secondary-text-color);
+  transition:
+    color 200ms ease-in,
+    border-color 200ms ease-in,
+    background-color 200ms ease-in;
+
+  &:hover:not(:disabled) {
+    color: var(--primary-text-color);
+    border-color: rgba(var(--white-rgb), 0.3);
+    background-color: rgba(var(--gray-rgb), 0.7);
+  }
+}
+
+.small {
+  height: 32px;
+  padding: 8px;
+}
+
+.medium {
+  height: 48px;
+  padding: 12px;
+}
+
+.big {
+  height: 64px;
+  padding: 18px;
+}
+
+.icon {
+  color: inherit;
+}
+
+.disabled {
+  opacity: 0.5;
+}

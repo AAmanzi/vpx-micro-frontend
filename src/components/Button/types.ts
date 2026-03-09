@@ -7,6 +7,7 @@ export enum Type {
   danger = 'danger',
   primaryAlt = 'primaryAlt',
   primaryAltTransparent = 'primaryAltTransparent',
+  success = 'success',
 }
 
 export enum Size {

@@ -31,6 +31,7 @@ const Button: FunctionComponent<Props> = ({
         [style.danger]: type === Type.danger,
         [style.primaryAlt]: type === Type.primaryAlt,
         [style.primaryAltTransparent]: type === Type.primaryAltTransparent,
+        [style.success]: type === Type.success,
         [style.small]: size === Size.small,
         [style.medium]: size === Size.medium,
         [style.large]: size === Size.large,

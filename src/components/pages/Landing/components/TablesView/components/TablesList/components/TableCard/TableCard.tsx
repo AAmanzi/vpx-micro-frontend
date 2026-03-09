@@ -29,6 +29,7 @@ const TableCard: FunctionComponent<Props> = ({
   romFilePath,
   vpxFile,
   vpxFilePath,
+  vpxExecutablePath,
   dateAddedTimestamp,
   lastPlayedTimestamp,
 }) => {
@@ -124,6 +125,7 @@ const TableCard: FunctionComponent<Props> = ({
                   id={id}
                   name={name}
                   vpxFilePath={vpxFilePath}
+                  vpxExecutablePath={vpxExecutablePath}
                   vpxFile={vpxFile}
                   romFilePath={romFilePath}
                   romFile={romFile}

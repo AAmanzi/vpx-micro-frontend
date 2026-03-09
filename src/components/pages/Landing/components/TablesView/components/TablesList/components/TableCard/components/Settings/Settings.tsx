@@ -7,6 +7,7 @@ import useClickOutside from 'src/utils/useClickOutside';
 
 import style from './Settings.module.scss';
 import DeleteTableModal from './components/DeleteTableModal';
+import EditTableExecutableModal from './components/EditTableExecutableModal';
 import EditTableRomModal from './components/EditTableRomModal/EditTableRomModal';
 import RenameTableModal from './components/RenameTableModal';
 
@@ -15,6 +16,7 @@ interface Props {
   name: string;
   romFile?: string;
   romFilePath?: string;
+  vpxExecutablePath?: string;
   vpxFile: string;
   vpxFilePath: string;
   close: () => void;
@@ -25,6 +27,7 @@ const Settings: FunctionComponent<Props> = ({
   name,
   romFile,
   romFilePath,
+  vpxExecutablePath,
   vpxFile,
   vpxFilePath,
   close,
@@ -36,6 +39,8 @@ const Settings: FunctionComponent<Props> = ({
 
   const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
   const [isEditTableRomModalOpen, setIsEditTableRomModalOpen] = useState(false);
+  const [isEditExecutableModalOpen, setIsEditExecutableModalOpen] =
+    useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const closeRenameModal = () => {
@@ -52,6 +57,12 @@ const Settings: FunctionComponent<Props> = ({
 
   const closeEditTableRomModal = () => {
     setIsEditTableRomModalOpen(false);
+    fetchTables();
+    close();
+  };
+
+  const closeEditExecutableModal = () => {
+    setIsEditExecutableModalOpen(false);
     fetchTables();
     close();
   };
@@ -79,6 +90,16 @@ const Settings: FunctionComponent<Props> = ({
         </span>
       </button>
       <button
+        onClick={() => setIsEditExecutableModalOpen(true)}
+        className={style.button}>
+        <div className={style.iconWrapper}>
+          <Icon icon='play' className={style.icon} />
+        </div>
+        <span className={classNames('body-sm-semibold', style.label)}>
+          VPX Executable
+        </span>
+      </button>
+      <button
         onClick={() => setIsDeleteModalOpen(true)}
         className={classNames(style.button, style.danger)}>
         <div className={style.iconWrapper}>
@@ -98,6 +119,13 @@ const Settings: FunctionComponent<Props> = ({
           currentRomName={romFile}
           currentRomPath={romFilePath}
           close={closeEditTableRomModal}
+        />
+      )}
+      {isEditExecutableModalOpen && (
+        <EditTableExecutableModal
+          id={id}
+          currentExecutablePath={vpxExecutablePath}
+          close={closeEditExecutableModal}
         />
       )}
       {isDeleteModalOpen && (

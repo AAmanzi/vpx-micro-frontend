@@ -19,5 +19,5 @@ export interface Props {
   allowOverflow?: boolean;
   children: React.ReactNode;
   size?: Size;
-  color?: 'yellow' | 'blue' | 'red' | 'purple';
+  color?: 'yellow' | 'blue' | 'red' | 'purple' | 'green';
 }

@@ -1,4 +1,8 @@
-import { VPX_DEFAULT_ROM_PATH, VPX_DEFAULT_TABLES_PATH } from 'src/consts/vpx';
+import {
+  VPX_DEFAULT_EXECUTABLE,
+  VPX_DEFAULT_ROM_PATH,
+  VPX_DEFAULT_TABLES_PATH,
+} from 'src/consts/vpx';
 import { Table } from 'src/types/table';
 
 export const normalizePathForComparison = (value?: string): string =>
@@ -10,6 +14,10 @@ export const getDefaultRomsDirectory = (vpxRootPath: string): string => {
 
 export const getDefaultTablesDirectory = (vpxRootPath: string): string => {
   return `${vpxRootPath}/${VPX_DEFAULT_TABLES_PATH}`;
+};
+
+export const getDefaultVpxExecutablePath = (vpxRootPath: string): string => {
+  return `${vpxRootPath}/${VPX_DEFAULT_EXECUTABLE}`;
 };
 
 export const displayDate = (date: Date | number): string => {

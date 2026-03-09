@@ -97,6 +97,16 @@
   }
 }
 
+.green {
+  .headerWrapper {
+    background: linear-gradient(
+      135deg,
+      rgba(var(--green-rgb), 0.1) 0%,
+      rgba(var(--green-rgb), 0.3) 100%
+    );
+  }
+}
+
 .headerWrapper {
   position: relative;
   padding-top: 24px;

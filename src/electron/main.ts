@@ -106,6 +106,11 @@ app.whenReady().then(async () => {
       api.updateTableRom(tableId, rom || null),
   );
   ipcMain.handle(
+    'api:updateTableVpxExecutablePath',
+    async (_, tableId: string, executablePath: string | null) =>
+      api.updateTableVpxExecutablePath(tableId, executablePath),
+  );
+  ipcMain.handle(
     'api:importTables',
     async (_, tables: Array<TableFile>, deleteAfterImport: boolean) =>
       api.importTables(tables, deleteAfterImport),

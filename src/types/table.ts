@@ -12,6 +12,8 @@ export interface Table {
   isFavorite: boolean;
   lastPlayedTimestamp?: number;
   dateAddedTimestamp: number;
+
+  vpxExecutablePath?: string;
 }
 
 export interface ScanResult {

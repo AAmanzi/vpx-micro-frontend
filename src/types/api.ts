@@ -37,6 +37,10 @@ export interface Api {
     tableId: string,
     rom: FileSystemItem | null,
   ) => Promise<ApiResult<null>>;
+  updateTableVpxExecutablePath: (
+    tableId: string,
+    executablePath: string | null,
+  ) => Promise<ApiResult<null>>;
   importTables: (
     tables: Array<TableFile>,
     deleteAfterImport: boolean,
