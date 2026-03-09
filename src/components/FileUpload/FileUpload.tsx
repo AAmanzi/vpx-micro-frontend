@@ -18,6 +18,18 @@ const FileUpload: FunctionComponent<Props> = ({
 }) => {
   const [dragActive, setDragActive] = useState(false);
 
+  const finalizeSelection = (items: Array<FileSystemItem>) => {
+    const uniqueItems = items.filter(
+      (item, index, allItems) =>
+        allItems.findIndex((candidate) => candidate.path === item.path) ===
+        index,
+    );
+
+    if (uniqueItems.length > 0) {
+      onFilesSelected(uniqueItems);
+    }
+  };
+
   const getPathForFile = (file: File): string | null => {
     try {
       const { data: path } = api.getPathForFile(file);
@@ -134,14 +146,24 @@ const FileUpload: FunctionComponent<Props> = ({
     );
 
     const newItems = resolvedItems.flat();
-    const uniqueItems = newItems.filter(
-      (item, index, allItems) =>
-        allItems.findIndex((candidate) => candidate.path === item.path) ===
-        index,
-    );
+    finalizeSelection(newItems);
+  };
 
-    if (uniqueItems.length > 0) {
-      onFilesSelected(uniqueItems);
+  const handleOpenFilePicker = async () => {
+    if (loading) {
+      return;
+    }
+
+    try {
+      const result = await api.openFilePicker(acceptedExtensions, acceptFolders);
+
+      if (!result.success || !Array.isArray(result.data)) {
+        return;
+      }
+
+      finalizeSelection(result.data);
+    } catch {
+      return;
     }
   };
 
@@ -155,7 +177,8 @@ const FileUpload: FunctionComponent<Props> = ({
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
-        onDrop={handleDrop}>
+        onDrop={handleDrop}
+        onClick={handleOpenFilePicker}>
         {!loading ? (
           <>
             <div

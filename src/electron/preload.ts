@@ -47,6 +47,15 @@ const frontendApi: Api = {
       };
     }
   },
+  openFilePicker: (
+    acceptedExtensions: string[],
+    acceptFolders = true,
+  ): Promise<ApiResult<Array<FileSystemItem>>> =>
+    invoke<ApiResult<Array<FileSystemItem>>>(
+      'api:openFilePicker',
+      acceptedExtensions,
+      acceptFolders,
+    ),
   getDirectoryTree: (
     directoryPath: string,
     acceptedExtensions: string[],

@@ -114,6 +114,14 @@ app.whenReady().then(async () => {
     api.getExpectedRomName(vpxFilePath),
   );
   ipcMain.handle(
+    'api:openFilePicker',
+    async (
+      _,
+      acceptedExtensions: string[],
+      acceptFolders: boolean = true,
+    ) => api.openFilePicker(acceptedExtensions, acceptFolders),
+  );
+  ipcMain.handle(
     'api:getDirectoryTree',
     async (_, directoryPath: string, acceptedExtensions: string[]) =>
       api.getDirectoryTree(directoryPath, acceptedExtensions),

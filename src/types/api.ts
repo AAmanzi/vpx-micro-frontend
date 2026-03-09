@@ -49,6 +49,10 @@ export interface Api {
 
   // FileSystem
   getPathForFile: (file: File) => ApiResult<string>;
+  openFilePicker: (
+    acceptedExtensions: string[],
+    acceptFolders?: boolean,
+  ) => Promise<ApiResult<Array<FileSystemItem>>>;
   getDirectoryTree: (
     directoryPath: string,
     acceptedExtensions: string[],
