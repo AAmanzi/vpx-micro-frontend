@@ -47,6 +47,8 @@ const frontendApi: Api = {
       };
     }
   },
+  openDirectoryPicker: (): Promise<ApiResult<string | null>> =>
+    invoke<ApiResult<string | null>>('api:openDirectoryPicker'),
   openFilePicker: (
     acceptedExtensions: string[],
     acceptFolders = true,

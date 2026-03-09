@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import { FunctionComponent, useState } from 'react';
 
+import FolderPicker from 'src/components/FolderPicker';
 import Input from 'src/components/Input';
 import api from 'src/consts';
 import { useConfigContext } from 'src/providers/config';
@@ -27,6 +28,20 @@ const FilePathsSection: FunctionComponent = () => {
 
   const handleUpdateVpxRootPath = async () => {
     const { error } = await api.updateVpxRootPath(vpxRootPath);
+
+    if (error) {
+      showErrorToast(error.message || 'Failed to update VPX root path');
+
+      return;
+    }
+
+    fetchConfig();
+  };
+
+  const handlePickVpxRootPath = async (directory: string) => {
+    setVpxRootPath(directory);
+
+    const { error } = await api.updateVpxRootPath(directory);
 
     if (error) {
       showErrorToast(error.message || 'Failed to update VPX root path');
@@ -66,13 +81,19 @@ const FilePathsSection: FunctionComponent = () => {
   return (
     <>
       <div className={style.vpxDirectoryWrapper}>
-        {/* TODO: folder picker */}
-        <Input
-          label='VPX Root Directory'
-          value={vpxRootPath}
-          onChange={setVpxRootPath}
-          onBlur={handleUpdateVpxRootPath}
-        />
+        <div className={style.inputWrapper}>
+          <Input
+            label='VPX Root Directory'
+            value={vpxRootPath}
+            onChange={setVpxRootPath}
+            onBlur={handleUpdateVpxRootPath}
+          />
+          <FolderPicker
+            onSelect={handlePickVpxRootPath}
+            onError={showErrorToast}
+            label='Browse'
+          />
+        </div>
         <div
           className={classNames(
             'secondary-text-color',
@@ -83,7 +104,6 @@ const FilePathsSection: FunctionComponent = () => {
         </div>
       </div>
       <div className={style.lockedSettingsWrapper}>
-        {/* TODO: folder picker */}
         <LockedSetting
           label='ROMs Directory'
           value={romsDirectory}
@@ -92,7 +112,6 @@ const FilePathsSection: FunctionComponent = () => {
           lockedNote='Auto-syncing with Root'
           lockedNoteIcon='reload'
         />
-        {/* TODO: folder picker */}
         <LockedSetting
           label='Tables Directory'
           value={tablesDirectory}

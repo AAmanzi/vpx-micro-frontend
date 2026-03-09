@@ -5,6 +5,7 @@ import Button, {
   Size as ButtonSize,
   Type as ButtonType,
 } from 'src/components/Button';
+import FolderPicker from 'src/components/FolderPicker';
 import Icon from 'src/components/Icon';
 import Input from 'src/components/Input';
 import Modal from 'src/components/Modal';
@@ -63,13 +64,19 @@ const ExportTablesModal: FunctionComponent<Props> = ({ close }) => {
       onExitClick={close}
       color='blue'>
       <div className={style.content}>
-        {/* TODO: folder picker */}
-        <Input
-          label='Export Directory'
-          value={exportPath}
-          onChange={setExportPath}
-          placeholder='e.g. C:/vpx-tables-export'
-        />
+        <div className={style.inputWrapper}>
+          <Input
+            label='Export Directory'
+            value={exportPath}
+            onChange={setExportPath}
+            placeholder='e.g. C:/vpx-tables-export'
+          />
+          <FolderPicker
+            onSelect={setExportPath}
+            onError={showErrorToast}
+            label='Browse'
+          />
+        </div>
         <p
           className={classNames(
             'secondary-text-color',

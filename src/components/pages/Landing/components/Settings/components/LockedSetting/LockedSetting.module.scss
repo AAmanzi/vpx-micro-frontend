@@ -17,6 +17,12 @@
   margin-bottom: 12px;
 }
 
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .lockButton {
   width: 26px;
   height: 26px;

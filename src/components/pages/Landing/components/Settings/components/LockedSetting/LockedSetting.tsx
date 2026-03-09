@@ -1,9 +1,13 @@
 import classNames from 'classnames';
 import { FunctionComponent, useEffect, useState } from 'react';
 
+import FolderPicker, {
+  Size as FolderPickerSize,
+} from 'src/components/FolderPicker';
 import Icon from 'src/components/Icon';
 import { Icon as IconType } from 'src/components/Icon/types';
 import Input from 'src/components/Input';
+import { useToastContext } from 'src/providers/toast';
 
 import style from './LockedSetting.module.scss';
 
@@ -24,6 +28,8 @@ const LockedSetting: FunctionComponent<Props> = ({
   lockedNote,
   lockedNoteIcon,
 }) => {
+  const { showErrorToast } = useToastContext();
+
   const [isLocked, setIsLocked] = useState(!Boolean(savedValue));
   const [editValue, setEditValue] = useState(savedValue);
 
@@ -61,26 +67,32 @@ const LockedSetting: FunctionComponent<Props> = ({
         [style.unlocked]: !isLocked,
       })}>
       <div className={style.header}>
-        <span
-          className={classNames(
-            'body-sm-regular',
-            'secondary-text-color',
-          )}>
+        <span className={classNames('body-sm-regular', 'secondary-text-color')}>
           {label}
         </span>
-        <button
-          type='button'
-          className={classNames(style.lockButton, {
-            [style.unlocked]: !isLocked,
-          })}
-          onClick={handleToggleLock}
-          title={isLocked ? 'Unlock to edit' : 'Lock to save'}>
-          <Icon
-            icon={isLocked ? 'locked' : 'unlocked'}
-            width={14}
-            height={14}
-          />
-        </button>
+        <div className={style.headerActions}>
+          {!isLocked && (
+            <FolderPicker
+              onSelect={onSave}
+              onError={showErrorToast}
+              label='Browse'
+              size={FolderPickerSize.small}
+            />
+          )}
+          <button
+            type='button'
+            className={classNames(style.lockButton, {
+              [style.unlocked]: !isLocked,
+            })}
+            onClick={handleToggleLock}
+            title={isLocked ? 'Unlock to edit' : 'Lock to save'}>
+            <Icon
+              icon={isLocked ? 'locked' : 'unlocked'}
+              width={14}
+              height={14}
+            />
+          </button>
+        </div>
       </div>
       <Input
         readonly={isLocked}

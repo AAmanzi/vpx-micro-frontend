@@ -2,6 +2,12 @@
   margin: 24px;
 }
 
+.inputWrapper {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
 .note {
   margin-top: 8px;
   margin-bottom: 24px;

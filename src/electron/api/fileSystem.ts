@@ -75,6 +75,22 @@ export function getExpectedRomName(
   }
 }
 
+export async function openDirectoryPicker(): Promise<ApiResult<string | null>> {
+  try {
+    const selection = await dialog.showOpenDialog({
+      properties: ['openDirectory'],
+    });
+
+    if (selection.canceled || selection.filePaths.length === 0) {
+      return apiSuccess(null);
+    }
+
+    return apiSuccess(selection.filePaths[0] || null);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}
+
 export async function openFilePicker(
   acceptedExtensions: string[],
   acceptFolders: boolean = true,

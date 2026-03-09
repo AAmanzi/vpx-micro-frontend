@@ -113,6 +113,9 @@ app.whenReady().then(async () => {
   ipcMain.handle('api:getExpectedRomName', async (_, vpxFilePath: string) =>
     api.getExpectedRomName(vpxFilePath),
   );
+  ipcMain.handle('api:openDirectoryPicker', async () =>
+    api.openDirectoryPicker(),
+  );
   ipcMain.handle(
     'api:openFilePicker',
     async (
