@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { FunctionComponent, useEffect, useState } from 'react';
+import { FunctionComponent, useEffect, useRef, useState } from 'react';
 
 import FileUpload from 'src/components/FileUpload';
 import Modal from 'src/components/Modal';
@@ -18,7 +18,10 @@ import UnassignedRomEntry from './components/UnassignedRomEntry';
 import { Props } from './types';
 import { buildImportSelectionResult, filterExistingFiles } from './utils';
 
-const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
+const ImportTablesModal: FunctionComponent<Props> = ({
+  onClose,
+  initialFiles,
+}) => {
   const { tables } = useTablesContext();
   const { config, fetchConfig } = useConfigContext();
   const { showErrorToast, showWarningToast, showSuccessToast } =
@@ -30,6 +33,7 @@ const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
     [],
   );
   const [deleteAfterImport, setDeleteAfterImport] = useState(false);
+  const initialFilesHandledRef = useRef(false);
 
   useEffect(() => {
     if (config) {
@@ -62,6 +66,19 @@ const ImportTablesModal: FunctionComponent<Props> = ({ onClose }) => {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (initialFilesHandledRef.current) {
+      return;
+    }
+
+    if (!initialFiles || initialFiles.length === 0) {
+      return;
+    }
+
+    initialFilesHandledRef.current = true;
+    handleFilesSelected(initialFiles);
+  }, [initialFiles]);
 
   const handleRemoveRomFile = (rom: FileSystemItem) => {
     setUnassignedRoms((prev) => prev.filter((r) => r.path !== rom.path));

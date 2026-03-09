@@ -5,6 +5,7 @@ import Button, {
   Size as ButtonSize,
   Type as ButtonType,
 } from 'src/components/Button';
+import FileUploadOverlay from 'src/components/FileUploadOverlay';
 import Icon from 'src/components/Icon';
 import ImportTablesModal from 'src/components/ImportTablesModal';
 import Input from 'src/components/Input';
@@ -13,6 +14,7 @@ import api from 'src/consts';
 import { useConfigContext } from 'src/providers/config';
 import { useTablesContext } from 'src/providers/tables';
 import { Order } from 'src/types/config';
+import { FileSystemItem } from 'src/types/file';
 import type { Table } from 'src/types/table';
 
 import style from './TablesView.module.scss';
@@ -35,13 +37,22 @@ const TablesView: FunctionComponent<Props> = ({
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isScanLibraryModalOpen, setIsScanLibraryModalOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const [droppedFilesForImport, setDroppedFilesForImport] = useState<
+    Array<FileSystemItem>
+  >([]);
 
   const favoritesOnTop = config?.keepFavoritesOnTop ?? true;
   const order = defaultOrder ?? config?.order ?? Order.dateAddedDesc;
 
   const handleCloseImportModal = () => {
     setIsImportModalOpen(false);
+    setDroppedFilesForImport([]);
     fetchTables();
+  };
+
+  const handleOverlayFilesSelected = (files: Array<FileSystemItem>) => {
+    setDroppedFilesForImport(files);
+    setIsImportModalOpen(true);
   };
 
   const handleFavoritesOnTopChange = async (newValue: boolean) => {
@@ -303,11 +314,21 @@ const TablesView: FunctionComponent<Props> = ({
         </div>
       </div>
       {isImportModalOpen && (
-        <ImportTablesModal onClose={handleCloseImportModal} />
+        <ImportTablesModal
+          onClose={handleCloseImportModal}
+          initialFiles={droppedFilesForImport}
+        />
       )}
       {isScanLibraryModalOpen && (
         <ScanLibraryModal close={() => setIsScanLibraryModalOpen(false)} />
       )}
+      <FileUploadOverlay
+        label='Drop files to import'
+        description='Release to import files or folders'
+        acceptedExtensions={['.vpx', '.zip']}
+        acceptFolders
+        onFilesSelected={handleOverlayFilesSelected}
+      />
     </>
   );
 };

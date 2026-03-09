@@ -1,14 +1,14 @@
 import classNames from 'classnames';
-import { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useEffect, useRef, useState } from 'react';
 
 import { api } from 'src/consts';
 import { FileSystemItem } from 'src/types/file';
 
 import Spinner from '../Spinner';
-import style from './FileUpload.module.scss';
+import style from './FileUploadOverlay.module.scss';
 import { Props } from './types';
 
-const FileUpload: FunctionComponent<Props> = ({
+const FileUploadOverlay: FunctionComponent<Props> = ({
   label,
   description,
   acceptedExtensions,
@@ -17,6 +17,7 @@ const FileUpload: FunctionComponent<Props> = ({
   onFilesSelected,
 }) => {
   const [dragActive, setDragActive] = useState(false);
+  const dragCounter = useRef(0);
 
   const finalizeSelection = (items: Array<FileSystemItem>) => {
     const uniqueItems = items.filter(
@@ -72,31 +73,15 @@ const FileUpload: FunctionComponent<Props> = ({
     return acceptedExtensions.some((e) => e.toLowerCase() === ext);
   };
 
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const resolveDataTransferItems = async (
+    dataTransfer: DataTransfer,
+  ): Promise<Array<FileSystemItem>> => {
+    const dropItems = Array.from(dataTransfer.items || []);
+    const files = Array.from(dataTransfer.files || []);
 
-    if (loading) return;
-
-    if (e.type === 'dragenter' || e.type === 'dragover') {
-      setDragActive(true);
-    } else if (e.type === 'dragleave') {
-      setDragActive(false);
+    if (dropItems.length === 0 && files.length === 0) {
+      return [];
     }
-  };
-
-  const handleDrop = async (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (loading) return;
-
-    setDragActive(false);
-
-    const dropItems = Array.from(e.dataTransfer.items || []);
-    const files = Array.from(e.dataTransfer.files || []);
-
-    if (dropItems.length === 0 && files.length === 0) return;
 
     const resolvedItems = await Promise.all(
       (dropItems.length > 0
@@ -145,43 +130,82 @@ const FileUpload: FunctionComponent<Props> = ({
           })) as Array<Promise<Array<FileSystemItem>>>,
     );
 
-    const newItems = resolvedItems.flat();
-    finalizeSelection(newItems);
+    return resolvedItems.flat();
   };
 
-  const handleOpenFilePicker = async () => {
-    if (loading) {
-      return;
-    }
+  useEffect(() => {
+    const hasFilesInEvent = (event: globalThis.DragEvent) =>
+      Array.from(event.dataTransfer?.types || []).includes('Files');
 
-    try {
-      const result = await api.openFilePicker(
-        acceptedExtensions,
-        acceptFolders,
-      );
-
-      if (!result.success || !Array.isArray(result.data)) {
+    const handleWindowDragEnter = (event: globalThis.DragEvent) => {
+      if (loading || !hasFilesInEvent(event)) {
         return;
       }
 
-      finalizeSelection(result.data);
-    } catch {
-      return;
-    }
-  };
+      event.preventDefault();
+      dragCounter.current += 1;
+      setDragActive(true);
+    };
+
+    const handleWindowDragOver = (event: globalThis.DragEvent) => {
+      if (loading || !hasFilesInEvent(event)) {
+        return;
+      }
+
+      event.preventDefault();
+    };
+
+    const handleWindowDragLeave = (event: globalThis.DragEvent) => {
+      if (loading || !hasFilesInEvent(event)) {
+        return;
+      }
+
+      event.preventDefault();
+      dragCounter.current = Math.max(0, dragCounter.current - 1);
+
+      if (dragCounter.current === 0) {
+        setDragActive(false);
+      }
+    };
+
+    const handleWindowDrop = async (event: globalThis.DragEvent) => {
+      if (loading || !hasFilesInEvent(event)) {
+        return;
+      }
+
+      event.preventDefault();
+      dragCounter.current = 0;
+      setDragActive(false);
+
+      if (!event.dataTransfer) {
+        return;
+      }
+
+      const newItems = await resolveDataTransferItems(event.dataTransfer);
+      finalizeSelection(newItems);
+    };
+
+    window.addEventListener('dragenter', handleWindowDragEnter);
+    window.addEventListener('dragover', handleWindowDragOver);
+    window.addEventListener('dragleave', handleWindowDragLeave);
+    window.addEventListener('drop', handleWindowDrop);
+
+    return () => {
+      window.removeEventListener('dragenter', handleWindowDragEnter);
+      window.removeEventListener('dragover', handleWindowDragOver);
+      window.removeEventListener('dragleave', handleWindowDragLeave);
+      window.removeEventListener('drop', handleWindowDrop);
+      dragCounter.current = 0;
+    };
+  }, [acceptedExtensions, acceptFolders, loading]);
 
   return (
-    <div className={style.container}>
-      <div
-        className={classNames(style.dropZone, {
-          [style.dragActive]: dragActive && !loading,
-          [style.loading]: loading,
-        })}
-        onDragEnter={handleDrag}
-        onDragLeave={handleDrag}
-        onDragOver={handleDrag}
-        onDrop={handleDrop}
-        onClick={handleOpenFilePicker}>
+    <div
+      className={classNames(style.container, {
+        [style.visible]: dragActive,
+        [style.loading]: loading,
+      })}>
+      <div className={style.dropZone}>
         {!loading ? (
           <>
             <div
@@ -209,4 +233,4 @@ const FileUpload: FunctionComponent<Props> = ({
   );
 };
 
-export default FileUpload;
+export default FileUploadOverlay;

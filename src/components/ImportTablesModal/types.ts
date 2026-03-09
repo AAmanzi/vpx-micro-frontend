@@ -7,4 +7,5 @@ export interface ImportSelectionResult {
 
 export interface Props {
   onClose: () => void;
+  initialFiles?: Array<FileSystemItem>;
 }
