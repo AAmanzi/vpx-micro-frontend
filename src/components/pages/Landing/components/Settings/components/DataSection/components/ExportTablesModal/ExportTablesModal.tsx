@@ -29,6 +29,8 @@ const ExportTablesModal: FunctionComponent<Props> = ({ close }) => {
   const [exportPath, setExportPath] = useState(
     `${config?.vpxRootPath}/export` || '',
   );
+  const [isExporting, setIsExporting] = useState(false);
+  const [isExportComplete, setIsExportComplete] = useState(false);
 
   const numberOfTables = tables.length;
 
@@ -38,9 +40,15 @@ const ExportTablesModal: FunctionComponent<Props> = ({ close }) => {
       return;
     }
 
+    setIsExporting(true);
+
     const result = await window.api.exportTables(exportPath);
 
+    setIsExporting(false);
+
     if (result.success) {
+      setIsExportComplete(true);
+
       if (result.warning) {
         showWarningToast(
           result.warning.message || 'Some tables failed to export',
@@ -48,12 +56,23 @@ const ExportTablesModal: FunctionComponent<Props> = ({ close }) => {
       } else {
         showSuccessToast('Tables exported successfully!');
       }
-      // TODO: offer to open the export folder
-      close();
     } else {
       showErrorToast(
         `Failed to export tables: ${result.error.message || 'Unknown error'}`,
       );
+    }
+  };
+
+  const handleOpenExportPath = async () => {
+    if (!exportPath) {
+      showErrorToast('Export path is missing.');
+      return;
+    }
+
+    const result = await window.api.openPath(exportPath);
+
+    if (!result.success) {
+      showErrorToast(result.error.message || 'Failed to open export location');
     }
   };
 
@@ -131,19 +150,38 @@ const ExportTablesModal: FunctionComponent<Props> = ({ close }) => {
         </div>
       </div>
       <div className={style.footer}>
-        <Button
-          size={ButtonSize.small}
-          type={ButtonType.transparent}
-          label='Cancel'
-          onClick={close}
-        />
-        <Button
-          icon='folder-export'
-          size={ButtonSize.small}
-          disabled={numberOfTables === 0}
-          label={`Export ${numberOfTables} Table${numberOfTables !== 1 ? 's' : ''}`}
-          onClick={handleExport}
-        />
+        {isExportComplete ? (
+          <>
+            <Button
+              size={ButtonSize.small}
+              type={ButtonType.transparent}
+              label='Done'
+              onClick={close}
+            />
+            <Button
+              icon='folder'
+              size={ButtonSize.small}
+              label='Open Export Folder'
+              onClick={handleOpenExportPath}
+            />
+          </>
+        ) : (
+          <>
+            <Button
+              size={ButtonSize.small}
+              type={ButtonType.transparent}
+              label='Cancel'
+              onClick={close}
+            />
+            <Button
+              icon='folder-export'
+              size={ButtonSize.small}
+              disabled={numberOfTables === 0 || isExporting}
+              label={`Export ${numberOfTables} Table${numberOfTables !== 1 ? 's' : ''}`}
+              onClick={handleExport}
+            />
+          </>
+        )}
       </div>
     </Modal>
   );

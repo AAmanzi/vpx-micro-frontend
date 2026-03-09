@@ -118,12 +118,10 @@ app.whenReady().then(async () => {
   );
   ipcMain.handle(
     'api:openFilePicker',
-    async (
-      _,
-      acceptedExtensions: string[],
-      acceptFolders: boolean = true,
-    ) => api.openFilePicker(acceptedExtensions, acceptFolders),
+    async (_, acceptedExtensions: string[], acceptFolders: boolean = true) =>
+      api.openFilePicker(acceptedExtensions, acceptFolders),
   );
+  ipcMain.handle('api:openPath', async (_, path: string) => api.openPath(path));
   ipcMain.handle(
     'api:getDirectoryTree',
     async (_, directoryPath: string, acceptedExtensions: string[]) =>

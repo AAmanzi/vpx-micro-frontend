@@ -1,5 +1,6 @@
 import { apiFailure, apiSuccess } from '.';
 import { dialog } from 'electron';
+import { shell } from 'electron';
 import fs from 'fs';
 import path from 'path';
 
@@ -168,6 +169,24 @@ export async function openFilePicker(
     );
 
     return apiSuccess(uniqueResults);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}
+
+export async function openPath(filePath: string): Promise<ApiResult<null>> {
+  try {
+    if (!filePath) {
+      return apiFailure(new Error('Path is required'));
+    }
+
+    const shellError = await shell.openPath(filePath);
+
+    if (shellError) {
+      return apiFailure(new Error(shellError));
+    }
+
+    return apiSuccess(null);
   } catch (error) {
     return apiFailure(error);
   }
