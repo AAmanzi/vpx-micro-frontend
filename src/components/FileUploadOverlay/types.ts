@@ -5,6 +5,7 @@ export interface Props {
   description: string;
   acceptedExtensions: string[];
   acceptFolders?: boolean;
+  disabled?: boolean;
   loading?: boolean;
   onFilesSelected: (files: Array<FileSystemItem>) => void;
 }

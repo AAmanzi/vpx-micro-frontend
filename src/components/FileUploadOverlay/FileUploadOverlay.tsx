@@ -13,11 +13,17 @@ const FileUploadOverlay: FunctionComponent<Props> = ({
   description,
   acceptedExtensions,
   acceptFolders = true,
+  disabled = false,
   loading = false,
   onFilesSelected,
 }) => {
   const [dragActive, setDragActive] = useState(false);
   const dragCounter = useRef(0);
+
+  const hasOpenModal = (): boolean => {
+    const modalRoot = document.querySelector('#modal');
+    return Boolean(modalRoot && modalRoot.childElementCount > 0);
+  };
 
   const finalizeSelection = (items: Array<FileSystemItem>) => {
     const uniqueItems = items.filter(
@@ -134,33 +140,58 @@ const FileUploadOverlay: FunctionComponent<Props> = ({
   };
 
   useEffect(() => {
+    if (disabled) {
+      dragCounter.current = 0;
+      setDragActive(false);
+      return;
+    }
+
     const hasFilesInEvent = (event: globalThis.DragEvent) =>
       Array.from(event.dataTransfer?.types || []).includes('Files');
 
     const handleWindowDragEnter = (event: globalThis.DragEvent) => {
-      if (loading || !hasFilesInEvent(event)) {
+      if (!hasFilesInEvent(event)) {
         return;
       }
 
       event.preventDefault();
+
+      if (loading || hasOpenModal()) {
+        dragCounter.current = 0;
+        setDragActive(false);
+        return;
+      }
+
       dragCounter.current += 1;
       setDragActive(true);
     };
 
     const handleWindowDragOver = (event: globalThis.DragEvent) => {
-      if (loading || !hasFilesInEvent(event)) {
+      if (!hasFilesInEvent(event)) {
         return;
       }
 
       event.preventDefault();
+
+      if (loading || hasOpenModal()) {
+        dragCounter.current = 0;
+        setDragActive(false);
+      }
     };
 
     const handleWindowDragLeave = (event: globalThis.DragEvent) => {
-      if (loading || !hasFilesInEvent(event)) {
+      if (!hasFilesInEvent(event)) {
         return;
       }
 
       event.preventDefault();
+
+      if (loading || hasOpenModal()) {
+        dragCounter.current = 0;
+        setDragActive(false);
+        return;
+      }
+
       dragCounter.current = Math.max(0, dragCounter.current - 1);
 
       if (dragCounter.current === 0) {
@@ -169,13 +200,17 @@ const FileUploadOverlay: FunctionComponent<Props> = ({
     };
 
     const handleWindowDrop = async (event: globalThis.DragEvent) => {
-      if (loading || !hasFilesInEvent(event)) {
+      if (!hasFilesInEvent(event)) {
         return;
       }
 
       event.preventDefault();
       dragCounter.current = 0;
       setDragActive(false);
+
+      if (loading || hasOpenModal()) {
+        return;
+      }
 
       if (!event.dataTransfer) {
         return;
@@ -197,7 +232,28 @@ const FileUploadOverlay: FunctionComponent<Props> = ({
       window.removeEventListener('drop', handleWindowDrop);
       dragCounter.current = 0;
     };
-  }, [acceptedExtensions, acceptFolders, loading]);
+  }, [acceptedExtensions, acceptFolders, disabled, loading]);
+
+  useEffect(() => {
+    const modalRoot = document.querySelector('#modal');
+
+    if (!modalRoot) {
+      return;
+    }
+
+    const observer = new MutationObserver(() => {
+      if (hasOpenModal()) {
+        dragCounter.current = 0;
+        setDragActive(false);
+      }
+    });
+
+    observer.observe(modalRoot, { childList: true });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   return (
     <div
