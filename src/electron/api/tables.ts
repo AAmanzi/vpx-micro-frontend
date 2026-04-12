@@ -2,7 +2,6 @@ import { apiFailure, apiSuccess } from '.';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 
-import { VPX_DEFAULT_EXECUTABLE } from 'src/consts/vpx';
 import type { ApiResult } from 'src/types/api';
 import type { FileSystemItem, TableFile } from 'src/types/file';
 import type { ScanResult, Table } from 'src/types/table';

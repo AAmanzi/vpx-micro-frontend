@@ -98,8 +98,13 @@ export async function openFilePicker(
 ): Promise<ApiResult<Array<FileSystemItem>>> {
   const extensionSet = new Set(
     (acceptedExtensions || [])
-      .map((extension) => extension.toLowerCase())
-      .filter(Boolean),
+      .map((extension) =>
+        typeof extension === 'string' ? extension.trim().toLowerCase() : '',
+      )
+      .filter(Boolean)
+      .map((extension) =>
+        extension.startsWith('.') ? extension : `.${extension}`,
+      ),
   );
 
   const properties: Array<'openFile' | 'openDirectory' | 'multiSelections'> = [
@@ -107,7 +112,10 @@ export async function openFilePicker(
     'multiSelections',
   ];
 
-  if (acceptFolders) {
+  // Windows and Linux cannot show file and directory selectors in the same
+  // dialog. Only enable directory selection on macOS so file-type filters
+  // remain available for .vpx/.zip selection.
+  if (acceptFolders && process.platform === 'darwin') {
     properties.push('openDirectory');
   }
 
