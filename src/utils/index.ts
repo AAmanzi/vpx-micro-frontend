@@ -1,3 +1,4 @@
+import path from 'path';
 import {
   VPX_DEFAULT_EXECUTABLE,
   VPX_DEFAULT_ROM_PATH,
@@ -9,15 +10,19 @@ export const normalizePathForComparison = (value?: string): string =>
   (value || '').trim().toLowerCase().replace(/\\/g, '/');
 
 export const getDefaultRomsDirectory = (vpxRootPath: string): string => {
-  return `${vpxRootPath}/${VPX_DEFAULT_ROM_PATH}`;
+  const result = path.join(vpxRootPath, VPX_DEFAULT_ROM_PATH);
+
+  return result;
 };
 
 export const getDefaultTablesDirectory = (vpxRootPath: string): string => {
-  return `${vpxRootPath}/${VPX_DEFAULT_TABLES_PATH}`;
+  const result = path.join(vpxRootPath, VPX_DEFAULT_TABLES_PATH);
+
+  return result;
 };
 
 export const getDefaultVpxExecutablePath = (vpxRootPath: string): string => {
-  return `${vpxRootPath}/${VPX_DEFAULT_EXECUTABLE}`;
+  return path.join(vpxRootPath, VPX_DEFAULT_EXECUTABLE);
 };
 
 export const displayDate = (date: Date | number): string => {

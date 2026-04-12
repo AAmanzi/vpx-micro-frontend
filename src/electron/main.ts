@@ -11,6 +11,35 @@ import type { ScanResult } from 'src/types/table';
 import * as api from './api';
 import * as db from './database/tables';
 
+const logFile = path.join(process.cwd(), 'backend.log');
+const logStream = fs.createWriteStream(logFile, { flags: 'a', encoding: 'utf8' });
+
+const originalLog = console.log;
+const originalError = console.error;
+const originalWarn = console.warn;
+
+console.log = (...args) => {
+  const message = `[${new Date().toISOString()}] LOG: ${args.join(' ')}\n`;
+  logStream.write(message);
+  originalLog(...args);
+};
+
+console.error = (...args) => {
+  const message = `[${new Date().toISOString()}] ERROR: ${args.join(' ')}\n`;
+  logStream.write(message);
+  originalError(...args);
+};
+
+console.warn = (...args) => {
+  const message = `[${new Date().toISOString()}] WARN: ${args.join(' ')}\n`;
+  logStream.write(message);
+  originalWarn(...args);
+};
+
+process.on('exit', () => logStream.end());
+process.on('SIGINT', () => logStream.end());
+process.on('SIGTERM', () => logStream.end());
+
 const NEXT_PORT = process.env.NEXT_PORT || 3000;
 let nextProcess: any = null;
 
@@ -178,7 +207,7 @@ function shutdownNext() {
   if (nextProcess && !nextProcess.killed) {
     try {
       nextProcess.kill();
-    } catch (e) {}
+    } catch (e) { }
   }
 }
 

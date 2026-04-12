@@ -9,6 +9,7 @@
     "dev:next": "npm run build:preload && next dev",
     "dev:mock": "DEV_MOCK=1 npm run dev:electron",
     "dev": "yarn dev:electron",
+    "logs": "powershell \"Get-Content -Path backend.log -Wait\"",
     "build:preload": "esbuild src/electron/preload.ts --bundle --platform=node --external:electron --outfile=src/electron/preload.js --format=cjs",
     "build:next": "next build",
     "start:next": "next start",
