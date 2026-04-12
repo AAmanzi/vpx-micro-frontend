@@ -151,7 +151,7 @@ const ImportTablesModal: FunctionComponent<Props> = ({
     if (importTablesWarning) {
       showWarningToast(
         importTablesWarning.message ||
-          'Some tables failed to import because source files were missing',
+        'Some tables failed to import because source files were missing',
       );
     }
 
@@ -161,7 +161,7 @@ const ImportTablesModal: FunctionComponent<Props> = ({
     if (updateDeleteAfterImportError) {
       showErrorToast(
         updateDeleteAfterImportError.message ||
-          'Failed to update import setting',
+        'Failed to update import setting',
       );
 
       return;

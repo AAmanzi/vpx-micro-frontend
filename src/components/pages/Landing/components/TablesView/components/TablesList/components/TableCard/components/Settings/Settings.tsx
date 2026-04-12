@@ -89,6 +89,7 @@ const Settings: FunctionComponent<Props> = ({
           Edit ROM
         </span>
       </button>
+      {/* TODO: Fix alternative executables
       <button
         onClick={() => setIsEditExecutableModalOpen(true)}
         className={style.button}>
@@ -98,7 +99,7 @@ const Settings: FunctionComponent<Props> = ({
         <span className={classNames('body-sm-semibold', style.label)}>
           VPX Executable
         </span>
-      </button>
+      </button> */}
       <button
         onClick={() => setIsDeleteModalOpen(true)}
         className={classNames(style.button, style.danger)}>
