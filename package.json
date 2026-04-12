@@ -11,21 +11,17 @@
     "dev": "yarn dev:electron",
     "logs": "powershell \"Get-Content -Path backend.log -Wait\"",
     "build:preload": "esbuild src/electron/preload.ts --bundle --platform=node --external:electron --outfile=src/electron/preload.js --format=cjs",
+    "build:preload:prod": "esbuild src/electron/preload.ts --bundle --platform=node --external:electron --outfile=dist-electron/preload.js --format=cjs",
+    "build:main:prod": "esbuild src/electron/main.ts --bundle --platform=node --external:electron --outfile=dist-electron/main.js --format=cjs",
+    "build:electron:prod": "yarn build:preload:prod && yarn build:main:prod",
+    "build:renderer:prod": "next build",
+    "build:prod": "yarn build:renderer:prod && yarn build:electron:prod",
+    "dist:win": "yarn build:prod && electron-builder --win nsis portable",
+    "dist:dir": "yarn build:prod && electron-builder --dir",
     "build:next": "next build",
     "start:next": "next start",
     "vpx:cgamename": "node scripts/vpx-cgamename.js",
     "db:reset": "electron scripts/reset-db.js"
-  },
-  "dependencies": {
-    "cfb": "^1.2.2",
-    "classnames": "^2.5.1",
-    "electron-store": "^8.1.0",
-    "next": "^16.1.6",
-    "prettier": "^3.2.5",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "sass": "^1.72.0",
-    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
@@ -35,15 +31,61 @@
     "@typescript-eslint/eslint-plugin": "^7.2.0",
     "@typescript-eslint/parser": "^7.2.0",
     "@vitejs/plugin-react": "^4.2.1",
+    "cfb": "^1.2.2",
+    "classnames": "^2.5.1",
     "electron": "^40.4.0",
+    "electron-builder": "^25.1.8",
+    "electron-store": "^8.1.0",
     "esbuild": "^0.19.0",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
+    "next": "^16.1.6",
     "nodemon": "^3.0.2",
+    "prettier": "^3.2.5",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "sass": "^1.72.0",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "uuid": "^13.0.0"
+  },
+  "build": {
+    "appId": "com.vpx.microfrontend",
+    "productName": "VPX Micro Frontend",
+    "npmRebuild": false,
+    "nodeGypRebuild": false,
+    "files": [
+      "dist-electron/**/*",
+      "out/**/*",
+      "package.json",
+      "!node_modules/**/*",
+      "!src/**/*",
+      "!.next/**/*",
+      "!scripts/**/*",
+      "!dist/**/*",
+      "!gitignore/**/*",
+      "!backend.log"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "extraMetadata": {
+      "main": "dist-electron/main.js"
+    },
+    "win": {
+      "signAndEditExecutable": false,
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false
+    }
   }
 }

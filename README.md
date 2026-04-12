@@ -141,6 +141,52 @@ yarn install
 yarn dev
 ```
 
+## Build Windows binaries (EXE)
+
+This project now supports production packaging via Electron Builder.
+
+### 1. Install dependencies
+
+```bash
+yarn install
+```
+
+### 2. Build production assets only
+
+```bash
+yarn build:prod
+```
+
+This creates:
+
+- `out/` (static Next renderer)
+- `dist-electron/main.js` and `dist-electron/preload.js` (bundled Electron files)
+
+### 3. Create Windows distributables
+
+```bash
+yarn dist:win
+```
+
+Artifacts are written to `dist/`:
+
+- NSIS installer `.exe`
+- Portable `.exe`
+
+### 4. Create unpacked app only (quick local validation)
+
+```bash
+yarn dist:dir
+```
+
+This outputs `dist/win-unpacked/`.
+
+### Notes
+
+- Packaging is Windows-first in the current setup.
+- If Defender/permissions interfere with packaging, run the terminal as Administrator and retry.
+- Optional polish for release: set `author`, `description`, and app icon in `package.json`.
+
 ## Troubleshooting
 
 - If scan/import appears outdated, re-open the view or run a fresh scan.

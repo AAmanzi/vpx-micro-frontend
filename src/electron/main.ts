@@ -60,6 +60,14 @@ function startNext() {
   });
 }
 
+function getProductionIndexPath(): string {
+  const basePath = app.isPackaged
+    ? path.join(__dirname, '..')
+    : path.join(__dirname, '..', '..');
+
+  return path.join(basePath, 'out', 'index.html');
+}
+
 function waitForServer(port: number, timeout = 30000, interval = 300) {
   const start = Date.now();
   return new Promise<void>((resolve, reject) => {
@@ -90,12 +98,19 @@ const createWindow = () => {
       nodeIntegration: false,
     },
   });
+
+  if (app.isPackaged) {
+    const indexPath = getProductionIndexPath();
+    win.loadFile(indexPath);
+    return;
+  }
+
   const url = `http://localhost:${NEXT_PORT}`;
   win.loadURL(url);
 };
 
 app.whenReady().then(async () => {
-  if (process.env.NODE_ENV !== 'production') {
+  if (!app.isPackaged) {
     startNext();
     try {
       await waitForServer(Number(NEXT_PORT), 30000, 300);
