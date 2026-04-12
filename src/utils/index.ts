@@ -9,20 +9,23 @@ import { Table } from 'src/types/table';
 export const normalizePathForComparison = (value?: string): string =>
   (value || '').trim().toLowerCase().replace(/\\/g, '/');
 
+export const normalizePath = (inputPath: string): string => {
+  return path.normalize((inputPath || '').trim().replace(/\\/g, '/'));
+}
+
 export const getDefaultRomsDirectory = (vpxRootPath: string): string => {
   const result = path.join(vpxRootPath, VPX_DEFAULT_ROM_PATH);
-
-  return result;
+  return normalizePath(result);
 };
 
 export const getDefaultTablesDirectory = (vpxRootPath: string): string => {
   const result = path.join(vpxRootPath, VPX_DEFAULT_TABLES_PATH);
-
-  return result;
+  return normalizePath(result);
 };
 
 export const getDefaultVpxExecutablePath = (vpxRootPath: string): string => {
-  return path.join(vpxRootPath, VPX_DEFAULT_EXECUTABLE);
+  const result = path.join(vpxRootPath, VPX_DEFAULT_EXECUTABLE);
+  return normalizePath(result);
 };
 
 export const displayDate = (date: Date | number): string => {

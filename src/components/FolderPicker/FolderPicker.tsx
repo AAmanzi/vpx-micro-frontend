@@ -2,6 +2,7 @@ import classNames from 'classnames';
 import { FunctionComponent, useState } from 'react';
 
 import api from 'src/consts';
+import { normalizePath } from 'src/utils';
 
 import Icon from '../Icon';
 import style from './FolderPicker.module.scss';
@@ -49,7 +50,7 @@ const FolderPicker: FunctionComponent<Props> = ({
         return;
       }
 
-      onSelect(result.data);
+      onSelect(normalizePath(result.data));
     } finally {
       setIsPicking(false);
     }

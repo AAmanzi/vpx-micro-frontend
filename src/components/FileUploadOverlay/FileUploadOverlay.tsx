@@ -3,6 +3,7 @@ import { FunctionComponent, useEffect, useRef, useState } from 'react';
 
 import { api } from 'src/consts';
 import { FileSystemItem } from 'src/types/file';
+import { normalizePath } from 'src/utils';
 
 import Spinner from '../Spinner';
 import style from './FileUploadOverlay.module.scss';
@@ -39,11 +40,11 @@ const FileUploadOverlay: FunctionComponent<Props> = ({
 
   const getPathForFile = (file: File): string | null => {
     try {
-      const { data: path } = api.getPathForFile(file);
-      if (typeof path === 'string' && path) {
-        return path;
+      const { data: rawPath } = api.getPathForFile(file);
+      if (typeof rawPath === 'string' && rawPath) {
+        return normalizePath(rawPath);
       }
-    } catch (error) {}
+    } catch (error) { }
 
     return null;
   };
@@ -61,10 +62,15 @@ const FileUploadOverlay: FunctionComponent<Props> = ({
         return [];
       }
 
-      return items.filter(
-        (item): item is FileSystemItem =>
-          Boolean(item?.path) && Boolean(item?.name),
-      );
+      return items
+        .filter(
+          (item): item is FileSystemItem =>
+            Boolean(item?.path) && Boolean(item?.name),
+        )
+        .map(item => ({
+          ...item,
+          path: normalizePath(item.path),
+        }));
     } catch (error) {
       return [];
     }
@@ -92,48 +98,48 @@ const FileUploadOverlay: FunctionComponent<Props> = ({
     const resolvedItems = await Promise.all(
       (dropItems.length > 0
         ? dropItems
-            .filter((item) => item.kind === 'file')
-            .map(async (item) => {
-              const file = item.getAsFile();
-              if (!file) {
-                return [] as Array<FileSystemItem>;
-              }
-
-              const path = getPathForFile(file);
-              if (!path) {
-                return [] as Array<FileSystemItem>;
-              }
-
-              const entry = item.webkitGetAsEntry?.();
-              const isDirectory = Boolean(entry?.isDirectory);
-              if (!isValidFile(path, isDirectory)) {
-                return [] as Array<FileSystemItem>;
-              }
-
-              if (isDirectory) {
-                return getDirectoryTree(path);
-              }
-
-              return [
-                {
-                  path,
-                  name: file.name,
-                },
-              ];
-            })
-        : files.map(async (file) => {
-            const path = getPathForFile(file);
-            if (!path || !isValidFile(path, false)) {
+          .filter((item) => item.kind === 'file')
+          .map(async (item) => {
+            const file = item.getAsFile();
+            if (!file) {
               return [] as Array<FileSystemItem>;
+            }
+
+            const filePath = getPathForFile(file);
+            if (!filePath) {
+              return [] as Array<FileSystemItem>;
+            }
+
+            const entry = item.webkitGetAsEntry?.();
+            const isDirectory = Boolean(entry?.isDirectory);
+            if (!isValidFile(filePath, isDirectory)) {
+              return [] as Array<FileSystemItem>;
+            }
+
+            if (isDirectory) {
+              return getDirectoryTree(filePath);
             }
 
             return [
               {
-                path,
+                path: filePath,
                 name: file.name,
               },
             ];
-          })) as Array<Promise<Array<FileSystemItem>>>,
+          })
+        : files.map(async (file) => {
+          const path = getPathForFile(file);
+          if (!path || !isValidFile(path, false)) {
+            return [] as Array<FileSystemItem>;
+          }
+
+          return [
+            {
+              path,
+              name: file.name,
+            },
+          ];
+        })) as Array<Promise<Array<FileSystemItem>>>,
     );
 
     return resolvedItems.flat();

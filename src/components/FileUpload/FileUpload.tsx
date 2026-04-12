@@ -3,6 +3,7 @@ import { FunctionComponent, useState } from 'react';
 
 import { api } from 'src/consts';
 import { FileSystemItem } from 'src/types/file';
+import { normalizePath } from 'src/utils';
 
 import Spinner from '../Spinner';
 import style from './FileUpload.module.scss';
@@ -32,9 +33,9 @@ const FileUpload: FunctionComponent<Props> = ({
 
   const getPathForFile = (file: File): string | null => {
     try {
-      const { data: path } = api.getPathForFile(file);
-      if (typeof path === 'string' && path) {
-        return path;
+      const { data: rawPath } = api.getPathForFile(file);
+      if (typeof rawPath === 'string' && rawPath) {
+        return normalizePath(rawPath);
       }
     } catch (error) {}
 
@@ -54,10 +55,15 @@ const FileUpload: FunctionComponent<Props> = ({
         return [];
       }
 
-      return items.filter(
-        (item): item is FileSystemItem =>
-          Boolean(item?.path) && Boolean(item?.name),
-      );
+      return items
+        .filter(
+          (item): item is FileSystemItem =>
+            Boolean(item?.path) && Boolean(item?.name),
+        )
+        .map(item => ({
+          ...item,
+          path: normalizePath(item.path),
+        }));
     } catch (error) {
       return [];
     }
@@ -108,37 +114,37 @@ const FileUpload: FunctionComponent<Props> = ({
                 return [] as Array<FileSystemItem>;
               }
 
-              const path = getPathForFile(file);
-              if (!path) {
+              const filePath = getPathForFile(file);
+              if (!filePath) {
                 return [] as Array<FileSystemItem>;
               }
 
               const entry = item.webkitGetAsEntry?.();
               const isDirectory = Boolean(entry?.isDirectory);
-              if (!isValidFile(path, isDirectory)) {
+              if (!isValidFile(filePath, isDirectory)) {
                 return [] as Array<FileSystemItem>;
               }
 
               if (isDirectory) {
-                return getDirectoryTree(path);
+                return getDirectoryTree(filePath);
               }
 
               return [
                 {
-                  path,
+                  path: filePath,
                   name: file.name,
                 },
               ];
             })
         : files.map(async (file) => {
-            const path = getPathForFile(file);
-            if (!path || !isValidFile(path, false)) {
+            const filePath = getPathForFile(file);
+            if (!filePath || !isValidFile(filePath, false)) {
               return [] as Array<FileSystemItem>;
             }
 
             return [
               {
-                path,
+                path: filePath,
                 name: file.name,
               },
             ];
@@ -164,7 +170,12 @@ const FileUpload: FunctionComponent<Props> = ({
         return;
       }
 
-      finalizeSelection(result.data);
+      const normalizedItems = result.data.map(item => ({
+        ...item,
+        path: normalizePath(item.path),
+      }));
+
+      finalizeSelection(normalizedItems);
     } catch {
       return;
     }

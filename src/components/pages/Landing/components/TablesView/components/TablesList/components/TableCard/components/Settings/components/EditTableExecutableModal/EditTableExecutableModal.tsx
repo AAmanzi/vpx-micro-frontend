@@ -34,7 +34,7 @@ const EditTableExecutableModal: FunctionComponent<Props> = ({
 
   const getCurrentExecutable = () => {
     if (currentExecutablePath) {
-      return currentExecutablePath.split('\\').pop() || currentExecutablePath;
+      return currentExecutablePath.split(/[/\\]/).pop() || currentExecutablePath;
     }
 
     return VPX_DEFAULT_EXECUTABLE;

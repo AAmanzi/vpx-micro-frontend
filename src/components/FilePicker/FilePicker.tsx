@@ -2,6 +2,7 @@ import classNames from 'classnames';
 import { FunctionComponent, useState } from 'react';
 
 import api from 'src/consts';
+import { normalizePath } from 'src/utils';
 
 import Icon from '../Icon';
 import style from './FilePicker.module.scss';
@@ -51,7 +52,7 @@ const FilePicker: FunctionComponent<Props> = ({
         return;
       }
 
-      onSelect(result.data[0].path);
+      onSelect(normalizePath(result.data[0].path));
     } finally {
       setIsPicking(false);
     }
