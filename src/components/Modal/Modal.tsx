@@ -31,7 +31,7 @@ const Modal: FunctionComponent<Props> = ({
       return;
     }
 
-    const shouldLockBody = portalRoot.childElementCount === 0;
+    const shouldLockBody = portalRoot.childElementCount === 1;
     const bodyStyle = document.body.style;
     const previousBodyStyle = {
       overflow: bodyStyle.overflow,

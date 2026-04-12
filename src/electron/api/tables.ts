@@ -286,6 +286,7 @@ export function importTables(
     const transferFile = deleteAfterImport ? moveFile : copyFile;
     const movedSourceFilePaths = new Set<string>();
     let missingSourceFailures = 0;
+    let permissionFailures = 0;
     const tablesDirectoryPath = configDb.getTablesDirectoryPath();
     const romsDirectoryPath = configDb.getRomsDirectoryPath();
 
@@ -356,7 +357,20 @@ export function importTables(
           error.message.includes('does not exist')
         ) {
           missingSourceFailures += 1;
+          return;
         }
+
+        if (
+          error &&
+          typeof error === 'object' &&
+          'code' in error &&
+          (error.code === 'EACCES' || error.code === 'EPERM')
+        ) {
+          permissionFailures += 1;
+          return;
+        }
+
+        throw error;
       }
     });
 
@@ -373,6 +387,16 @@ export function importTables(
         warning: {
           code: 'IMPORT_MISSING_SOURCE_FILES',
           message: `${missingSourceFailures} table(s) failed to import because source files were missing`,
+        },
+      };
+    }
+
+    if (permissionFailures > 0) {
+      return {
+        success: false,
+        error: {
+          code: 'IMPORT_PERMISSION_DENIED',
+          message: `Permission denied. The destination folder (e.g. Program Files) requires administrator access. Move your VPX library to C:\\Visual Pinball and update the library path in Settings, then try again.`,
         },
       };
     }
