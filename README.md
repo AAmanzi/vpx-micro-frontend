@@ -2,6 +2,12 @@
 
 This guide explains how to use the app day-to-day to manage your Visual Pinball X tables and ROMs.
 
+<!-- MEDIA: Place hero screenshot directly below this intro paragraph. -->
+<!-- Example: ![VPX Micro Frontend dashboard](public/readme/hero-dashboard.png) -->
+
+<!-- MEDIA (optional): Place short product tour video link below hero image. -->
+<!-- Example: [Quick product tour video](public/readme/vpx-usage-overview.mp4) -->
+
 <!--
 README media plan
 
@@ -14,19 +20,12 @@ Store files under: public/readme/
    - Embed:
      ![VPX Micro Frontend dashboard](public/readme/hero-dashboard.png)
 
-2) Quick start GIF (high-value)
+2) Quick start GIF (manual import path)
    - File: public/readme/quickstart-import.gif
    - Shows: Import Tables -> select files -> confirm import
-   - Place: in “Add tables to your library”
+  - Place: in “Option B (manual fallback): Import files/folders”
    - Embed:
      ![Import workflow](public/readme/quickstart-import.gif)
-
-3) Scan workflow GIF
-   - File: public/readme/scan-library.gif
-   - Shows: Scan Library modal -> apply scan result
-   - Place: in “Option B: Scan your VPX library”
-   - Embed:
-     ![Scan library workflow](public/readme/scan-library.gif)
 
 4) Settings screenshot
    - File: public/readme/settings-file-paths.png
@@ -69,6 +68,9 @@ Store files under: public/readme/
 
 ## First-time setup
 
+<!-- MEDIA: Place settings screenshot here to anchor path configuration steps. -->
+<!-- Example: ![Settings file paths](public/readme/settings-file-paths.png) -->
+
 1. Open **Settings** from the left navigation.
 2. In **File Paths**, set **VPX Root Directory** (the folder containing `VPinballX.exe`).
 3. Confirm **ROMs Directory** and **Tables Directory**.
@@ -76,19 +78,27 @@ Store files under: public/readme/
 
 ## Add tables to your library
 
-### Option A: Import files/folders manually
+If you already have an existing VPX setup, start with Scan Library first.
+
+### Option A: Scan your VPX library
+
+<!-- MEDIA: Place scan workflow GIF directly under this heading. -->
+<!-- Example: ![Scan library workflow](public/readme/scan-library.gif) -->
+
+1. Click **Scan Library** (top-right) or open it from **Settings → Data Management**.
+2. Review detected matches.
+3. Apply results.
+
+### Option B: Import files/folders
+
+<!-- MEDIA: Place import workflow GIF directly under this heading. -->
+<!-- Example: ![Import workflow](public/readme/quickstart-import.gif) -->
 
 1. Click **Import Tables**.
 2. Drag/drop `.vpx`, `.zip`, or folders.
 3. Review detected tables and unassigned ROMs.
 4. Optionally enable **Delete original files after import**.
 5. Click **Import Tables**.
-
-### Option B: Scan your VPX library
-
-1. Click **Scan Library** (top-right) or open it from **Settings → Data Management**.
-2. Review detected matches.
-3. Apply results.
 
 ## Work with tables
 
@@ -109,6 +119,9 @@ Store files under: public/readme/
 
 ### Table card actions
 
+<!-- MEDIA: Place table actions screenshot here to show kebab menu actions. -->
+<!-- Example: ![Table card actions](public/readme/table-card-actions.png) -->
+
 - **Play** button launches the table.
 - **Kebab menu** lets you:
   - Rename table
@@ -123,6 +136,9 @@ Store files under: public/readme/
 - Tables directory
 
 ### Data Management
+
+<!-- MEDIA (optional): Place export tables screenshot here. -->
+<!-- Example: ![Export tables](public/readme/export-tables-modal.png) -->
 
 - **Scan VPX Library**
 - **Export Tables** (create a shareable bundle)
