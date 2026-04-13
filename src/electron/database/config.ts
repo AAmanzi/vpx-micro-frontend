@@ -1,7 +1,7 @@
 import Store from 'electron-store';
 
 import { VPX_DEFAULT_ROOT_PATH } from 'src/consts/vpx';
-import { Config, Order } from 'src/types/config';
+import { Config, Order, ViewType } from 'src/types/config';
 import { getDefaultRomsDirectory, getDefaultTablesDirectory } from 'src/utils';
 
 import { resolveUserPath } from '../utils/path';
@@ -17,6 +17,7 @@ const defaultConfig: Config = {
   tablesDirectory: '',
   keepFavoritesOnTop: false,
   order: Order.dateAddedDesc,
+  viewType: ViewType.grid,
 };
 
 const store = new Store<ConfigStoreSchema>({
