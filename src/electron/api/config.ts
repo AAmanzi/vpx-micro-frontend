@@ -70,3 +70,12 @@ export function updateOrder(order: Config['order']): ApiResult<null> {
     return apiFailure(error);
   }
 }
+
+export function updateViewType(viewType: Config['viewType']): ApiResult<null> {
+  try {
+    configDb.updateViewType(viewType);
+    return apiSuccess(null);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}

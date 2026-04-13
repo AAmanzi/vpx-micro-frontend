@@ -5,6 +5,7 @@ export interface Config {
   tablesDirectory?: string;
   keepFavoritesOnTop: boolean;
   order: Order;
+  viewType: ViewType;
 }
 
 export enum Order {
@@ -14,4 +15,9 @@ export enum Order {
   dateAddedDesc = 'dateAddedDesc',
   recentlyPlayed = 'recentlyPlayed',
   leastPlayed = 'leastPlayed',
+}
+
+export enum ViewType {
+  grid = 'grid',
+  list = 'list',
 }

@@ -30,7 +30,8 @@ export type Icon =
   | 'package-cross'
   | 'folder-export'
   | 'shield-checkmark'
-  | 'clock-recent';
+  | 'clock-recent'
+  | 'list';
 
 export interface Props {
   icon: Icon;

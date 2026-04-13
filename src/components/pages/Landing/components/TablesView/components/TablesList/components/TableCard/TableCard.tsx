@@ -16,8 +16,8 @@ import {
   getTableGradientVariant,
 } from 'src/utils';
 
+import Settings from '../Settings';
 import style from './TableCard.module.scss';
-import Settings from './components/Settings';
 
 type Props = Table;
 

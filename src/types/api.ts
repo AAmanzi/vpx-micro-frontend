@@ -79,6 +79,7 @@ export interface Api {
     keepFavoritesOnTop: boolean,
   ) => Promise<ApiResult<null>>;
   updateOrder: (order: Config['order']) => Promise<ApiResult<null>>;
+  updateViewType: (viewType: Config['viewType']) => Promise<ApiResult<null>>;
 }
 
 declare global {

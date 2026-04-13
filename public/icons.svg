@@ -149,4 +149,7 @@
     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.499" d="M2.25 8.997a6.747 6.747 0 1 0 6.747-6.748 7.3 7.3 0 0 0-5.053 2.054L2.249 5.998"/>
     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.499" d="M2.25 2.249v3.749h3.748M8.997 5.248v3.749l2.999 1.5"/>
   </symbol>
+  <symbol id="icon-list" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+    <path d="M3 12h.01M3 18h.01M3 6h.01M8 12h13M8 18h13M8 6h13"/>
+  </symbol>
 </svg>

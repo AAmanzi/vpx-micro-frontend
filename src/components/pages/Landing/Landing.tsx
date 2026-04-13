@@ -60,7 +60,7 @@ const Landing: FunctionComponent<Props> = () => {
             title='Recently Played'
             defaultOrder={Order.recentlyPlayed}
             emptyStateVariant='recentlyPlayed'
-              isOrderPickerDisabled
+            isOrderPickerDisabled
           />
         );
       case View.settings:
@@ -70,11 +70,13 @@ const Landing: FunctionComponent<Props> = () => {
 
   return (
     <div className={style.container}>
-      <Navigation
-        view={view}
-        setView={handleChangeView}
-        librarySize={tables.length}
-      />
+      <div className={style.navigationWrapper}>
+        <Navigation
+          view={view}
+          setView={handleChangeView}
+          librarySize={tables.length}
+        />
+      </div>
       <div className={style.content}>{getView()}</div>
     </div>
   );

@@ -15,6 +15,12 @@
   flex: 1;
 }
 
+.infoAndFiltering {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
 .librarySize {
   text-align: end;
 }

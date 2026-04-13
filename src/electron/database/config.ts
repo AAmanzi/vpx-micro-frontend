@@ -102,3 +102,10 @@ export function updateOrder(order: Config['order']): void {
     order,
   });
 }
+
+export function updateViewType(viewType: Config['viewType']): void {
+  store.set('config', {
+    ...getStoredConfig(),
+    viewType,
+  });
+}

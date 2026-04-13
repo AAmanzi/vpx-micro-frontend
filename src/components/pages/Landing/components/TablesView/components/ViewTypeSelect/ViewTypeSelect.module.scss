@@ -1,0 +1,38 @@
+.container {
+  display: flex;
+  gap: 8px;
+  padding-left: 3px;
+  padding-right: 3px;
+  height: 48px;
+  background-color: var(--gray-800);
+  border: thin solid var(--gray);
+  border-radius: 14px;
+  width: fit-content;
+  display: flex;
+  align-items: center;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background-color: transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 200ms ease-in;
+
+  &:hover {
+    background-color: rgba(var(--gray-rgb), 0.5);
+  }
+
+  &.active {
+    background-color: rgba(var(--gray-rgb), 0.7);
+
+    > svg {
+      color: var(--white);
+    }
+  }
+}

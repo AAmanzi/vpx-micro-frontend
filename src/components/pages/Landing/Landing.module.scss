@@ -2,6 +2,10 @@
   display: flex;
 }
 
+.navigationWrapper {
+  flex-shrink: 0;
+}
+
 .content {
   flex: 1;
   padding-bottom: 16px;

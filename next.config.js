@@ -1,8 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  output: 'export',
-  assetPrefix: './',
+  output: process.env.NODE_ENV === 'development' ? undefined : 'export',
+  assetPrefix: process.env.NODE_ENV === 'development' ? '' : './',
   sassOptions: {
     prependData: `@use 'src/styles/text' as *;`,
   },

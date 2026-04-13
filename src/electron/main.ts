@@ -208,6 +208,9 @@ app.whenReady().then(async () => {
   ipcMain.handle('api:updateOrder', async (_, order: Config['order']) =>
     api.updateOrder(order),
   );
+  ipcMain.handle('api:updateViewType', async (_, viewType: Config['viewType']) =>
+    api.updateViewType(viewType),
+  );
   ipcMain.handle('api:startTable', async (_, tableId: string) =>
     api.startTable(tableId),
   );

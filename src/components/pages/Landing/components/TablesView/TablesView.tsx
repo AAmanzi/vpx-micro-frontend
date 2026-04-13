@@ -13,13 +13,14 @@ import ScanLibraryModal from 'src/components/ScanLibraryModal';
 import api from 'src/consts';
 import { useConfigContext } from 'src/providers/config';
 import { useTablesContext } from 'src/providers/tables';
-import { Order } from 'src/types/config';
+import { Order, ViewType } from 'src/types/config';
 import { FileSystemItem } from 'src/types/file';
 import type { Table } from 'src/types/table';
 
 import style from './TablesView.module.scss';
 import OrderPicker from './components/OrderPicker';
 import TablesList from './components/TablesList';
+import ViewTypeSelect from './components/ViewTypeSelect';
 import { Props } from './types';
 
 const TablesView: FunctionComponent<Props> = ({
@@ -43,6 +44,7 @@ const TablesView: FunctionComponent<Props> = ({
 
   const favoritesOnTop = config?.keepFavoritesOnTop ?? true;
   const order = defaultOrder ?? config?.order ?? Order.dateAddedDesc;
+  const viewType = config?.viewType ?? ViewType.grid;
 
   const handleCloseImportModal = () => {
     setIsImportModalOpen(false);
@@ -71,6 +73,16 @@ const TablesView: FunctionComponent<Props> = ({
     }
 
     await api.updateOrder(newValue);
+
+    fetchConfig();
+  };
+
+  const handleViewTypeChange = async (newValue: ViewType) => {
+    if (newValue === viewType) {
+      return;
+    }
+
+    await api.updateViewType(newValue);
 
     fetchConfig();
   };
@@ -176,6 +188,10 @@ const TablesView: FunctionComponent<Props> = ({
           />
         </div>
         <div className={style.infoAndFiltering}>
+          <ViewTypeSelect
+            viewType={viewType}
+            onViewTypeChange={handleViewTypeChange}
+          />
           <OrderPicker
             favoritesOnTop={favoritesOnTop}
             onFavoritesOnTopChange={handleFavoritesOnTopChange}
@@ -212,7 +228,9 @@ const TablesView: FunctionComponent<Props> = ({
         </div>
 
         <div className={style.tablesWrapper}>
-          {hasResults && <TablesList tables={orderedTables} />}{' '}
+          {hasResults && (
+            <TablesList tables={orderedTables} viewType={viewType} />
+          )}{' '}
           {hasNoSearchResults && (
             <div className={style.noData}>
               <div className={style.noDataIconWrapper}>

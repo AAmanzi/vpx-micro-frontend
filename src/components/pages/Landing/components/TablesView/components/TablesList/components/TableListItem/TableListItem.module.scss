@@ -1,0 +1,164 @@
+.item {
+  position: relative;
+  background-color: var(--gray-800);
+  border: thin solid var(--gray);
+  border-radius: 16px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  overflow: visible;
+  padding: 10px;
+  gap: 16px;
+  min-width: 0;
+
+  &:hover {
+    background-color: rgba(var(--white-rgb), 0.08);
+    border-color: rgba(var(--white-rgb), 0.2);
+  }
+}
+
+.playArea {
+  width: 80px;
+  height: 48px;
+  border-radius: 16px;
+  background-color: rgba(0, 0, 0, 0.3);
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.titleSection {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 0 1 400px;
+}
+
+.title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.romPill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: thin solid rgba(var(--white-rgb), 0.1);
+  border-radius: 999px;
+  padding: 6px 12px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.romDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--blue);
+  flex-shrink: 0;
+}
+
+.datesContainer {
+  display: flex;
+  gap: 24px;
+  flex-shrink: 0;
+}
+
+.dateItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.favoriteButton {
+  background-color: transparent;
+  border: none;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 200ms ease-in;
+  flex-shrink: 0;
+  cursor: pointer;
+
+  & .favoriteIcon {
+    color: var(--gray-300);
+    fill: transparent;
+    transition:
+      fill 200ms ease-in,
+      color 200ms ease-in;
+  }
+
+  &.isFavorite {
+    & .favoriteIcon {
+      color: var(--yellow);
+      fill: var(--yellow);
+    }
+  }
+}
+
+.settingsButton {
+  flex-shrink: 0;
+  position: relative;
+}
+
+.settingsTrigger {
+  background-color: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.settingsContainer {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  right: 0;
+  z-index: 1;
+}
+
+@media (max-width: 1200px) {
+  .datesContainer {
+    .dateItem:first-child {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: 1000px) {
+  .datesContainer {
+    .dateItem:last-child {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: 800px) {
+  .romPill {
+    display: none;
+  }
+}

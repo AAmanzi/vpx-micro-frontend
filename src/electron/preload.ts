@@ -109,6 +109,8 @@ const frontendApi: Api = {
     invoke<ApiResult<null>>('api:updateKeepFavoritesOnTop', keepFavoritesOnTop),
   updateOrder: (order: Config['order']): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:updateOrder', order),
+  updateViewType: (viewType: Config['viewType']): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:updateViewType', viewType),
   startTable: (tableId: string): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:startTable', tableId),
 };
