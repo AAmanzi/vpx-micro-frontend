@@ -4,26 +4,6 @@ This guide explains how to use the app day-to-day to manage your Visual Pinball 
 
 ![VPX Micro Frontend dashboard](public/readme/hero-dashboard.png)
 
-<!-- MEDIA (optional): Place short product tour video link below hero image. -->
-<!-- Example: [Quick product tour video](public/readme/vpx-usage-overview.mp4) -->
-
-<!--
-
-2) Quick start GIF (manual import path)
-   - File: public/readme/quickstart-import.gif
-   - Shows: Import Tables -> select files -> confirm import
-  - Place: in “Option B (manual fallback): Import files/folders”
-   - Embed:
-     ![Import workflow](public/readme/quickstart-import.gif)
-
-7) Optional short video (30-60s)
-   - File: public/readme/vpx-usage-overview.mp4
-   - Shows: setup -> import -> search/favorite -> play -> recent
-   - Place: near top as “Quick product tour”
-   - Embed as link (GitHub video autoplay is limited):
-     [Quick product tour video](public/readme/vpx-usage-overview.mp4)
--->
-
 ## What you can do
 
 - Import `.vpx` tables and `.zip` ROM files
@@ -49,8 +29,7 @@ If you already have an existing VPX setup, start with Scan Library first.
 
 ### Option A: Scan your VPX library
 
-<!-- MEDIA: Place scan workflow GIF directly under this heading. -->
-<!-- Example: ![Scan library workflow](public/readme/scan-library.gif) -->
+![Scan library workflow](public/readme/scan-library.gif)
 
 1. Click **Scan Library** (top-right) or open it from **Settings → Data Management**.
 2. Review detected matches.
@@ -58,8 +37,7 @@ If you already have an existing VPX setup, start with Scan Library first.
 
 ### Option B: Import files/folders
 
-<!-- MEDIA: Place import workflow GIF directly under this heading. -->
-<!-- Example: ![Import workflow](public/readme/quickstart-import.gif) -->
+![Import workflow](public/readme/import-tables.gif)
 
 1. Click **Import Tables**.
 2. Drag/drop `.vpx`, `.zip`, or folders.
@@ -91,6 +69,7 @@ If you already have an existing VPX setup, start with Scan Library first.
 - **Play** button launches the table.
 - **Kebab menu** lets you:
   - Rename table
+  - Edit ROM
   - Delete table
 
 ## Settings reference
