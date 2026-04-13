@@ -2,23 +2,12 @@
 
 This guide explains how to use the app day-to-day to manage your Visual Pinball X tables and ROMs.
 
-<!-- MEDIA: Place hero screenshot directly below this intro paragraph. -->
-<!-- Example: ![VPX Micro Frontend dashboard](public/readme/hero-dashboard.png) -->
+![VPX Micro Frontend dashboard](public/readme/hero-dashboard.png)
 
 <!-- MEDIA (optional): Place short product tour video link below hero image. -->
 <!-- Example: [Quick product tour video](public/readme/vpx-usage-overview.mp4) -->
 
 <!--
-README media plan
-
-Store files under: public/readme/
-
-1) Hero screenshot (required)
-   - File: public/readme/hero-dashboard.png
-   - Shows: Landing page with navigation + table cards
-   - Place: directly under title/introduction
-   - Embed:
-     ![VPX Micro Frontend dashboard](public/readme/hero-dashboard.png)
 
 2) Quick start GIF (manual import path)
    - File: public/readme/quickstart-import.gif
@@ -26,27 +15,6 @@ Store files under: public/readme/
   - Place: in “Option B (manual fallback): Import files/folders”
    - Embed:
      ![Import workflow](public/readme/quickstart-import.gif)
-
-4) Settings screenshot
-   - File: public/readme/settings-file-paths.png
-   - Shows: File Paths section with VPX/ROM/Tables directories
-   - Place: in “First-time setup” or “Settings reference”
-   - Embed:
-     ![Settings file paths](public/readme/settings-file-paths.png)
-
-5) Table actions screenshot
-   - File: public/readme/table-card-actions.png
-   - Shows: Card kebab menu with rename/delete actions
-   - Place: in “Table card actions”
-   - Embed:
-     ![Table card actions](public/readme/table-card-actions.png)
-
-6) Export tables screenshot (optional)
-   - File: public/readme/export-tables-modal.png
-   - Shows: Export modal and destination selection state
-   - Place: in “Data Management”
-   - Embed:
-     ![Export tables](public/readme/export-tables-modal.png)
 
 7) Optional short video (30-60s)
    - File: public/readme/vpx-usage-overview.mp4
@@ -68,8 +36,7 @@ Store files under: public/readme/
 
 ## First-time setup
 
-<!-- MEDIA: Place settings screenshot here to anchor path configuration steps. -->
-<!-- Example: ![Settings file paths](public/readme/settings-file-paths.png) -->
+![Settings file paths](public/readme/settings-file-paths.png)
 
 1. Open **Settings** from the left navigation.
 2. In **File Paths**, set **VPX Root Directory** (the folder containing `VPinballX.exe`).
@@ -119,8 +86,7 @@ If you already have an existing VPX setup, start with Scan Library first.
 
 ### Table card actions
 
-<!-- MEDIA: Place table actions screenshot here to show kebab menu actions. -->
-<!-- Example: ![Table card actions](public/readme/table-card-actions.png) -->
+![Table card actions](public/readme/table-card-actions.png)
 
 - **Play** button launches the table.
 - **Kebab menu** lets you:
@@ -137,11 +103,12 @@ If you already have an existing VPX setup, start with Scan Library first.
 
 ### Data Management
 
-<!-- MEDIA (optional): Place export tables screenshot here. -->
-<!-- Example: ![Export tables](public/readme/export-tables-modal.png) -->
+![Data Management settings](public/readme/settings-data-management.png)
 
 - **Scan VPX Library**
 - **Export Tables** (create a shareable bundle)
+
+![Export tables modal](public/readme/export-tables-modal.png)
 
 ### Maintenance
 
