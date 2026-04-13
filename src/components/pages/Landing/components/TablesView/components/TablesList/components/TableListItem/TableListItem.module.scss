@@ -8,7 +8,6 @@
   align-items: center;
   overflow: visible;
   padding: 10px;
-  gap: 16px;
   min-width: 0;
 
   &:hover {
@@ -29,6 +28,7 @@
   justify-content: center;
   position: relative;
   flex-shrink: 0;
+  margin-right: 16px;
 }
 
 .content {
@@ -58,6 +58,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  margin-right: 8px;
 }
 
 .romPill {
@@ -83,6 +84,7 @@
   display: flex;
   gap: 24px;
   flex-shrink: 0;
+  margin-left: 10px;
 }
 
 .dateItem {
@@ -95,13 +97,15 @@
 .favoriteButton {
   background-color: transparent;
   border: none;
-  padding: 8px;
+  padding: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 200ms ease-in;
   flex-shrink: 0;
   cursor: pointer;
+  margin-right: 4px;
+  margin-left: 8px;
 
   & .favoriteIcon {
     color: var(--gray-300);
@@ -130,7 +134,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 8px;
+  padding: 4px;
   cursor: pointer;
 }
 
