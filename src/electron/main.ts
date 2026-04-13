@@ -68,6 +68,14 @@ function getProductionIndexPath(): string {
   return path.join(basePath, 'out', 'index.html');
 }
 
+function getWindowIconPath(): string {
+  if (app.isPackaged) {
+    return path.join(process.resourcesPath, 'icon.ico');
+  }
+
+  return path.join(__dirname, '..', '..', 'public', 'icon.ico');
+}
+
 function waitForServer(port: number, timeout = 30000, interval = 300) {
   const start = Date.now();
   return new Promise<void>((resolve, reject) => {
@@ -92,6 +100,7 @@ const createWindow = () => {
   const win = new BrowserWindow({
     width: 900,
     height: 600,
+    icon: getWindowIconPath(),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
