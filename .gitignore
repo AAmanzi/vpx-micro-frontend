@@ -10,3 +10,4 @@
 tsconfig.tsbuildinfo
 /gitignore
 /src/electron/preload.js
+next-env.d.ts
