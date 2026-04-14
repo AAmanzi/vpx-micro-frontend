@@ -6,6 +6,12 @@ export const startVpxTable = async (
   tablePath: string,
   vpxExecutablePath: string,
 ): Promise<void> => {
+  if (process.platform !== 'win32') {
+    throw new Error(
+      'Starting Visual Pinball tables is only supported on Windows.',
+    );
+  }
+
   if (!fs.existsSync(tablePath)) {
     throw new Error(`Table file not found: ${tablePath}`);
   }
@@ -14,19 +20,18 @@ export const startVpxTable = async (
     throw new Error(`VPX executable not found: ${vpxExecutablePath}`);
   }
 
-  try {
-    const command = `start "" "${tablePath}"`;
-    const vpxDir = path.dirname(vpxExecutablePath);
+  const command = `start "" "${tablePath}"`;
+  const vpxDir = path.dirname(vpxExecutablePath);
 
+  await new Promise<void>((resolve, reject) => {
     exec(command, { cwd: vpxDir }, (error) => {
       if (error) {
-        console.error(`Failed to start VPX: ${error.message}`);
+        reject(new Error(`Failed to start VPX: ${error.message}`));
+
+        return;
       }
+
+      resolve();
     });
-
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-  } catch (error) {
-    throw new Error(`Failed to spawn VPX process: ${error}`);
-  }
+  });
 };

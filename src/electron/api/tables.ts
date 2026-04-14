@@ -407,7 +407,7 @@ export function importTables(
   }
 }
 
-export function startTable(tableId: string): ApiResult<null> {
+export async function startTable(tableId: string): Promise<ApiResult<null>> {
   try {
     const vpxRootPath = configDb.getVpxRootPath();
     const table = tablesDb.get(tableId);
@@ -422,14 +422,14 @@ export function startTable(tableId: string): ApiResult<null> {
       };
     }
 
-    tablesDb.update(tableId, {
-      lastPlayedTimestamp: Date.now(),
-    });
-
-    startVpxTable(
+    await startVpxTable(
       table.vpxFilePath,
       table.vpxExecutablePath || getDefaultVpxExecutablePath(vpxRootPath),
     );
+
+    tablesDb.update(tableId, {
+      lastPlayedTimestamp: Date.now(),
+    });
 
     return apiSuccess(null);
   } catch (error) {

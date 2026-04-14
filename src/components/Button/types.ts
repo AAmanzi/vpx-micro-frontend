@@ -20,6 +20,7 @@ export interface Props {
   label?: string;
   onClick?: () => void;
   disabled?: boolean;
+  loading?: boolean;
   type?: Type;
   icon?: Icon;
   size?: Size;

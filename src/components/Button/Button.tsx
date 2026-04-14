@@ -9,6 +9,7 @@ const Button: FunctionComponent<Props> = ({
   label,
   onClick,
   disabled = false,
+  loading = false,
   type = Type.primary,
   icon,
   size = Size.medium,
@@ -16,8 +17,10 @@ const Button: FunctionComponent<Props> = ({
   circle,
   isSubmit = false,
 }) => {
+  const isDisabled = disabled || loading;
+
   const handleClick = () => {
-    if (!disabled && onClick) {
+    if (!isDisabled && onClick) {
       onClick();
     }
   };
@@ -37,10 +40,16 @@ const Button: FunctionComponent<Props> = ({
         [style.large]: size === Size.large,
         [style.circle]: circle,
       })}>
-      {icon && (
+      {loading ? (
         <div className={style.iconWrapper}>
-          <Icon icon={icon} className={style.icon} />
+          <div className={style.spinner} />
         </div>
+      ) : (
+        icon && (
+          <div className={style.iconWrapper}>
+            <Icon icon={icon} className={style.icon} />
+          </div>
+        )
       )}
       <span className={classNames('label-md-bold', style.label)}>{label}</span>
     </div>
@@ -51,11 +60,12 @@ const Button: FunctionComponent<Props> = ({
       <button
         type='button'
         className={classNames(style.container, {
-          [style.disabled]: disabled,
+          [style.disabled]: isDisabled,
           [style.fill]: fill,
         })}
         onClick={handleClick}
-        disabled={disabled}>
+        disabled={isDisabled}
+        aria-busy={loading}>
         {content}
       </button>
     );
@@ -66,11 +76,12 @@ const Button: FunctionComponent<Props> = ({
       <button
         type='submit'
         className={classNames(style.container, {
-          [style.disabled]: disabled,
+          [style.disabled]: isDisabled,
           [style.fill]: fill,
         })}
         onClick={handleClick}
-        disabled={disabled}>
+        disabled={isDisabled}
+        aria-busy={loading}>
         {content}
       </button>
     );

@@ -34,16 +34,30 @@ const TableCard: FunctionComponent<Props> = ({
   lastPlayedTimestamp,
 }) => {
   const [favorite, setFavorite] = useState(isFavorite);
+  const [isStarting, setIsStarting] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { showErrorToast } = useToastContext();
   const { fetchTables } = useTablesContext();
 
   const handlePlay = async () => {
-    const { error } = await api.startTable(id);
-    fetchTables();
+    if (isStarting) {
+      return;
+    }
 
-    if (error) {
-      showErrorToast(error.message || 'Failed to start table');
+    setIsStarting(true);
+
+    try {
+      const { error } = await api.startTable(id);
+
+      if (error) {
+        showErrorToast(error.message || 'Failed to start table');
+
+        return;
+      }
+
+      fetchTables();
+    } finally {
+      setIsStarting(false);
     }
   };
 
@@ -82,6 +96,7 @@ const TableCard: FunctionComponent<Props> = ({
         <Button
           circle
           icon='play'
+          loading={isStarting}
           onClick={handlePlay}
           size={ButtonSize.large}
           type={ButtonType.secondary}
