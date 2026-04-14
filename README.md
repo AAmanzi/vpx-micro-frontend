@@ -20,6 +20,18 @@ Download the latest Windows build from GitHub Releases:
 
 - [VPX Micro Frontend Releases](https://github.com/AAmanzi/vpx-micro-frontend/releases)
 
+### Download options
+
+- **Installer (recommended)**
+  - Standard Windows installation flow
+  - Creates Start Menu/Desktop shortcuts
+  - Best for most users
+
+- **Portable (`.exe`)**
+  - No installation required
+  - Run directly from any folder or USB drive
+  - Good for testing or restricted environments
+
 ### Smart App Control (Windows 11)
 
 Some systems have Smart App Control enabled, which can block unsigned apps completely.
