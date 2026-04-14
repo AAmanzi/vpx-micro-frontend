@@ -4,6 +4,11 @@
   & .note {
     margin-top: 8px;
   }
+
+  & .warningNote {
+    margin-top: 8px;
+    color: var(--yellow);
+  }
 }
 
 .inputWrapper {

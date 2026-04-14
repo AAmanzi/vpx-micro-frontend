@@ -9,6 +9,34 @@ import { Table } from 'src/types/table';
 export const normalizePathForComparison = (value?: string): string =>
   (value || '').trim().toLowerCase().replace(/\\/g, '/');
 
+const RESTRICTED_VPX_ROOT_PATH_PATTERNS = [
+  /^[a-z]:\/program files(?: \(x86\))?(?:\/|$)/,
+  /^[a-z]:\/windows(?:\/|$)/,
+  /^\/applications(?:\/|$)/,
+  /^\/system(?:\/|$)/,
+  /^\/library(?:\/|$)/,
+];
+
+export const getVpxRootPathPermissionWarning = (
+  inputPath?: string,
+): string | null => {
+  const normalizedPath = normalizePathForComparison(inputPath);
+
+  if (!normalizedPath) {
+    return null;
+  }
+
+  const isRestrictedPath = RESTRICTED_VPX_ROOT_PATH_PATTERNS.some((pattern) =>
+    pattern.test(normalizedPath),
+  );
+
+  if (!isRestrictedPath) {
+    return null;
+  }
+
+  return 'This folder is commonly write-protected and may require administrator access for imports, updates, or file management. Prefer a user-writable location such as C:/Visual Pinball.';
+};
+
 export const normalizePath = (inputPath: string): string => {
   return path.normalize((inputPath || '').trim().replace(/\\/g, '/'));
 }

@@ -6,14 +6,19 @@ import Input from 'src/components/Input';
 import api from 'src/consts';
 import { useConfigContext } from 'src/providers/config';
 import { useToastContext } from 'src/providers/toast';
-import { getDefaultRomsDirectory, getDefaultTablesDirectory } from 'src/utils';
+import {
+  getDefaultRomsDirectory,
+  getDefaultTablesDirectory,
+  getVpxRootPathPermissionWarning,
+  normalizePathForComparison,
+} from 'src/utils';
 
 import LockedSetting from '../LockedSetting';
 import style from './FilePathsSection.module.scss';
 
 const FilePathsSection: FunctionComponent = () => {
   const { config, fetchConfig } = useConfigContext();
-  const { showErrorToast } = useToastContext();
+  const { showErrorToast, showWarningToast } = useToastContext();
 
   const [_vpxRootPath, setVpxRootPath] = useState('');
   const [_romsDirectory, setRomsDirectory] = useState('');
@@ -25,9 +30,20 @@ const FilePathsSection: FunctionComponent = () => {
 
   const defaultRomsDirectory = getDefaultRomsDirectory(vpxRootPath);
   const defaultTablesDirectory = getDefaultTablesDirectory(vpxRootPath);
+  const vpxRootPathWarning = getVpxRootPathPermissionWarning(vpxRootPath);
 
-  const handleUpdateVpxRootPath = async () => {
-    const { error } = await api.updateVpxRootPath(vpxRootPath);
+  const saveVpxRootPath = async (nextPath: string) => {
+    const trimmedPath = nextPath.trim();
+    const currentSavedPath = config?.vpxRootPath || '';
+
+    if (
+      normalizePathForComparison(trimmedPath) ===
+      normalizePathForComparison(currentSavedPath)
+    ) {
+      return;
+    }
+
+    const { error } = await api.updateVpxRootPath(trimmedPath);
 
     if (error) {
       showErrorToast(error.message || 'Failed to update VPX root path');
@@ -38,18 +54,14 @@ const FilePathsSection: FunctionComponent = () => {
     fetchConfig();
   };
 
+  const handleUpdateVpxRootPath = async () => {
+    await saveVpxRootPath(vpxRootPath);
+  };
+
   const handlePickVpxRootPath = async (directory: string) => {
     setVpxRootPath(directory);
 
-    const { error } = await api.updateVpxRootPath(directory);
-
-    if (error) {
-      showErrorToast(error.message || 'Failed to update VPX root path');
-
-      return;
-    }
-
-    fetchConfig();
+    await saveVpxRootPath(directory);
   };
 
   const handleSaveRomsDirectory = async (newValue: string) => {
@@ -102,6 +114,11 @@ const FilePathsSection: FunctionComponent = () => {
           )}>
           Primary directory containing <strong>VPinballX.exe.</strong>
         </div>
+        {vpxRootPathWarning && (
+          <div className={classNames('body-xs-regular', style.warningNote)}>
+            {vpxRootPathWarning}
+          </div>
+        )}
       </div>
       <div className={style.lockedSettingsWrapper}>
         <LockedSetting
