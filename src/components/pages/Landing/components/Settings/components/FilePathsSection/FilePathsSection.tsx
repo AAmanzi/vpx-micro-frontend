@@ -18,7 +18,7 @@ import style from './FilePathsSection.module.scss';
 
 const FilePathsSection: FunctionComponent = () => {
   const { config, fetchConfig } = useConfigContext();
-  const { showErrorToast, showWarningToast } = useToastContext();
+  const { showErrorToast } = useToastContext();
 
   const [_vpxRootPath, setVpxRootPath] = useState('');
   const [_romsDirectory, setRomsDirectory] = useState('');
