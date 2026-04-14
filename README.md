@@ -14,6 +14,22 @@ This guide explains how to use the app day-to-day to manage your Visual Pinball 
 - View recently played tables
 - Export a bundle of tables + ROMs
 
+## Install
+
+Download the latest Windows build from GitHub Releases:
+
+- [VPX Micro Frontend Releases](https://github.com/AAmanzi/vpx-micro-frontend/releases)
+
+### Smart App Control (Windows 11)
+
+Some systems have Smart App Control enabled, which can block unsigned apps completely.
+
+If the app does not start at all (no **Run anyway** option), you may need to disable Smart App Control:
+
+`Windows Security → App & browser control → Smart App Control → Off`
+
+After installation, open the app and continue with first-time setup below.
+
 ## First-time setup
 
 ![Settings file paths](public/readme/settings-file-paths.png)
@@ -89,6 +105,8 @@ If you already have an existing VPX setup, start with Scan Library first.
 
 ![Export tables modal](public/readme/export-tables-modal.png)
 
+![Export result](public/readme/export-result.png)
+
 ### Maintenance
 
 - **Clear Library Data** resets app metadata/list only.
@@ -102,6 +120,26 @@ If you are running this locally from source:
 yarn install
 yarn dev
 ```
+
+### Data mocking notes
+
+You can mock VPX by creating empty folders and pointing the app to them in **Settings → File Paths**.
+
+Use this structure:
+
+```text
+/mockVpxFolder
+  /Tables
+  /VPinMAME
+    /roms
+```
+
+Then set **VPX Root Directory** to `/mockVpxFolder`.
+
+The app will default the table and ROM paths to:
+
+- `/mockVpxFolder/Tables`
+- `/mockVpxFolder/VPinMAME/roms`
 
 ## Build Windows binaries (EXE)
 
