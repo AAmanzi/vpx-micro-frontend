@@ -1,4 +1,4 @@
-import { exec } from 'child_process';
+import { spawn } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
@@ -20,17 +20,30 @@ export const startVpxTable = async (
     throw new Error(`VPX executable not found: ${vpxExecutablePath}`);
   }
 
-  const command = `start "" "${tablePath}"`;
   const vpxDir = path.dirname(vpxExecutablePath);
+  const launchArgs = [
+    '-DisableTrueFullScreen',
+    '-primary',
+    '-LessCPUthreads',
+    '-minimized',
+    '-play',
+    tablePath,
+  ];
 
   await new Promise<void>((resolve, reject) => {
-    exec(command, { cwd: vpxDir }, (error) => {
-      if (error) {
-        reject(new Error(`Failed to start VPX: ${error.message}`));
+    const child = spawn(vpxExecutablePath, launchArgs, {
+      cwd: vpxDir,
+      detached: true,
+      stdio: 'ignore',
+      windowsHide: false,
+    });
 
-        return;
-      }
+    child.once('error', (error) => {
+      reject(new Error(`Failed to start VPX: ${error.message}`));
+    });
 
+    child.once('spawn', () => {
+      child.unref();
       resolve();
     });
   });
