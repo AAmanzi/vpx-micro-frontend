@@ -25,7 +25,7 @@ export const startVpxTable = async (
     '-DisableTrueFullScreen',
     '-primary',
     '-LessCPUthreads',
-    '-minimized',
+    '-ExtMinimized',
     '-play',
     tablePath,
   ];
