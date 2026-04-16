@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useEffect, useRef, useState } from 'react';
 
 import Button, {
   Size as ButtonSize,
@@ -36,8 +36,46 @@ const TableListItem: FunctionComponent<Props> = ({
   const [favorite, setFavorite] = useState(isFavorite);
   const [isStarting, setIsStarting] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isNameTruncated, setIsNameTruncated] = useState(false);
+  const titleRef = useRef<HTMLHeadingElement | null>(null);
   const { showErrorToast } = useToastContext();
   const { fetchTables } = useTablesContext();
+
+  useEffect(() => {
+    const updateTruncation = () => {
+      const element = titleRef.current;
+
+      if (!element) {
+        setIsNameTruncated(false);
+
+        return;
+      }
+
+      setIsNameTruncated(element.scrollWidth > element.clientWidth);
+    };
+
+    updateTruncation();
+
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', updateTruncation);
+
+      return () => {
+        window.removeEventListener('resize', updateTruncation);
+      };
+    }
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateTruncation();
+    });
+
+    if (titleRef.current) {
+      resizeObserver.observe(titleRef.current);
+    }
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [name]);
 
   const handlePlay = async () => {
     if (isStarting) {
@@ -106,14 +144,23 @@ const TableListItem: FunctionComponent<Props> = ({
       <div className={style.content}>
         <div className={style.header}>
           <div className={style.titleSection}>
-            <h3
-              className={classNames(
-                'primary-text-color',
-                'heading-6-bold',
-                style.title,
-              )}>
-              {name}
-            </h3>
+            <div className={style.titleWrapper}>
+              <h3
+                ref={titleRef}
+                className={classNames(
+                  'primary-text-color',
+                  'heading-6-bold',
+                  style.title,
+                )}>
+                {name}
+              </h3>
+              {isNameTruncated && (
+                <span
+                  className={classNames('body-xs-regular', style.titleTooltip)}>
+                  {name}
+                </span>
+              )}
+            </div>
             <p className='secondary-text-color body-xs-semibold'>{vpxFile}</p>
           </div>
         </div>
