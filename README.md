@@ -97,8 +97,9 @@ If you already have an existing VPX setup, start with Scan Library first.
 - **Play** button launches the table.
 - **Kebab menu** lets you:
   - Rename table
-  - Edit ROM
-  - Delete table
+  - Edit ROM — set the ROM file associated with this table
+  - VPX Executable — set a different VPX exe file per table (overrides the global one)
+  - Delete Table — removes the DB entry and deletes the table's files from VPX folders
 
 ## Settings reference
 
