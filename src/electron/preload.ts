@@ -69,6 +69,8 @@ const frontendApi: Api = {
     ),
   openPath: (path: string): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:openPath', path),
+  openExternalUrl: (url: string): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:openExternalUrl', url),
   getDirectoryTree: (
     directoryPath: string,
     acceptedExtensions: string[],

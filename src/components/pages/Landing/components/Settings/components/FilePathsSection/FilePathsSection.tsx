@@ -1,7 +1,8 @@
 import classNames from 'classnames';
-import { FunctionComponent, useState } from 'react';
+import { FunctionComponent, MouseEvent, useState } from 'react';
 
 import FolderPicker from 'src/components/FolderPicker';
+import Icon from 'src/components/Icon';
 import Input from 'src/components/Input';
 import api from 'src/consts';
 import { useConfigContext } from 'src/providers/config';
@@ -90,6 +91,16 @@ const FilePathsSection: FunctionComponent = () => {
     fetchConfig();
   };
 
+  const handleOpenVpxDownload = async () => {
+    const { error } = await api.openExternalUrl(
+      'https://github.com/vpinball/vpinball/releases',
+    );
+
+    if (error) {
+      showErrorToast(error.message || 'Failed to open browser');
+    }
+  };
+
   return (
     <>
       <div className={style.vpxDirectoryWrapper}>
@@ -110,9 +121,20 @@ const FilePathsSection: FunctionComponent = () => {
           className={classNames(
             'secondary-text-color',
             'body-xs-regular',
-            style.note,
+            style.noteRow,
           )}>
-          Primary directory containing <strong>VPinballX.exe.</strong>
+          <span className={style.note}>
+            Primary directory containing <strong>VPinballX.exe.</strong>
+          </span>
+          <button
+            className={style.vpxDownloadLink}
+            onClick={handleOpenVpxDownload}
+            type='button'>
+            <span className='body-xxs-semibold'>
+              Don't have VPX installed? Download it here
+            </span>
+            <Icon icon='external-link' width={12} height={12} />
+          </button>
         </div>
         {vpxRootPathWarning && (
           <div className={classNames('body-xs-regular', style.warningNote)}>

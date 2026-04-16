@@ -59,6 +59,7 @@ export interface Api {
     acceptFolders?: boolean,
   ) => Promise<ApiResult<Array<FileSystemItem>>>;
   openPath: (path: string) => Promise<ApiResult<null>>;
+  openExternalUrl: (url: string) => Promise<ApiResult<null>>;
   getDirectoryTree: (
     directoryPath: string,
     acceptedExtensions: string[],
