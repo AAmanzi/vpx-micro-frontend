@@ -77,7 +77,7 @@ const Modal: FunctionComponent<Props> = ({
     event.stopPropagation();
   };
 
-  const handleOutsideClick = () => {
+  const handleOutsideMouseDown = () => {
     if (onExitClick) {
       onExitClick();
     }
@@ -93,7 +93,7 @@ const Modal: FunctionComponent<Props> = ({
   }
 
   return createPortal(
-    <div className={style.outerWrapper} onClick={handleOutsideClick}>
+    <div className={style.outerWrapper} onMouseDown={handleOutsideMouseDown}>
       <div
         className={classNames(style.innerWrapper, {
           [style.allowOverflow]: allowOverflow,
@@ -105,13 +105,13 @@ const Modal: FunctionComponent<Props> = ({
             sizeClassName,
             colorClassName,
           )}
-          onClick={stopBubbling}>
+          onMouseDown={stopBubbling}>
           {hasHeader && (
             <div
               className={classNames(style.headerWrapper, headerClassName, {
                 [style.hasBorder]: hasBorder,
               })}>
-              <div className={style.titleAndDesctiptionWrapper}>
+              <div className={style.titleAndDesdescriptionWrapper}>
                 {title && (
                   <h2
                     className={classNames(
