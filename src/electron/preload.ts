@@ -69,6 +69,8 @@ const frontendApi: Api = {
     ),
   openPath: (path: string): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:openPath', path),
+  openExternalUrl: (url: string): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:openExternalUrl', url),
   getDirectoryTree: (
     directoryPath: string,
     acceptedExtensions: string[],
@@ -96,6 +98,8 @@ const frontendApi: Api = {
     invoke<ApiResult<null>>('api:updateRomsDirectoryPath', path),
   updateTablesDirectoryPath: (path: string): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:updateTablesDirectoryPath', path),
+  updateVpxExecutablePath: (path: string): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:updateVpxExecutablePath', path),
   updateDeleteFilesAfterImport: (
     deleteAfterImport: boolean,
   ): Promise<ApiResult<null>> =>

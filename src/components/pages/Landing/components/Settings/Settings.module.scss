@@ -1,18 +1,27 @@
-.wrapper {
-  margin-left: 32px;
-  margin-right: 32px;
-  padding-top: 68px;
+.header {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 32px;
+  padding-right: 32px;
+  border-bottom: thin solid transparent;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
 }
 
 .container {
-  max-width: 768px;
-  margin-left: auto;
-  margin-right: auto;
+  margin-top: 24px;
+  margin-left: 32px;
+  margin-right: 32px;
 }
 
-.header {
-  display: flex;
-  align-items: center;
+.titleWrapper {
   margin-bottom: 40px;
 }
 

@@ -184,6 +184,9 @@ app.whenReady().then(async () => {
       api.openFilePicker(acceptedExtensions, acceptFolders),
   );
   ipcMain.handle('api:openPath', async (_, path: string) => api.openPath(path));
+  ipcMain.handle('api:openExternalUrl', async (_, url: string) =>
+    api.openExternalUrl(url),
+  );
   ipcMain.handle(
     'api:getDirectoryTree',
     async (_, directoryPath: string, acceptedExtensions: string[]) =>
@@ -198,6 +201,9 @@ app.whenReady().then(async () => {
   );
   ipcMain.handle('api:updateTablesDirectoryPath', async (_, path: string) =>
     api.updateTablesDirectoryPath(path),
+  );
+  ipcMain.handle('api:updateVpxExecutablePath', async (_, path: string) =>
+    api.updateVpxExecutablePath(path),
   );
   ipcMain.handle(
     'api:updateDeleteFilesAfterImport',

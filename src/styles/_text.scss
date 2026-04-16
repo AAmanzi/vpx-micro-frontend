@@ -166,6 +166,18 @@
   @include body-xs-semibold-mixin;
 }
 
+@mixin body-xxs-semibold-mixin {
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  line-height: 14px;
+  letter-spacing: normal;
+}
+
+.body-xxs-semibold {
+  @include body-xxs-semibold-mixin;
+}
+
 @mixin body-xs-bold-mixin {
   font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: 700;

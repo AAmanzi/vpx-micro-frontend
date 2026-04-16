@@ -59,6 +59,7 @@ export interface Api {
     acceptFolders?: boolean,
   ) => Promise<ApiResult<Array<FileSystemItem>>>;
   openPath: (path: string) => Promise<ApiResult<null>>;
+  openExternalUrl: (url: string) => Promise<ApiResult<null>>;
   getDirectoryTree: (
     directoryPath: string,
     acceptedExtensions: string[],
@@ -72,6 +73,7 @@ export interface Api {
   updateVpxRootPath: (path: string) => Promise<ApiResult<null>>;
   updateRomsDirectoryPath: (path: string) => Promise<ApiResult<null>>;
   updateTablesDirectoryPath: (path: string) => Promise<ApiResult<null>>;
+  updateVpxExecutablePath: (path: string) => Promise<ApiResult<null>>;
   updateDeleteFilesAfterImport: (
     deleteAfterImport: boolean,
   ) => Promise<ApiResult<null>>;

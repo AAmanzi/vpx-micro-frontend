@@ -1,7 +1,8 @@
 import classNames from 'classnames';
-import { FunctionComponent, useState } from 'react';
+import { FunctionComponent, MouseEvent, useState } from 'react';
 
 import FolderPicker from 'src/components/FolderPicker';
+import Icon from 'src/components/Icon';
 import Input from 'src/components/Input';
 import api from 'src/consts';
 import { useConfigContext } from 'src/providers/config';
@@ -9,11 +10,12 @@ import { useToastContext } from 'src/providers/toast';
 import {
   getDefaultRomsDirectory,
   getDefaultTablesDirectory,
+  getDefaultVpxExecutablePath,
   getVpxRootPathPermissionWarning,
   normalizePathForComparison,
 } from 'src/utils';
 
-import LockedSetting from '../LockedSetting';
+import LockedSetting, { PickerType } from '../LockedSetting';
 import style from './FilePathsSection.module.scss';
 
 const FilePathsSection: FunctionComponent = () => {
@@ -23,13 +25,17 @@ const FilePathsSection: FunctionComponent = () => {
   const [_vpxRootPath, setVpxRootPath] = useState('');
   const [_romsDirectory, setRomsDirectory] = useState('');
   const [_tablesDirectory, setTablesDirectory] = useState('');
+  const [_vpxExecutablePath, setVpxExecutablePath] = useState('');
 
   const vpxRootPath = _vpxRootPath || config?.vpxRootPath || '';
   const romsDirectory = _romsDirectory || config?.romsDirectory || '';
   const tablesDirectory = _tablesDirectory || config?.tablesDirectory || '';
+  const vpxExecutablePath =
+    _vpxExecutablePath || config?.vpxExecutablePath || '';
 
   const defaultRomsDirectory = getDefaultRomsDirectory(vpxRootPath);
   const defaultTablesDirectory = getDefaultTablesDirectory(vpxRootPath);
+  const defaultVpxExecutablePath = getDefaultVpxExecutablePath(vpxRootPath);
   const vpxRootPathWarning = getVpxRootPathPermissionWarning(vpxRootPath);
 
   const saveVpxRootPath = async (nextPath: string) => {
@@ -90,6 +96,29 @@ const FilePathsSection: FunctionComponent = () => {
     fetchConfig();
   };
 
+  const handleSaveVpxExecutablePath = async (newValue: string) => {
+    setVpxExecutablePath(newValue);
+    const { error } = await api.updateVpxExecutablePath(newValue);
+
+    if (error) {
+      showErrorToast(error.message || 'Failed to update VPX executable path');
+
+      return;
+    }
+
+    fetchConfig();
+  };
+
+  const handleOpenVpxDownload = async () => {
+    const { error } = await api.openExternalUrl(
+      'https://github.com/vpinball/vpinball/releases',
+    );
+
+    if (error) {
+      showErrorToast(error.message || 'Failed to open browser');
+    }
+  };
+
   return (
     <>
       <div className={style.vpxDirectoryWrapper}>
@@ -110,9 +139,20 @@ const FilePathsSection: FunctionComponent = () => {
           className={classNames(
             'secondary-text-color',
             'body-xs-regular',
-            style.note,
+            style.noteRow,
           )}>
-          Primary directory containing <strong>VPinballX.exe.</strong>
+          <span className={style.note}>
+            Primary directory containing <strong>VPinballX.exe.</strong>
+          </span>
+          <button
+            className={style.vpxDownloadLink}
+            onClick={handleOpenVpxDownload}
+            type='button'>
+            <span className='body-xxs-semibold'>
+              Don't have VPX installed? Download it here
+            </span>
+            <Icon icon='external-link' width={12} height={12} />
+          </button>
         </div>
         {vpxRootPathWarning && (
           <div className={classNames('body-xs-regular', style.warningNote)}>
@@ -136,6 +176,16 @@ const FilePathsSection: FunctionComponent = () => {
           onSave={handleSaveTablesDirectory}
           lockedNote='Auto-syncing with Root'
           lockedNoteIcon='reload'
+        />
+        <LockedSetting
+          label='VPX Executable'
+          value={vpxExecutablePath}
+          defaultValue={defaultVpxExecutablePath}
+          onSave={handleSaveVpxExecutablePath}
+          lockedNote='Auto-syncing with Root'
+          lockedNoteIcon='reload'
+          pickerType={PickerType.file}
+          acceptedExtensions={['.exe']}
         />
       </div>
     </>

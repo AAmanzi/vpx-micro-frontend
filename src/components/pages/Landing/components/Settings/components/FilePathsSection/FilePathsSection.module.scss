@@ -1,13 +1,34 @@
 .vpxDirectoryWrapper {
   margin-bottom: 32px;
 
-  & .note {
+  & .noteRow {
     margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  & .note {
+    flex: 1;
   }
 
   & .warningNote {
     margin-top: 8px;
     color: var(--yellow);
+  }
+
+  & .vpxDownloadLink {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--gray-500);
+    transition: color 200ms ease-out;
+
+    &:hover {
+      color: var(--blue);
+    }
   }
 }
 

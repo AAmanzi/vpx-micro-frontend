@@ -1,24 +1,16 @@
 import classNames from 'classnames';
 import { FunctionComponent, useEffect, useState } from 'react';
 
+import FilePicker, { Size as FilePickerSize } from 'src/components/FilePicker';
 import FolderPicker, {
   Size as FolderPickerSize,
 } from 'src/components/FolderPicker';
 import Icon from 'src/components/Icon';
-import { Icon as IconType } from 'src/components/Icon/types';
 import Input from 'src/components/Input';
 import { useToastContext } from 'src/providers/toast';
 
 import style from './LockedSetting.module.scss';
-
-interface Props {
-  label: string;
-  value: string;
-  defaultValue: string;
-  onSave: (value: string) => void;
-  lockedNote?: string;
-  lockedNoteIcon?: IconType;
-}
+import { PickerType, Props } from './types';
 
 const LockedSetting: FunctionComponent<Props> = ({
   label,
@@ -27,6 +19,8 @@ const LockedSetting: FunctionComponent<Props> = ({
   onSave,
   lockedNote,
   lockedNoteIcon,
+  pickerType = PickerType.folder,
+  acceptedExtensions = [],
 }) => {
   const { showErrorToast } = useToastContext();
 
@@ -71,7 +65,16 @@ const LockedSetting: FunctionComponent<Props> = ({
           {label}
         </span>
         <div className={style.headerActions}>
-          {!isLocked && (
+          {!isLocked && pickerType === PickerType.file && (
+            <FilePicker
+              onSelect={onSave}
+              onError={showErrorToast}
+              acceptedExtensions={acceptedExtensions}
+              label='Browse'
+              size={FilePickerSize.small}
+            />
+          )}
+          {!isLocked && pickerType === PickerType.folder && (
             <FolderPicker
               onSelect={onSave}
               onError={showErrorToast}

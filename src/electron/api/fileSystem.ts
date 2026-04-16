@@ -200,6 +200,20 @@ export async function openPath(filePath: string): Promise<ApiResult<null>> {
   }
 }
 
+export async function openExternalUrl(url: string): Promise<ApiResult<null>> {
+  try {
+    if (!url) {
+      return apiFailure(new Error('URL is required'));
+    }
+
+    await shell.openExternal(url);
+
+    return apiSuccess(null);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}
+
 export async function getDirectoryTree(
   directoryPath: string,
   acceptedExtensions: string[],

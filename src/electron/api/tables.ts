@@ -409,7 +409,7 @@ export function importTables(
 
 export async function startTable(tableId: string): Promise<ApiResult<null>> {
   try {
-    const vpxRootPath = configDb.getVpxRootPath();
+    const configVpxExecutablePath = configDb.getVpxExecutablePath();
     const table = tablesDb.get(tableId);
 
     if (!table) {
@@ -424,7 +424,7 @@ export async function startTable(tableId: string): Promise<ApiResult<null>> {
 
     await startVpxTable(
       table.vpxFilePath,
-      table.vpxExecutablePath || getDefaultVpxExecutablePath(vpxRootPath),
+      table.vpxExecutablePath || configVpxExecutablePath,
     );
 
     tablesDb.update(tableId, {
