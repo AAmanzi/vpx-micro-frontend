@@ -73,6 +73,7 @@ export interface Api {
   updateVpxRootPath: (path: string) => Promise<ApiResult<null>>;
   updateRomsDirectoryPath: (path: string) => Promise<ApiResult<null>>;
   updateTablesDirectoryPath: (path: string) => Promise<ApiResult<null>>;
+  updateVpxExecutablePath: (path: string) => Promise<ApiResult<null>>;
   updateDeleteFilesAfterImport: (
     deleteAfterImport: boolean,
   ) => Promise<ApiResult<null>>;

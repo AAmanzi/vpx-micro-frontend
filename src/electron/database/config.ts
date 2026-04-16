@@ -2,7 +2,11 @@ import Store from 'electron-store';
 
 import { VPX_DEFAULT_ROOT_PATH } from 'src/consts/vpx';
 import { Config, Order, ViewType } from 'src/types/config';
-import { getDefaultRomsDirectory, getDefaultTablesDirectory } from 'src/utils';
+import {
+  getDefaultRomsDirectory,
+  getDefaultTablesDirectory,
+  getDefaultVpxExecutablePath,
+} from 'src/utils';
 
 import { resolveUserPath } from '../utils/path';
 
@@ -15,6 +19,7 @@ const defaultConfig: Config = {
   deleteFilesAfterImport: false,
   romsDirectory: '',
   tablesDirectory: '',
+  vpxExecutablePath: '',
   keepFavoritesOnTop: false,
   order: Order.dateAddedDesc,
   viewType: ViewType.grid,
@@ -56,16 +61,27 @@ export function getTablesDirectoryPath(): string {
   return resolveUserPath(getDefaultTablesDirectory(config.vpxRootPath));
 }
 
-export function getVpxRootPath(): string {
+export function getVpxExecutablePath(): string {
   const config = getStoredConfig();
 
-  return resolveUserPath(config.vpxRootPath);
+  if (config.vpxExecutablePath) {
+    return resolveUserPath(config.vpxExecutablePath);
+  }
+
+  return resolveUserPath(getDefaultVpxExecutablePath(config.vpxRootPath));
 }
 
 export function updateVpxRootPath(path: string): void {
   store.set('config', {
     ...getStoredConfig(),
     vpxRootPath: path,
+  });
+}
+
+export function updateVpxExecutablePath(path: string): void {
+  store.set('config', {
+    ...getStoredConfig(),
+    vpxExecutablePath: path,
   });
 }
 

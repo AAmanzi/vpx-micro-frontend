@@ -3,6 +3,7 @@ export interface Config {
   deleteFilesAfterImport: boolean;
   romsDirectory?: string;
   tablesDirectory?: string;
+  vpxExecutablePath?: string;
   keepFavoritesOnTop: boolean;
   order: Order;
   viewType: ViewType;

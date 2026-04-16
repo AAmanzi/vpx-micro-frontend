@@ -22,6 +22,15 @@ export function updateVpxRootPath(path: string): ApiResult<null> {
   }
 }
 
+export function updateVpxExecutablePath(path: string): ApiResult<null> {
+  try {
+    configDb.updateVpxExecutablePath(path);
+    return apiSuccess(null);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}
+
 export function updateRomsDirectoryPath(path: string): ApiResult<null> {
   try {
     configDb.updateRomsDirectoryPath(path);

@@ -10,11 +10,12 @@ import { useToastContext } from 'src/providers/toast';
 import {
   getDefaultRomsDirectory,
   getDefaultTablesDirectory,
+  getDefaultVpxExecutablePath,
   getVpxRootPathPermissionWarning,
   normalizePathForComparison,
 } from 'src/utils';
 
-import LockedSetting from '../LockedSetting';
+import LockedSetting, { PickerType } from '../LockedSetting';
 import style from './FilePathsSection.module.scss';
 
 const FilePathsSection: FunctionComponent = () => {
@@ -24,13 +25,17 @@ const FilePathsSection: FunctionComponent = () => {
   const [_vpxRootPath, setVpxRootPath] = useState('');
   const [_romsDirectory, setRomsDirectory] = useState('');
   const [_tablesDirectory, setTablesDirectory] = useState('');
+  const [_vpxExecutablePath, setVpxExecutablePath] = useState('');
 
   const vpxRootPath = _vpxRootPath || config?.vpxRootPath || '';
   const romsDirectory = _romsDirectory || config?.romsDirectory || '';
   const tablesDirectory = _tablesDirectory || config?.tablesDirectory || '';
+  const vpxExecutablePath =
+    _vpxExecutablePath || config?.vpxExecutablePath || '';
 
   const defaultRomsDirectory = getDefaultRomsDirectory(vpxRootPath);
   const defaultTablesDirectory = getDefaultTablesDirectory(vpxRootPath);
+  const defaultVpxExecutablePath = getDefaultVpxExecutablePath(vpxRootPath);
   const vpxRootPathWarning = getVpxRootPathPermissionWarning(vpxRootPath);
 
   const saveVpxRootPath = async (nextPath: string) => {
@@ -84,6 +89,19 @@ const FilePathsSection: FunctionComponent = () => {
 
     if (error) {
       showErrorToast(error.message || 'Failed to update tables directory');
+
+      return;
+    }
+
+    fetchConfig();
+  };
+
+  const handleSaveVpxExecutablePath = async (newValue: string) => {
+    setVpxExecutablePath(newValue);
+    const { error } = await api.updateVpxExecutablePath(newValue);
+
+    if (error) {
+      showErrorToast(error.message || 'Failed to update VPX executable path');
 
       return;
     }
@@ -158,6 +176,16 @@ const FilePathsSection: FunctionComponent = () => {
           onSave={handleSaveTablesDirectory}
           lockedNote='Auto-syncing with Root'
           lockedNoteIcon='reload'
+        />
+        <LockedSetting
+          label='VPX Executable'
+          value={vpxExecutablePath}
+          defaultValue={defaultVpxExecutablePath}
+          onSave={handleSaveVpxExecutablePath}
+          lockedNote='Auto-syncing with Root'
+          lockedNoteIcon='reload'
+          pickerType={PickerType.file}
+          acceptedExtensions={['.exe']}
         />
       </div>
     </>

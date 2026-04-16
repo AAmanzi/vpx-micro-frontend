@@ -98,6 +98,8 @@ const frontendApi: Api = {
     invoke<ApiResult<null>>('api:updateRomsDirectoryPath', path),
   updateTablesDirectoryPath: (path: string): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:updateTablesDirectoryPath', path),
+  updateVpxExecutablePath: (path: string): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:updateVpxExecutablePath', path),
   updateDeleteFilesAfterImport: (
     deleteAfterImport: boolean,
   ): Promise<ApiResult<null>> =>

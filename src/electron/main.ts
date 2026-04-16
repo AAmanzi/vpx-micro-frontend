@@ -202,6 +202,9 @@ app.whenReady().then(async () => {
   ipcMain.handle('api:updateTablesDirectoryPath', async (_, path: string) =>
     api.updateTablesDirectoryPath(path),
   );
+  ipcMain.handle('api:updateVpxExecutablePath', async (_, path: string) =>
+    api.updateVpxExecutablePath(path),
+  );
   ipcMain.handle(
     'api:updateDeleteFilesAfterImport',
     async (_, deleteAfterImport: boolean) =>
