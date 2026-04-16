@@ -11,6 +11,7 @@ import Input from 'src/components/Input';
 import Modal, { Size as ModalSize } from 'src/components/Modal';
 import api from 'src/consts';
 import { VPX_DEFAULT_EXECUTABLE } from 'src/consts/vpx';
+import { useConfigContext } from 'src/providers/config';
 import { useToastContext } from 'src/providers/toast';
 
 import style from './EditTableExecutableModal.module.scss';
@@ -26,15 +27,23 @@ const EditTableExecutableModal: FunctionComponent<Props> = ({
   currentExecutablePath,
   close,
 }) => {
+  const { config } = useConfigContext();
   const { showErrorToast, showSuccessToast } = useToastContext();
   const [executablePath, setExecutablePath] = useState(
     currentExecutablePath || '',
   );
   const [isSaving, setIsSaving] = useState(false);
 
+  const getExecutableName = (pathValue: string): string =>
+    pathValue.split(/[/\\]/).pop() || pathValue;
+
   const getCurrentExecutable = () => {
     if (currentExecutablePath) {
-      return currentExecutablePath.split(/[/\\]/).pop() || currentExecutablePath;
+      return getExecutableName(currentExecutablePath);
+    }
+
+    if (config?.vpxExecutablePath) {
+      return getExecutableName(config.vpxExecutablePath);
     }
 
     return VPX_DEFAULT_EXECUTABLE;
