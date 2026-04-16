@@ -108,6 +108,8 @@ If you already have an existing VPX setup, start with Scan Library first.
 - VPX root path
 - ROMs directory
 - Tables directory
+- VPX executable path (global/default launcher)
+- Direct link to VPX Releases (onboarding helper)
 
 ### Data Management
 
@@ -124,6 +126,11 @@ If you already have an existing VPX setup, start with Scan Library first.
 
 - **Clear Library Data** resets app metadata/list only.
 - It does **not** delete your actual VPX/ROM files.
+
+### VPX utilities
+
+- **Open VPX Folder** opens the configured VPX root folder for quick manual checks/cleanup.
+- **Run VPX** launches VPX without loading a table.
 
 ## Minimal run notes (dev)
 
