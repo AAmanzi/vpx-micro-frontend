@@ -2,7 +2,9 @@ import classNames from 'classnames';
 import { FunctionComponent, useRef, useState } from 'react';
 
 import Icon from 'src/components/Icon';
+import api from 'src/consts';
 import { useTablesContext } from 'src/providers/tables';
+import { useToastContext } from 'src/providers/toast';
 import useClickOutside from 'src/utils/useClickOutside';
 
 import style from './Settings.module.scss';
@@ -17,6 +19,7 @@ interface Props {
   romFile?: string;
   romFilePath?: string;
   vpxExecutablePath?: string;
+  isArchived?: boolean;
   vpxFile: string;
   vpxFilePath: string;
   close: () => void;
@@ -28,6 +31,7 @@ const Settings: FunctionComponent<Props> = ({
   romFile,
   romFilePath,
   vpxExecutablePath,
+  isArchived,
   vpxFile,
   vpxFilePath,
   close,
@@ -36,6 +40,7 @@ const Settings: FunctionComponent<Props> = ({
   useClickOutside(ref, close, { ignoreSelector: '#modal' });
 
   const { fetchTables } = useTablesContext();
+  const { showErrorToast } = useToastContext();
 
   const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
   const [isEditTableRomModalOpen, setIsEditTableRomModalOpen] = useState(false);
@@ -63,6 +68,19 @@ const Settings: FunctionComponent<Props> = ({
 
   const closeEditExecutableModal = () => {
     setIsEditExecutableModalOpen(false);
+    fetchTables();
+    close();
+  };
+
+  const handleToggleArchive = async () => {
+    const { error } = await api.setTableArchived(id, !isArchived);
+
+    if (error) {
+      showErrorToast(error.message || 'Failed to update table archive state');
+
+      return;
+    }
+
     fetchTables();
     close();
   };
@@ -107,6 +125,14 @@ const Settings: FunctionComponent<Props> = ({
         </div>
         <span className={classNames('body-sm-semibold', style.label)}>
           Delete table
+        </span>
+      </button>
+      <button onClick={handleToggleArchive} className={style.button}>
+        <div className={style.iconWrapper}>
+          <Icon icon='archive' className={style.icon} />
+        </div>
+        <span className={classNames('body-sm-semibold', style.label)}>
+          {isArchived ? 'Unarchive table' : 'Archive table'}
         </span>
       </button>
       {isRenameModalOpen && (

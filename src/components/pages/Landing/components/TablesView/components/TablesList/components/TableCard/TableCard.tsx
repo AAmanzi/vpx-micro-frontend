@@ -24,6 +24,7 @@ type Props = Table;
 const TableCard: FunctionComponent<Props> = ({
   id,
   isFavorite,
+  isArchived,
   name,
   romFile,
   romFilePath,
@@ -139,6 +140,7 @@ const TableCard: FunctionComponent<Props> = ({
                 <Settings
                   id={id}
                   name={name}
+                  isArchived={isArchived}
                   vpxFilePath={vpxFilePath}
                   vpxExecutablePath={vpxExecutablePath}
                   vpxFile={vpxFile}

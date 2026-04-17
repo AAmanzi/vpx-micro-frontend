@@ -10,6 +10,7 @@ export interface Table {
   romFilePath?: string;
 
   isFavorite: boolean;
+  isArchived?: boolean;
   lastPlayedTimestamp?: number;
   dateAddedTimestamp: number;
 

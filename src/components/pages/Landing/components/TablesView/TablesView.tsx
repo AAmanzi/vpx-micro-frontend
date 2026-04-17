@@ -171,6 +171,13 @@ const TablesView: FunctionComponent<Props> = ({
           description:
             'Play a table and it will appear here for quick access next time.',
         };
+      case 'archive':
+        return {
+          icon: 'archive' as const,
+          title: 'No archived tables',
+          description:
+            'Archive tables from table settings to keep your active library clean.',
+        };
       default:
         return null;
     }

@@ -24,6 +24,7 @@ type Props = Table;
 const TableListItem: FunctionComponent<Props> = ({
   id,
   isFavorite,
+  isArchived,
   name,
   romFile,
   romFilePath,
@@ -217,6 +218,7 @@ const TableListItem: FunctionComponent<Props> = ({
             <Settings
               id={id}
               name={name}
+              isArchived={isArchived}
               vpxFilePath={vpxFilePath}
               vpxExecutablePath={vpxExecutablePath}
               vpxFile={vpxFile}

@@ -5,7 +5,6 @@ import { v4 as uuidv4 } from 'uuid';
 import type { ApiResult } from 'src/types/api';
 import type { FileSystemItem, TableFile } from 'src/types/file';
 import type { ScanResult, Table } from 'src/types/table';
-import { getDefaultVpxExecutablePath } from 'src/utils';
 
 import * as configDb from '../database/config';
 import * as tablesDb from '../database/tables';
@@ -43,6 +42,29 @@ export function getAllTables(): ApiResult<Table[]> {
 export function setTableFavorite(id: string, fav: boolean): ApiResult<null> {
   try {
     const table = tablesDb.setFavorite(id, fav);
+
+    if (!table) {
+      return {
+        success: false,
+        error: {
+          code: 'TABLE_NOT_FOUND',
+          message: `Table not found: ${id}`,
+        },
+      };
+    }
+
+    return apiSuccess(null);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}
+
+export function setTableArchived(
+  id: string,
+  archived: boolean,
+): ApiResult<null> {
+  try {
+    const table = tablesDb.setArchived(id, archived);
 
     if (!table) {
       return {
@@ -341,6 +363,7 @@ export function importTables(
           vpxFile: tableFile.fileName,
           romFile: tableFile.rom?.name,
           isFavorite: false,
+          isArchived: false,
           vpxFilePath: vpxDestinationFilePath,
           romFilePath: romDestinationFilePath,
           dateAddedTimestamp: Date.now(),

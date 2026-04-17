@@ -166,6 +166,11 @@ app.whenReady().then(async () => {
   ipcMain.handle('api:setTableFavorite', async (_, id: string, fav: boolean) =>
     api.setTableFavorite(id, fav),
   );
+  ipcMain.handle(
+    'api:setTableArchived',
+    async (_, id: string, archived: boolean) =>
+      api.setTableArchived(id, archived),
+  );
   ipcMain.handle('api:renameTable', async (_, id: string, newName: string) =>
     api.renameTable(id, newName),
   );

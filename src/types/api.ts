@@ -30,6 +30,7 @@ export interface Api {
   // Tables
   getAllTables: () => Promise<ApiResult<Array<Table>>>;
   setTableFavorite: (id: string, fav: boolean) => Promise<ApiResult<null>>;
+  setTableArchived: (id: string, archived: boolean) => Promise<ApiResult<null>>;
   deleteTable: (id: string) => Promise<ApiResult<null>>;
   renameTable: (id: string, newName: string) => Promise<ApiResult<null>>;
   getUnmatchedRoms: () => Promise<ApiResult<Array<FileSystemItem>>>;

@@ -1,4 +1,4 @@
-import { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useEffect, useState } from 'react';
 
 import { useTablesContext } from 'src/providers/tables';
 import { Order } from 'src/types/config';
@@ -16,11 +16,20 @@ interface Props {}
 const Landing: FunctionComponent<Props> = () => {
   const [view, setView] = useState<View>(View.allTables);
 
-  const { tables } = useTablesContext();
+  const { tables: allTables } = useTablesContext();
 
   const handleChangeView = (value: View) => {
     setView(value);
   };
+
+  const tables = allTables.filter((table) => !table.isArchived);
+  const archivedTables = allTables.filter((table) => table.isArchived);
+
+  useEffect(() => {
+    if (view === View.archive && archivedTables.length === 0) {
+      setView(View.allTables);
+    }
+  }, [view, archivedTables.length]);
 
   const getView = () => {
     switch (view) {
@@ -45,7 +54,7 @@ const Landing: FunctionComponent<Props> = () => {
           />
         );
       case View.recentlyPlayed:
-        const sortedTables = tables.sort((a, b) => {
+        const sortedTables = [...tables].sort((a, b) => {
           return (
             new Date(b.lastPlayedTimestamp || 0).getTime() -
             new Date(a.lastPlayedTimestamp || 0).getTime()
@@ -66,6 +75,17 @@ const Landing: FunctionComponent<Props> = () => {
             isOrderPickerDisabled
           />
         );
+      case View.archive:
+        return (
+          <TablesView
+            animationKey={view}
+            tables={archivedTables}
+            librarySize={archivedTables.length}
+            title='Archive'
+            description='Archived tables are hidden from your main library views'
+            emptyStateVariant='archive'
+          />
+        );
       case View.settings:
         return <Settings />;
     }
@@ -78,6 +98,7 @@ const Landing: FunctionComponent<Props> = () => {
           view={view}
           setView={handleChangeView}
           librarySize={tables.length}
+          archivedTablesCount={archivedTables.length}
         />
       </div>
       <div className={style.content}>{getView()}</div>

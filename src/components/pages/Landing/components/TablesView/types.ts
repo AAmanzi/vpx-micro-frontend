@@ -7,7 +7,7 @@ export interface Props {
   tables: Array<Table>;
   librarySize: number;
   defaultOrder?: Order;
-  emptyStateVariant?: 'favorites' | 'recentlyPlayed';
+  emptyStateVariant?: 'favorites' | 'recentlyPlayed' | 'archive';
   isOrderPickerDisabled?: boolean;
   animationKey: string;
 }

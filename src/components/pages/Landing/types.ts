@@ -3,4 +3,5 @@ export enum View {
   favorites = 'favorites',
   settings = 'settings',
   recentlyPlayed = 'recentlyPlayed',
+  archive = 'archive',
 }

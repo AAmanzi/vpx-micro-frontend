@@ -13,6 +13,11 @@ const frontendApi: Api = {
     invoke<ApiResult<Table[]>>('api:getAllTables'),
   setTableFavorite: (id: string, fav: boolean): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:setTableFavorite', id, fav),
+  setTableArchived: (
+    id: string,
+    archived: boolean,
+  ): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:setTableArchived', id, archived),
   deleteTable: (id: string): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:deleteTable', id),
   renameTable: (id: string, newName: string): Promise<ApiResult<null>> =>
