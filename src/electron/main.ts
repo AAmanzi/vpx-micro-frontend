@@ -1,5 +1,5 @@
 import { spawn } from 'child_process';
-import { BrowserWindow, app, ipcMain } from 'electron';
+import { BrowserWindow, Menu, app, ipcMain } from 'electron';
 import fs from 'fs';
 import http from 'http';
 import path from 'path';
@@ -97,6 +97,8 @@ function waitForServer(port: number, timeout = 30000, interval = 300) {
 }
 
 const createWindow = () => {
+  const isProduction = app.isPackaged;
+
   const win = new BrowserWindow({
     width: 900,
     height: 600,
@@ -105,10 +107,17 @@ const createWindow = () => {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
+      devTools: !isProduction,
     },
   });
 
-  if (app.isPackaged) {
+  if (isProduction) {
+    win.webContents.on('devtools-opened', () => {
+      win.webContents.closeDevTools();
+    });
+  }
+
+  if (isProduction) {
     const indexPath = getProductionIndexPath();
     win.loadFile(indexPath);
     return;
@@ -121,6 +130,10 @@ const createWindow = () => {
 app.whenReady().then(async () => {
   if (process.platform === 'win32') {
     app.setAppUserModelId('com.vpx.microfrontend');
+  }
+
+  if (app.isPackaged) {
+    Menu.setApplicationMenu(null);
   }
 
   if (!app.isPackaged) {
