@@ -11,19 +11,20 @@
 
 .visible {
   display: flex;
+  background-color: rgba(var(--dark-rgb), 0.5);
 }
 
 .dropZone {
   border: thin dashed var(--primary);
   border-radius: 12px;
-  padding: 24px;
+  padding: 64px 24px;
   width: min(640px, 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 1rem;
-  background-color: rgba(var(--gray-rgb), 0.9);
+  background-color: rgba(var(--gray-800-rgb), 0.9);
 }
 
 .label {
