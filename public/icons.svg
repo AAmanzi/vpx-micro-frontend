@@ -152,6 +152,13 @@
   <symbol id="icon-list" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
     <path d="M3 12h.01M3 18h.01M3 6h.01M8 12h13M8 18h13M8 6h13"/>
   </symbol>
+  <symbol id="icon-shuffle" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+    <path d="m18 14 4 4-4 4"/>
+    <path d="m18 2 4 4-4 4"/>
+    <path d="M2 18h1.973a4 4 0 0 0 3.3-1.7l5.454-8.6a4 4 0 0 1 3.3-1.7H22"/>
+    <path d="M2 6h1.972a4 4 0 0 1 3.6 2.2"/>
+    <path d="M22 18h-6.041a4 4 0 0 1-3.3-1.8l-.359-.45"/>
+  </symbol>
   <symbol id="icon-external-link" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
     <path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
   </symbol>

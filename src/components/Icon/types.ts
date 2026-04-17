@@ -32,6 +32,7 @@ export type Icon =
   | 'shield-checkmark'
   | 'clock-recent'
   | 'list'
+  | 'shuffle'
   | 'external-link';
 
 export interface Props {

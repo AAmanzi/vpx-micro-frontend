@@ -66,3 +66,9 @@
   margin-bottom: 24px;
   max-width: 384px;
 }
+
+@media (max-width: 800px) {
+  .randomTableButtonWrapper {
+    width: auto;
+  }
+}

@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useEffect, useState } from 'react';
 
 import Button, {
   Size as ButtonSize,
@@ -23,6 +23,8 @@ import TablesHeader from './components/TablesHeader';
 import TablesList from './components/TablesList';
 import { Props } from './types';
 
+const MOBILE_TABLE_ACTIONS_BREAKPOINT_PX = 800;
+
 const TablesView: FunctionComponent<Props> = ({
   tables,
   librarySize,
@@ -41,9 +43,31 @@ const TablesView: FunctionComponent<Props> = ({
   const [isRandomTableStarting, setIsRandomTableStarting] = useState(false);
   const [isScanLibraryModalOpen, setIsScanLibraryModalOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const [isCompactTableActions, setIsCompactTableActions] = useState(false);
   const [droppedFilesForImport, setDroppedFilesForImport] = useState<
     Array<FileSystemItem>
   >([]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const mediaQuery = window.matchMedia(
+      `(max-width: ${MOBILE_TABLE_ACTIONS_BREAKPOINT_PX}px)`,
+    );
+
+    const updateCompactTableActions = () => {
+      setIsCompactTableActions(mediaQuery.matches);
+    };
+
+    updateCompactTableActions();
+    mediaQuery.addEventListener('change', updateCompactTableActions);
+
+    return () => {
+      mediaQuery.removeEventListener('change', updateCompactTableActions);
+    };
+  }, []);
 
   const favoritesOnTop = config?.keepFavoritesOnTop ?? true;
   const order = defaultOrder ?? config?.order ?? Order.dateAddedDesc;
@@ -234,13 +258,14 @@ const TablesView: FunctionComponent<Props> = ({
             {orderedTables.length > 0 && (
               <div className={style.randomTableButtonWrapper}>
                 <Button
-                  icon='play'
-                  label='Random table'
+                  icon={isCompactTableActions ? 'shuffle' : 'play'}
+                  label={isCompactTableActions ? undefined : 'Random table'}
                   type={ButtonType.successTransparent}
                   size={ButtonSize.medium}
                   onClick={handlePlayRandomTable}
                   loading={isRandomTableStarting}
-                  fill
+                  fill={!isCompactTableActions}
+                  circle={isCompactTableActions}
                 />
               </div>
             )}
