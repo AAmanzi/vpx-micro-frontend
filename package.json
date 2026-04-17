@@ -1,6 +1,6 @@
 {
   "name": "vpx-micro-frontend",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Desktop app for managing Visual Pinball X tables and ROMs.",
   "main": "main.js",
   "repository": "git@github.com:AAmanzi/visual-pinball-micro-frontend.git",
