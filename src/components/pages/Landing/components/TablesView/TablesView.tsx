@@ -5,6 +5,7 @@ import Button, {
   Size as ButtonSize,
   Type as ButtonType,
 } from 'src/components/Button';
+import FadeInAnimation from 'src/components/FadeInAnimation';
 import FileUploadOverlay from 'src/components/FileUploadOverlay';
 import Icon from 'src/components/Icon';
 import ImportTablesModal from 'src/components/ImportTablesModal';
@@ -17,7 +18,6 @@ import { Order, ViewType } from 'src/types/config';
 import { FileSystemItem } from 'src/types/file';
 import type { Table } from 'src/types/table';
 
-import FadeInAnimation from '../FadeInAnimation';
 import style from './TablesView.module.scss';
 import OrderPicker from './components/OrderPicker';
 import TablesList from './components/TablesList';
@@ -32,6 +32,7 @@ const TablesView: FunctionComponent<Props> = ({
   defaultOrder,
   emptyStateVariant,
   isOrderPickerDisabled = false,
+  animationKey,
 }) => {
   const { fetchTables } = useTablesContext();
   const { config, fetchConfig } = useConfigContext();
@@ -202,33 +203,33 @@ const TablesView: FunctionComponent<Props> = ({
           />
         </div>
       </div>
-      <FadeInAnimation animationKey={viewType}>
-        <div className={style.container}>
-          <div className={style.titleRow}>
-            <div>
-              <h1 className='primary-text-color heading-6-bold'>{title}</h1>
-              {displayedDescription && (
-                <p className='secondary-text-color body-sm-regular'>
-                  {displayedDescription}
-                </p>
-              )}
-            </div>
-            <div className={style.scanButtonWrapper}>
-              <Button
-                icon='scan-search'
-                label='Scan Library'
-                type={
-                  isLibraryEmpty
-                    ? ButtonType.primaryAlt
-                    : ButtonType.primaryAltTransparent
-                }
-                size={ButtonSize.medium}
-                onClick={() => setIsScanLibraryModalOpen(true)}
-                fill
-              />
-            </div>
+      <div className={style.container}>
+        <div className={style.titleRow}>
+          <div>
+            <h1 className='primary-text-color heading-6-bold'>{title}</h1>
+            {displayedDescription && (
+              <p className='secondary-text-color body-sm-regular'>
+                {displayedDescription}
+              </p>
+            )}
           </div>
+          <div className={style.scanButtonWrapper}>
+            <Button
+              icon='scan-search'
+              label='Scan Library'
+              type={
+                isLibraryEmpty
+                  ? ButtonType.primaryAlt
+                  : ButtonType.primaryAltTransparent
+              }
+              size={ButtonSize.medium}
+              onClick={() => setIsScanLibraryModalOpen(true)}
+              fill
+            />
+          </div>
+        </div>
 
+        <FadeInAnimation animationKey={`${animationKey}-${viewType}`}>
           <div className={style.tablesWrapper}>
             {hasResults && (
               <TablesList tables={orderedTables} viewType={viewType} />
@@ -332,8 +333,8 @@ const TablesView: FunctionComponent<Props> = ({
               </div>
             )}
           </div>
-        </div>
-      </FadeInAnimation>
+        </FadeInAnimation>
+      </div>
       {isImportModalOpen && (
         <ImportTablesModal
           onClose={handleCloseImportModal}
