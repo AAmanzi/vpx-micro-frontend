@@ -147,22 +147,22 @@ const TablesList: FunctionComponent<Props> = ({ tables, viewType }) => {
       {tables.map((table) => {
         if (viewType === ViewType.list) {
           return (
-            <div key={table.id} data-table-id={table.id}>
-              <TableListItem
-                {...table}
-                isSelected={isTableSelectActive && selectedTableId === table.id}
-              />
-            </div>
+            <TableListItem
+              key={table.id}
+              {...table}
+              dataTableId={table.id}
+              isSelected={isTableSelectActive && selectedTableId === table.id}
+            />
           );
         }
 
         return (
-          <div key={table.id} data-table-id={table.id}>
-            <TableCard
-              {...table}
-              isSelected={isTableSelectActive && selectedTableId === table.id}
-            />
-          </div>
+          <TableCard
+            key={table.id}
+            {...table}
+            dataTableId={table.id}
+            isSelected={isTableSelectActive && selectedTableId === table.id}
+          />
         );
       })}
     </div>

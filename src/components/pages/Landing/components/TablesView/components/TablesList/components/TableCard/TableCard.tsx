@@ -22,6 +22,7 @@ import style from './TableCard.module.scss';
 
 type Props = Table & {
   isSelected?: boolean;
+  dataTableId?: string;
 };
 
 const START_TABLE_KEY = DEFAULT_START_TABLE_KEY;
@@ -30,6 +31,7 @@ const TableCard: FunctionComponent<Props> = ({
   id,
   isFavorite,
   isSelected = false,
+  dataTableId,
   isArchived,
   name,
   romFile,
@@ -114,6 +116,7 @@ const TableCard: FunctionComponent<Props> = ({
 
   return (
     <div
+      data-table-id={dataTableId}
       className={classNames(style.card, {
         [style.selected]: isSelected,
       })}>

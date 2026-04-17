@@ -22,6 +22,7 @@ import style from './TableListItem.module.scss';
 
 type Props = Table & {
   isSelected?: boolean;
+  dataTableId?: string;
 };
 
 const START_TABLE_KEY = DEFAULT_START_TABLE_KEY;
@@ -30,6 +31,7 @@ const TableListItem: FunctionComponent<Props> = ({
   id,
   isFavorite,
   isSelected = false,
+  dataTableId,
   isArchived,
   name,
   romFile,
@@ -152,6 +154,7 @@ const TableListItem: FunctionComponent<Props> = ({
 
   return (
     <div
+      data-table-id={dataTableId}
       className={classNames(style.item, {
         [style.selected]: isSelected,
       })}>
