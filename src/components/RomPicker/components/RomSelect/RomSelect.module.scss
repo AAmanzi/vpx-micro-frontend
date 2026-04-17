@@ -3,6 +3,7 @@
   top: calc(100% + 8px);
   left: 0;
   z-index: 10;
+  animation: fadeInRomSelect 200ms ease-out;
   background-color: var(--gray-800);
   border: thin solid var(--gray);
   padding-top: 8px;
@@ -28,5 +29,23 @@
 
   &:hover {
     background-color: rgba(var(--gray-500-rgb), 0.1);
+  }
+}
+
+@keyframes fadeInRomSelect {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .container {
+    animation: none;
   }
 }
