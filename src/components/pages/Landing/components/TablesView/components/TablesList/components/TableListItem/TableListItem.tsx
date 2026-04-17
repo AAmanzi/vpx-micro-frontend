@@ -19,11 +19,14 @@ import {
 import SettingsPopover from '../SettingsPopover';
 import style from './TableListItem.module.scss';
 
-type Props = Table;
+type Props = Table & {
+  isSelected?: boolean;
+};
 
 const TableListItem: FunctionComponent<Props> = ({
   id,
   isFavorite,
+  isSelected = false,
   isArchived,
   name,
   romFile,
@@ -117,7 +120,10 @@ const TableListItem: FunctionComponent<Props> = ({
   };
 
   return (
-    <div className={style.item}>
+    <div
+      className={classNames(style.item, {
+        [style.selected]: isSelected,
+      })}>
       <div
         className={classNames(
           style.playArea,
