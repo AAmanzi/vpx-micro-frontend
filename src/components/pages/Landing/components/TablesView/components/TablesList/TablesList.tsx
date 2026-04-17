@@ -18,6 +18,7 @@ interface Props {
 
 const NEXT_TABLE_KEY = DEFAULT_NEXT_TABLE_KEY;
 const PREVIOUS_TABLE_KEY = DEFAULT_PREVIOUS_TABLE_KEY;
+const SCROLL_PADDING_PX = 16;
 
 const TablesList: FunctionComponent<Props> = ({ tables, viewType }) => {
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
@@ -92,6 +93,9 @@ const TablesList: FunctionComponent<Props> = ({ tables, viewType }) => {
       return;
     }
 
+    const headerElement = document.querySelector<HTMLElement>(
+      '[data-tables-header]',
+    );
     const selectedElement = document.querySelector<HTMLElement>(
       `[data-table-id="${selectedTableId}"]`,
     );
@@ -100,11 +104,26 @@ const TablesList: FunctionComponent<Props> = ({ tables, viewType }) => {
       return;
     }
 
-    selectedElement.scrollIntoView({
-      behavior: 'smooth',
-      block: 'nearest',
-      inline: 'nearest',
-    });
+    const headerHeight = headerElement?.getBoundingClientRect().height ?? 0;
+    const selectedRect = selectedElement.getBoundingClientRect();
+    const topBoundary = headerHeight + SCROLL_PADDING_PX;
+    const bottomBoundary = window.innerHeight - SCROLL_PADDING_PX;
+
+    if (selectedRect.top < topBoundary) {
+      window.scrollBy({
+        top: selectedRect.top - topBoundary,
+        behavior: 'smooth',
+      });
+
+      return;
+    }
+
+    if (selectedRect.bottom > bottomBoundary) {
+      window.scrollBy({
+        top: selectedRect.bottom - bottomBoundary,
+        behavior: 'smooth',
+      });
+    }
   }, [isTableSelectActive, selectedTableId]);
 
   useEffect(() => {

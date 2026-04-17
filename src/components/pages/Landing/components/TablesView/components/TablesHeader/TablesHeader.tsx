@@ -31,7 +31,7 @@ const TablesHeader: FunctionComponent<Props> = ({
   isOrderPickerDisabled = false,
 }) => {
   return (
-    <div className={style.header}>
+    <div className={style.header} data-tables-header>
       <div className={style.search}>
         <Input
           value={query}
