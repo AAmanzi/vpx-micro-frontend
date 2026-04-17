@@ -16,7 +16,7 @@ import {
   getTableGradientVariant,
 } from 'src/utils';
 
-import Settings from '../Settings';
+import SettingsPopover from '../SettingsPopover';
 import style from './TableListItem.module.scss';
 
 type Props = Table;
@@ -36,7 +36,6 @@ const TableListItem: FunctionComponent<Props> = ({
 }) => {
   const [favorite, setFavorite] = useState(isFavorite);
   const [isStarting, setIsStarting] = useState(false);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isNameTruncated, setIsNameTruncated] = useState(false);
   const titleRef = useRef<HTMLHeadingElement | null>(null);
   const { showErrorToast } = useToastContext();
@@ -115,14 +114,6 @@ const TableListItem: FunctionComponent<Props> = ({
     }
 
     fetchTables();
-  };
-
-  const openSettings = () => {
-    setIsSettingsOpen(true);
-  };
-
-  const closeSettings = () => {
-    setIsSettingsOpen(false);
   };
 
   return (
@@ -207,27 +198,17 @@ const TableListItem: FunctionComponent<Props> = ({
       </button>
 
       <div className={style.settingsButton}>
-        <button
-          type='button'
-          className={style.settingsTrigger}
-          onClick={openSettings}>
-          <Icon className='secondary-text-color' icon='kebab' />
-        </button>
-        {isSettingsOpen && (
-          <div className={style.settingsContainer}>
-            <Settings
-              id={id}
-              name={name}
-              isArchived={isArchived}
-              vpxFilePath={vpxFilePath}
-              vpxExecutablePath={vpxExecutablePath}
-              vpxFile={vpxFile}
-              romFilePath={romFilePath}
-              romFile={romFile}
-              close={closeSettings}
-            />
-          </div>
-        )}
+        <SettingsPopover
+          id={id}
+          name={name}
+          isArchived={isArchived}
+          vpxFilePath={vpxFilePath}
+          vpxExecutablePath={vpxExecutablePath}
+          vpxFile={vpxFile}
+          romFilePath={romFilePath}
+          romFile={romFile}
+          triggerClassName={style.settingsTrigger}
+        />
       </div>
     </div>
   );
