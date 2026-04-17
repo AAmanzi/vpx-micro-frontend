@@ -5,15 +5,17 @@ import http from 'http';
 import path from 'path';
 
 import type { Config } from 'src/types/config';
-import type { ExportGroup } from 'src/types/export';
 import type { TableFile } from 'src/types/file';
-import type { ScanResult } from 'src/types/table';
+import type { GroupType, ScanResult, Table } from 'src/types/table';
 
 import * as api from './api';
 import * as db from './database/tables';
 
 const logFile = path.join(process.cwd(), 'backend.log');
-const logStream = fs.createWriteStream(logFile, { flags: 'a', encoding: 'utf8' });
+const logStream = fs.createWriteStream(logFile, {
+  flags: 'a',
+  encoding: 'utf8',
+});
 
 const originalLog = console.log;
 const originalError = console.error;
@@ -237,8 +239,9 @@ app.whenReady().then(async () => {
   ipcMain.handle('api:updateOrder', async (_, order: Config['order']) =>
     api.updateOrder(order),
   );
-  ipcMain.handle('api:updateViewType', async (_, viewType: Config['viewType']) =>
-    api.updateViewType(viewType),
+  ipcMain.handle(
+    'api:updateViewType',
+    async (_, viewType: Config['viewType']) => api.updateViewType(viewType),
   );
   ipcMain.handle('api:startTable', async (_, tableId: string) =>
     api.startTable(tableId),
@@ -250,8 +253,12 @@ app.whenReady().then(async () => {
   );
   ipcMain.handle(
     'api:exportTables',
-    async (_, destinationPath: string, exportGroup: ExportGroup) =>
+    async (_, destinationPath: string, exportGroup: GroupType) =>
       api.exportTables(destinationPath, exportGroup),
+  );
+  ipcMain.handle(
+    'api:startRandomTable',
+    async (_, tables: Table[]) => api.startRandomTable(tables),
   );
 
   createWindow();
@@ -265,7 +272,7 @@ function shutdownNext() {
   if (nextProcess && !nextProcess.killed) {
     try {
       nextProcess.kill();
-    } catch (e) { }
+    } catch (e) {}
   }
 }
 

@@ -1,7 +1,6 @@
 import { Config } from './config';
-import { ExportGroup } from './export';
 import { FileSystemItem, TableFile } from './file';
-import { ScanResult, Table } from './table';
+import { GroupType, ScanResult, Table } from './table';
 
 export interface ApiError {
   code: string;
@@ -53,8 +52,9 @@ export interface Api {
   applyScanResult: (scanResult: ScanResult) => Promise<ApiResult<null>>;
   exportTables: (
     destinationPath: string,
-    exportGroup: ExportGroup,
+    exportGroup: GroupType,
   ) => Promise<ApiResult<null>>;
+  startRandomTable: (tables: Array<Table>) => Promise<ApiResult<null>>;
 
   // FileSystem
   getPathForFile: (file: File) => ApiResult<string>;

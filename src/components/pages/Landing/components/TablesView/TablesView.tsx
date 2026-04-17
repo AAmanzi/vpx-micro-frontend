@@ -9,19 +9,18 @@ import FadeInAnimation from 'src/components/FadeInAnimation';
 import FileUploadOverlay from 'src/components/FileUploadOverlay';
 import Icon from 'src/components/Icon';
 import ImportTablesModal from 'src/components/ImportTablesModal';
-import Input from 'src/components/Input';
 import ScanLibraryModal from 'src/components/ScanLibraryModal';
 import api from 'src/consts';
 import { useConfigContext } from 'src/providers/config';
 import { useTablesContext } from 'src/providers/tables';
+import { useToastContext } from 'src/providers/toast';
 import { Order, ViewType } from 'src/types/config';
 import { FileSystemItem } from 'src/types/file';
 import type { Table } from 'src/types/table';
 
 import style from './TablesView.module.scss';
-import OrderPicker from './components/OrderPicker';
+import TablesHeader from './components/TablesHeader';
 import TablesList from './components/TablesList';
-import ViewTypeSelect from './components/ViewTypeSelect';
 import { Props } from './types';
 
 const TablesView: FunctionComponent<Props> = ({
@@ -36,8 +35,10 @@ const TablesView: FunctionComponent<Props> = ({
 }) => {
   const { fetchTables } = useTablesContext();
   const { config, fetchConfig } = useConfigContext();
+  const { showErrorToast } = useToastContext();
 
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isRandomTableStarting, setIsRandomTableStarting] = useState(false);
   const [isScanLibraryModalOpen, setIsScanLibraryModalOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [droppedFilesForImport, setDroppedFilesForImport] = useState<
@@ -183,33 +184,42 @@ const TablesView: FunctionComponent<Props> = ({
     }
   };
 
+  const handlePlayRandomTable = async () => {
+    if (isRandomTableStarting) {
+      return;
+    }
+
+    setIsRandomTableStarting(true);
+
+    try {
+      const result = await api.startRandomTable(orderedTables);
+
+      if (!result.success) {
+        showErrorToast(result.error.message || 'Failed to start random table');
+        return;
+      }
+
+      fetchTables();
+    } finally {
+      setIsRandomTableStarting(false);
+    }
+  };
+
   const emptyViewContent = getEmptyViewContent();
 
   return (
     <>
-      <div className={style.header}>
-        <div className={style.search}>
-          <Input
-            value={query}
-            onChange={setQuery}
-            icon='search'
-            placeholder='Search tables, vpx files or roms...'
-          />
-        </div>
-        <div className={style.infoAndFiltering}>
-          <ViewTypeSelect
-            viewType={viewType}
-            onViewTypeChange={handleViewTypeChange}
-          />
-          <OrderPicker
-            favoritesOnTop={favoritesOnTop}
-            onFavoritesOnTopChange={handleFavoritesOnTopChange}
-            order={order}
-            onOrderChange={handleOrderChange}
-            disabled={isOrderPickerDisabled}
-          />
-        </div>
-      </div>
+      <TablesHeader
+        query={query}
+        onQueryChange={setQuery}
+        viewType={viewType}
+        onViewTypeChange={handleViewTypeChange}
+        favoritesOnTop={favoritesOnTop}
+        onFavoritesOnTopChange={handleFavoritesOnTopChange}
+        order={order}
+        onOrderChange={handleOrderChange}
+        isOrderPickerDisabled={isOrderPickerDisabled}
+      />
       <div className={style.container}>
         <div className={style.titleRow}>
           <div>
@@ -220,19 +230,34 @@ const TablesView: FunctionComponent<Props> = ({
               </p>
             )}
           </div>
-          <div className={style.scanButtonWrapper}>
-            <Button
-              icon='scan-search'
-              label='Scan Library'
-              type={
-                isLibraryEmpty
-                  ? ButtonType.primaryAlt
-                  : ButtonType.primaryAltTransparent
-              }
-              size={ButtonSize.medium}
-              onClick={() => setIsScanLibraryModalOpen(true)}
-              fill
-            />
+          <div className={style.buttonsWrapper}>
+            {orderedTables.length > 0 && (
+              <div className={style.randomTableButtonWrapper}>
+                <Button
+                  icon='play'
+                  label='Random table'
+                  type={ButtonType.successTransparent}
+                  size={ButtonSize.medium}
+                  onClick={handlePlayRandomTable}
+                  loading={isRandomTableStarting}
+                  fill
+                />
+              </div>
+            )}
+            <div className={style.scanButtonWrapper}>
+              <Button
+                icon='scan-search'
+                label='Scan Library'
+                type={
+                  isLibraryEmpty
+                    ? ButtonType.primaryAlt
+                    : ButtonType.primaryAltTransparent
+                }
+                size={ButtonSize.medium}
+                onClick={() => setIsScanLibraryModalOpen(true)}
+                fill
+              />
+            </div>
           </div>
         </div>
 

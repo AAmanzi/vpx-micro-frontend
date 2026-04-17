@@ -95,6 +95,19 @@
   }
 }
 
+.successTransparent {
+  background-color: rgba(var(--green-rgb), 0.1);
+  color: var(--green);
+
+  .icon {
+    color: var(--green);
+  }
+
+  &:hover {
+    background-color: rgba(var(--green-rgb), 0.2);
+  }
+}
+
 .small {
   height: 36px;
   padding-left: 24px;

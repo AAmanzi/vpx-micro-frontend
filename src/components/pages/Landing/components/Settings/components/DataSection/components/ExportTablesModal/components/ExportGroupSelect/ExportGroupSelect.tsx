@@ -3,33 +3,33 @@ import { FunctionComponent, useMemo, useRef, useState } from 'react';
 
 import Icon from 'src/components/Icon';
 import type { Icon as IconName } from 'src/components/Icon/types';
-import { ExportGroup } from 'src/types/export';
+import { GroupType } from 'src/types/table';
 import useClickOutside from 'src/utils/useClickOutside';
 
 import style from './ExportGroupSelect.module.scss';
 
 const GROUP_OPTIONS: Array<{
-  value: ExportGroup;
+  value: GroupType;
   label: string;
   icon: IconName;
 }> = [
   {
-    value: ExportGroup.allTables,
+    value: GroupType.allTables,
     label: 'All Tables (excluding archived)',
     icon: 'grid',
   },
-  { value: ExportGroup.favorites, label: 'Favorites', icon: 'star' },
+  { value: GroupType.favorites, label: 'Favorites', icon: 'star' },
   {
-    value: ExportGroup.allTablesIncludingArchived,
+    value: GroupType.allTablesIncludingArchived,
     label: 'All Tables (including archived)',
     icon: 'database',
   },
-  { value: ExportGroup.archived, label: 'Archived', icon: 'archive' },
+  { value: GroupType.archived, label: 'Archived', icon: 'archive' },
 ];
 
 interface Props {
-  value: ExportGroup;
-  onChange: (value: ExportGroup) => void;
+  value: GroupType;
+  onChange: (value: GroupType) => void;
   disabled?: boolean;
 }
 
@@ -49,7 +49,7 @@ const ExportGroupSelect: FunctionComponent<Props> = ({
     );
   }, [value]);
 
-  const handleSelectGroup = (nextValue: ExportGroup) => () => {
+  const handleSelectGroup = (nextValue: GroupType) => () => {
     onChange(nextValue);
     setIsOpen(false);
   };

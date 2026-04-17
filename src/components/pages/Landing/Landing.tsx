@@ -40,7 +40,7 @@ const Landing: FunctionComponent<Props> = () => {
             tables={tables}
             librarySize={tables.length}
             title='All Tables'
-            description='Manage your Visual Pinball library'
+            // description='Manage your Visual Pinball library'
           />
         );
       case View.favorites:
@@ -82,7 +82,7 @@ const Landing: FunctionComponent<Props> = () => {
             tables={archivedTables}
             librarySize={archivedTables.length}
             title='Archive'
-            description='Archived tables are hidden from your main library views'
+            // description='Archived tables are hidden from your main library views'
             emptyStateVariant='archive'
           />
         );

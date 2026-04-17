@@ -2,9 +2,8 @@ import { contextBridge, ipcRenderer, webUtils } from 'electron';
 
 import type { Api, ApiResult } from 'src/types/api';
 import type { Config } from 'src/types/config';
-import type { ExportGroup } from 'src/types/export';
 import type { FileSystemItem } from 'src/types/file';
-import type { ScanResult, Table } from 'src/types/table';
+import type { GroupType, ScanResult, Table } from 'src/types/table';
 
 const invoke = <T>(channel: string, ...args: any[]): Promise<T> =>
   ipcRenderer.invoke(channel, ...args);
@@ -14,10 +13,7 @@ const frontendApi: Api = {
     invoke<ApiResult<Table[]>>('api:getAllTables'),
   setTableFavorite: (id: string, fav: boolean): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:setTableFavorite', id, fav),
-  setTableArchived: (
-    id: string,
-    archived: boolean,
-  ): Promise<ApiResult<null>> =>
+  setTableArchived: (id: string, archived: boolean): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:setTableArchived', id, archived),
   deleteTable: (id: string): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:deleteTable', id),
@@ -96,7 +92,7 @@ const frontendApi: Api = {
     invoke<ApiResult<null>>('api:applyScanResult', scanResult),
   exportTables: (
     destinationPath: string,
-    exportGroup: ExportGroup,
+    exportGroup: GroupType,
   ): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:exportTables', destinationPath, exportGroup),
   getConfig: (): Promise<ApiResult<Config>> =>
@@ -126,6 +122,8 @@ const frontendApi: Api = {
     invoke<ApiResult<null>>('api:updateViewType', viewType),
   startTable: (tableId: string): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:startTable', tableId),
+  startRandomTable: (tables: Table[]): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:startRandomTable', tables),
 };
 
 contextBridge.exposeInMainWorld('api', frontendApi);

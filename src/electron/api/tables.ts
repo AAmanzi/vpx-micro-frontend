@@ -3,9 +3,8 @@ import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 
 import type { ApiResult } from 'src/types/api';
-import type { ExportGroup } from 'src/types/export';
 import type { FileSystemItem, TableFile } from 'src/types/file';
-import type { ScanResult, Table } from 'src/types/table';
+import { GroupType, ScanResult, Table } from 'src/types/table';
 
 import * as configDb from '../database/config';
 import * as tablesDb from '../database/tables';
@@ -547,7 +546,7 @@ export function applyScanResult(scanResult: ScanResult): ApiResult<null> {
 
 export function exportTables(
   destinationPath: string,
-  exportGroup: ExportGroup,
+  exportGroup: GroupType,
 ): ApiResult<null> {
   try {
     const result = createDirectoryIfNotExists(destinationPath);
@@ -565,13 +564,13 @@ export function exportTables(
     const allTables = tablesDb.getAll();
     const tables = allTables.filter((table) => {
       switch (exportGroup) {
-        case 'allTablesIncludingArchived':
+        case GroupType.allTablesIncludingArchived:
           return true;
-        case 'archived':
+        case GroupType.archived:
           return Boolean(table.isArchived);
-        case 'favorites':
+        case GroupType.favorites:
           return !table.isArchived && table.isFavorite;
-        case 'allTables':
+        case GroupType.allTables:
         default:
           return !table.isArchived;
       }
@@ -611,6 +610,41 @@ export function exportTables(
         },
       };
     }
+
+    return apiSuccess(null);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}
+
+export async function startRandomTable(
+  tables: Array<Table>,
+): Promise<ApiResult<null>> {
+  try {
+    if (tables.length === 0) {
+      return {
+        success: false,
+        error: {
+          code: 'NO_TABLES',
+          message: 'No tables available to pick from',
+        },
+      };
+    }
+
+    const configVpxExecutablePath = configDb.getVpxExecutablePath();
+    const randomIndex = Math.floor(Math.random() * tables.length);
+    const table = tables[randomIndex];
+
+    // ALEX TODO: test on windows
+
+    await startVpxTable(
+      table.vpxFilePath,
+      table.vpxExecutablePath || configVpxExecutablePath,
+    );
+
+    tablesDb.update(table.id, {
+      lastPlayedTimestamp: Date.now(),
+    });
 
     return apiSuccess(null);
   } catch (error) {

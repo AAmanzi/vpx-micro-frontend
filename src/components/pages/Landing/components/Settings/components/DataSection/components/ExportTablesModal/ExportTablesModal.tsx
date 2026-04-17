@@ -13,7 +13,7 @@ import Modal from 'src/components/Modal';
 import { useConfigContext } from 'src/providers/config';
 import { useTablesContext } from 'src/providers/tables';
 import { useToastContext } from 'src/providers/toast';
-import { ExportGroup } from 'src/types/export';
+import { GroupType } from 'src/types/table';
 import { getTableGradientVariant } from 'src/utils';
 
 import style from './ExportTablesModal.module.scss';
@@ -34,20 +34,20 @@ const ExportTablesModal: FunctionComponent<Props> = ({ close }) => {
   );
   const [isExporting, setIsExporting] = useState(false);
   const [isExportComplete, setIsExportComplete] = useState(false);
-  const [exportGroup, setExportGroup] = useState<ExportGroup>(
-    ExportGroup.allTables,
+  const [exportGroup, setExportGroup] = useState<GroupType>(
+    GroupType.allTables,
   );
 
   const exportTables = useMemo(() => {
-    if (exportGroup === ExportGroup.allTablesIncludingArchived) {
+    if (exportGroup === GroupType.allTablesIncludingArchived) {
       return tables;
     }
 
-    if (exportGroup === ExportGroup.archived) {
+    if (exportGroup === GroupType.archived) {
       return tables.filter((table) => table.isArchived);
     }
 
-    if (exportGroup === ExportGroup.favorites) {
+    if (exportGroup === GroupType.favorites) {
       return tables.filter((table) => !table.isArchived && table.isFavorite);
     }
 

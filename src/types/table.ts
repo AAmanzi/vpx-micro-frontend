@@ -26,3 +26,10 @@ export interface ScanResult {
     missingRomFile: boolean;
   }>;
 }
+
+export enum GroupType {
+  allTables = 'allTables',
+  favorites = 'favorites',
+  archived = 'archived',
+  allTablesIncludingArchived = 'allTablesIncludingArchived',
+}

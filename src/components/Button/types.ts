@@ -8,6 +8,7 @@ export enum Type {
   primaryAlt = 'primaryAlt',
   primaryAltTransparent = 'primaryAltTransparent',
   success = 'success',
+  successTransparent = 'successTransparent',
 }
 
 export enum Size {
