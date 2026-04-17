@@ -20,9 +20,8 @@ const startVpxAsAdmin = async (
   launchArgs: string[],
   vpxDir: string,
 ): Promise<void> => {
-  const escapedExecutablePath = escapePowerShellSingleQuotedString(
-    vpxExecutablePath,
-  );
+  const escapedExecutablePath =
+    escapePowerShellSingleQuotedString(vpxExecutablePath);
   const escapedWorkingDirectory = escapePowerShellSingleQuotedString(vpxDir);
   const escapedArgs = launchArgs
     .map((arg) => escapeWindowsArgument(arg))
@@ -52,7 +51,9 @@ const startVpxAsAdmin = async (
     );
 
     powerShell.once('error', (error) => {
-      reject(new Error(`Failed to request elevated VPX start: ${error.message}`));
+      reject(
+        new Error(`Failed to request elevated VPX start: ${error.message}`),
+      );
     });
 
     powerShell.once('exit', (code) => {
@@ -90,14 +91,7 @@ export const startVpxTable = async (
   }
 
   const vpxDir = path.dirname(vpxExecutablePath);
-  const launchArgs = [
-    '-DisableTrueFullScreen',
-    '-primary',
-    '-LessCPUthreads',
-    '-ExtMinimized',
-    '-play',
-    tablePath,
-  ];
+  const launchArgs = ['-LessCPUthreads', '-ExtMinimized', '-play', tablePath];
 
   await new Promise<void>((resolve, reject) => {
     const child = spawn(vpxExecutablePath, launchArgs, {
