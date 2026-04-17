@@ -27,6 +27,7 @@ const Landing: FunctionComponent<Props> = () => {
       case View.allTables:
         return (
           <TablesView
+            animationKey={view}
             tables={tables}
             librarySize={tables.length}
             title='All Tables'
@@ -36,6 +37,7 @@ const Landing: FunctionComponent<Props> = () => {
       case View.favorites:
         return (
           <TablesView
+            animationKey={view}
             tables={tables.filter((table) => table.isFavorite)}
             librarySize={tables.length}
             title='Favorites'
@@ -55,6 +57,7 @@ const Landing: FunctionComponent<Props> = () => {
 
         return (
           <TablesView
+            animationKey={view}
             tables={recentlyPlayedTables}
             librarySize={tables.length}
             title='Recently Played'

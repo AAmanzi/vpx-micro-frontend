@@ -6,6 +6,7 @@ import {
   Size as ButtonSize,
   Type as ButtonType,
 } from 'src/components/Button/types';
+import FadeInAnimation from 'src/components/FadeInAnimation';
 import Icon from 'src/components/Icon';
 import api from 'src/consts';
 import { useConfigContext } from 'src/providers/config';
@@ -13,7 +14,6 @@ import { useToastContext } from 'src/providers/toast';
 import { getDefaultVpxExecutablePath } from 'src/utils';
 
 import style from './Settings.module.scss';
-import FadeInAnimation from '../FadeInAnimation';
 import DataSection from './components/DataSection';
 import FilePathsSection from './components/FilePathsSection';
 import MaintenanceSection from './components/MaintenanceSection';
@@ -65,16 +65,16 @@ const Settings: FunctionComponent = () => {
           />
         </div>
       </div>
-      <FadeInAnimation animationKey='settings'>
-        <div className={style.container}>
-          <div className={style.titleWrapper}>
-            <h1 className='primary-text-color heading-6-bold'>
-              Application Settings
-            </h1>
-            <p className='secondary-text-color body-sm-regular'>
-              Configure your Visual Pinball X environment
-            </p>
-          </div>
+      <div className={style.container}>
+        <div className={style.titleWrapper}>
+          <h1 className='primary-text-color heading-6-bold'>
+            Application Settings
+          </h1>
+          <p className='secondary-text-color body-sm-regular'>
+            Configure your Visual Pinball X environment
+          </p>
+        </div>
+        <FadeInAnimation animationKey='settings'>
           <div className={classNames(style.section, style.filePathsSection)}>
             <div className={style.sectionHeader}>
               <Icon
@@ -119,8 +119,8 @@ const Settings: FunctionComponent = () => {
               <MaintenanceSection />
             </div>
           </div>
-        </div>
-      </FadeInAnimation>
+        </FadeInAnimation>
+      </div>
     </>
   );
 };

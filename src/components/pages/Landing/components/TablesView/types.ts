@@ -9,4 +9,5 @@ export interface Props {
   defaultOrder?: Order;
   emptyStateVariant?: 'favorites' | 'recentlyPlayed';
   isOrderPickerDisabled?: boolean;
+  animationKey: string;
 }
