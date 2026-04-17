@@ -39,6 +39,10 @@ const ExportTablesModal: FunctionComponent<Props> = ({ close }) => {
   );
 
   const exportTables = useMemo(() => {
+    if (exportGroup === ExportGroup.allTablesIncludingArchived) {
+      return tables;
+    }
+
     if (exportGroup === ExportGroup.archived) {
       return tables.filter((table) => table.isArchived);
     }
@@ -74,7 +78,7 @@ const ExportTablesModal: FunctionComponent<Props> = ({ close }) => {
 
     setIsExporting(true);
 
-    const result = await window.api.exportTables(exportPath);
+    const result = await window.api.exportTables(exportPath, exportGroup);
 
     setIsExporting(false);
 

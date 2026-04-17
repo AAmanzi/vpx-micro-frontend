@@ -1,4 +1,5 @@
 import { Config } from './config';
+import { ExportGroup } from './export';
 import { FileSystemItem, TableFile } from './file';
 import { ScanResult, Table } from './table';
 
@@ -50,7 +51,10 @@ export interface Api {
   clearTables: () => Promise<ApiResult<null>>;
   scanVpxLibrary: () => Promise<ApiResult<ScanResult>>;
   applyScanResult: (scanResult: ScanResult) => Promise<ApiResult<null>>;
-  exportTables: (destinationPath: string) => Promise<ApiResult<null>>;
+  exportTables: (
+    destinationPath: string,
+    exportGroup: ExportGroup,
+  ) => Promise<ApiResult<null>>;
 
   // FileSystem
   getPathForFile: (file: File) => ApiResult<string>;

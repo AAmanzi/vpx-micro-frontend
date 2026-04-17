@@ -3,6 +3,7 @@ import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 
 import type { ApiResult } from 'src/types/api';
+import type { ExportGroup } from 'src/types/export';
 import type { FileSystemItem, TableFile } from 'src/types/file';
 import type { ScanResult, Table } from 'src/types/table';
 
@@ -544,7 +545,10 @@ export function applyScanResult(scanResult: ScanResult): ApiResult<null> {
   }
 }
 
-export function exportTables(destinationPath: string): ApiResult<null> {
+export function exportTables(
+  destinationPath: string,
+  exportGroup: ExportGroup,
+): ApiResult<null> {
   try {
     const result = createDirectoryIfNotExists(destinationPath);
 
@@ -558,7 +562,20 @@ export function exportTables(destinationPath: string): ApiResult<null> {
       };
     }
 
-    const tables = tablesDb.getAll();
+    const allTables = tablesDb.getAll();
+    const tables = allTables.filter((table) => {
+      switch (exportGroup) {
+        case 'allTablesIncludingArchived':
+          return true;
+        case 'archived':
+          return Boolean(table.isArchived);
+        case 'favorites':
+          return !table.isArchived && table.isFavorite;
+        case 'allTables':
+        default:
+          return !table.isArchived;
+      }
+    });
     const failedTables: string[] = [];
 
     tables.forEach((table) => {

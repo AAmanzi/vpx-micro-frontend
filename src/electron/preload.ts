@@ -2,7 +2,8 @@ import { contextBridge, ipcRenderer, webUtils } from 'electron';
 
 import type { Api, ApiResult } from 'src/types/api';
 import type { Config } from 'src/types/config';
-import type { FileSystemItem, TableFile } from 'src/types/file';
+import type { ExportGroup } from 'src/types/export';
+import type { FileSystemItem } from 'src/types/file';
 import type { ScanResult, Table } from 'src/types/table';
 
 const invoke = <T>(channel: string, ...args: any[]): Promise<T> =>
@@ -93,8 +94,11 @@ const frontendApi: Api = {
     invoke<ApiResult<ScanResult>>('api:scanVpxLibrary'),
   applyScanResult: (scanResult: ScanResult): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:applyScanResult', scanResult),
-  exportTables: (destinationPath: string): Promise<ApiResult<null>> =>
-    invoke<ApiResult<null>>('api:exportTables', destinationPath),
+  exportTables: (
+    destinationPath: string,
+    exportGroup: ExportGroup,
+  ): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:exportTables', destinationPath, exportGroup),
   getConfig: (): Promise<ApiResult<Config>> =>
     invoke<ApiResult<Config>>('api:getConfig'),
   updateVpxRootPath: (path: string): Promise<ApiResult<null>> =>

@@ -2,15 +2,29 @@ import classNames from 'classnames';
 import { FunctionComponent, useMemo, useRef, useState } from 'react';
 
 import Icon from 'src/components/Icon';
+import type { Icon as IconName } from 'src/components/Icon/types';
 import { ExportGroup } from 'src/types/export';
 import useClickOutside from 'src/utils/useClickOutside';
 
 import style from './ExportGroupSelect.module.scss';
 
-const GROUP_OPTIONS: Array<{ value: ExportGroup; label: string }> = [
-  { value: ExportGroup.allTables, label: 'All Tables' },
-  { value: ExportGroup.favorites, label: 'Favorites' },
-  { value: ExportGroup.archived, label: 'Archived' },
+const GROUP_OPTIONS: Array<{
+  value: ExportGroup;
+  label: string;
+  icon: IconName;
+}> = [
+  {
+    value: ExportGroup.allTables,
+    label: 'All Tables (excluding archived)',
+    icon: 'grid',
+  },
+  { value: ExportGroup.favorites, label: 'Favorites', icon: 'star' },
+  {
+    value: ExportGroup.allTablesIncludingArchived,
+    label: 'All Tables (including archived)',
+    icon: 'database',
+  },
+  { value: ExportGroup.archived, label: 'Archived', icon: 'archive' },
 ];
 
 interface Props {
@@ -29,10 +43,9 @@ const ExportGroupSelect: FunctionComponent<Props> = ({
 
   useClickOutside(ref, () => setIsOpen(false));
 
-  const selectedLabel = useMemo(() => {
+  const selectedOption = useMemo(() => {
     return (
-      GROUP_OPTIONS.find((option) => option.value === value)?.label ||
-      'All Tables'
+      GROUP_OPTIONS.find((option) => option.value === value) || GROUP_OPTIONS[0]
     );
   }, [value]);
 
@@ -63,8 +76,16 @@ const ExportGroupSelect: FunctionComponent<Props> = ({
           })}
           onClick={handleToggle}
           disabled={disabled}>
-          <span className='secondary-text-color body-sm-semibold'>
-            {selectedLabel}
+          <span className={style.triggerContent}>
+            <Icon
+              icon={selectedOption.icon}
+              className={classNames('secondary-text-color', style.icon)}
+              width={14}
+              height={14}
+            />
+            <span className='secondary-text-color body-sm-semibold'>
+              {selectedOption.label}
+            </span>
           </span>
           <Icon
             icon='chevron-down'
@@ -85,8 +106,16 @@ const ExportGroupSelect: FunctionComponent<Props> = ({
                   [style.selected]: option.value === value,
                 })}
                 onClick={handleSelectGroup(option.value)}>
-                <span className='primary-text-color body-sm-semibold'>
-                  {option.label}
+                <span className={style.optionContent}>
+                  <Icon
+                    icon={option.icon}
+                    className={classNames('secondary-text-color', style.icon)}
+                    width={14}
+                    height={14}
+                  />
+                  <span className='primary-text-color body-sm-semibold'>
+                    {option.label}
+                  </span>
                 </span>
               </button>
             ))}
