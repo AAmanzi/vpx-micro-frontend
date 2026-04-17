@@ -8,6 +8,11 @@
   gap: 12px;
 }
 
+.controlsDisabled {
+  opacity: 0.65;
+  transition: opacity 150ms ease-in;
+}
+
 .spacer {
   margin-top: 12px;
   margin-bottom: 12px;

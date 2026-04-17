@@ -120,17 +120,22 @@ const ExportTablesModal: FunctionComponent<Props> = ({ close }) => {
       color='blue'>
       <Form submit={handleExport} validate={handleValidate}>
         <div className={style.content}>
-          <div className={style.inputWrapper}>
+          <div
+            className={classNames(style.inputWrapper, {
+              [style.controlsDisabled]: isExportComplete,
+            })}>
             <Input
               label='Export Directory'
               value={exportPath}
               onChange={setExportPath}
               placeholder='e.g. C:/vpx-tables-export'
+              readonly={isExportComplete}
             />
             <FolderPicker
               onSelect={setExportPath}
               onError={showErrorToast}
               label='Browse'
+              disabled={isExportComplete}
             />
           </div>
           <p
@@ -143,8 +148,15 @@ const ExportTablesModal: FunctionComponent<Props> = ({ close }) => {
             folder
           </p>
           <div className={style.spacer} />
-          <div className={style.exportGroupWrapper}>
-            <ExportGroupSelect value={exportGroup} onChange={setExportGroup} />
+          <div
+            className={classNames(style.exportGroupWrapper, {
+              [style.controlsDisabled]: isExportComplete,
+            })}>
+            <ExportGroupSelect
+              value={exportGroup}
+              onChange={setExportGroup}
+              disabled={isExportComplete}
+            />
           </div>
           <div className={style.summary}>
             <div className={style.iconWrapper}>
