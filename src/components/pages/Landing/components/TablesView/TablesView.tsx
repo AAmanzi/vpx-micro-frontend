@@ -17,6 +17,7 @@ import { Order, ViewType } from 'src/types/config';
 import { FileSystemItem } from 'src/types/file';
 import type { Table } from 'src/types/table';
 
+import FadeInAnimation from '../FadeInAnimation';
 import style from './TablesView.module.scss';
 import OrderPicker from './components/OrderPicker';
 import TablesList from './components/TablesList';
@@ -201,77 +202,43 @@ const TablesView: FunctionComponent<Props> = ({
           />
         </div>
       </div>
-      <div className={style.container}>
-        <div className={style.titleRow}>
-          <div>
-            <h1 className='primary-text-color heading-6-bold'>{title}</h1>
-            {displayedDescription && (
-              <p className='secondary-text-color body-sm-regular'>
-                {displayedDescription}
-              </p>
-            )}
-          </div>
-          <div className={style.scanButtonWrapper}>
-            <Button
-              icon='scan-search'
-              label='Scan Library'
-              type={
-                isLibraryEmpty
-                  ? ButtonType.primaryAlt
-                  : ButtonType.primaryAltTransparent
-              }
-              size={ButtonSize.medium}
-              onClick={() => setIsScanLibraryModalOpen(true)}
-              fill
-            />
-          </div>
-        </div>
-
-        <div className={style.tablesWrapper}>
-          {hasResults && (
-            <TablesList tables={orderedTables} viewType={viewType} />
-          )}{' '}
-          {hasNoSearchResults && (
-            <div className={style.noData}>
-              <div className={style.noDataIconWrapper}>
-                <Icon
-                  className='secondary-text-color'
-                  icon='search'
-                  width={40}
-                  height={40}
-                />
-              </div>
-              <h2
-                className={classNames(
-                  'primary-text-color',
-                  'heading-4-bold',
-                  style.noDataTitle,
-                )}>
-                No tables found
-              </h2>
-              <p
-                className={classNames(
-                  'secondary-text-color',
-                  'body-md-regular',
-                  style.noDataDescription,
-                )}>
-                We couldn't find any tables matching your current filter or
-                search criteria.
-              </p>
+      <FadeInAnimation animationKey={viewType}>
+        <div className={style.container}>
+          <div className={style.titleRow}>
+            <div>
+              <h1 className='primary-text-color heading-6-bold'>{title}</h1>
+              {displayedDescription && (
+                <p className='secondary-text-color body-sm-regular'>
+                  {displayedDescription}
+                </p>
+              )}
+            </div>
+            <div className={style.scanButtonWrapper}>
               <Button
-                label='Clear Search'
-                type={ButtonType.secondary}
-                onClick={() => setQuery('')}
+                icon='scan-search'
+                label='Scan Library'
+                type={
+                  isLibraryEmpty
+                    ? ButtonType.primaryAlt
+                    : ButtonType.primaryAltTransparent
+                }
+                size={ButtonSize.medium}
+                onClick={() => setIsScanLibraryModalOpen(true)}
+                fill
               />
             </div>
-          )}
-          {isLibraryEmpty && (
-            <div>
+          </div>
+
+          <div className={style.tablesWrapper}>
+            {hasResults && (
+              <TablesList tables={orderedTables} viewType={viewType} />
+            )}{' '}
+            {hasNoSearchResults && (
               <div className={style.noData}>
                 <div className={style.noDataIconWrapper}>
                   <Icon
                     className='secondary-text-color'
-                    icon='plus'
+                    icon='search'
                     width={40}
                     height={40}
                   />
@@ -282,7 +249,7 @@ const TablesView: FunctionComponent<Props> = ({
                     'heading-4-bold',
                     style.noDataTitle,
                   )}>
-                  Your library is empty
+                  No tables found
                 </h2>
                 <p
                   className={classNames(
@@ -290,47 +257,83 @@ const TablesView: FunctionComponent<Props> = ({
                     'body-md-regular',
                     style.noDataDescription,
                   )}>
-                  Start your collection by importing .vpx table files and their
-                  corresponding ROMs.
+                  We couldn't find any tables matching your current filter or
+                  search criteria.
                 </p>
                 <Button
-                  icon='plus'
-                  label='Import now'
-                  onClick={() => setIsImportModalOpen(true)}
+                  label='Clear Search'
+                  type={ButtonType.secondary}
+                  onClick={() => setQuery('')}
                 />
               </div>
-            </div>
-          )}
-          {hasNoViewResults && emptyViewContent && (
-            <div className={style.noData}>
-              <div className={style.noDataIconWrapper}>
-                <Icon
-                  className='secondary-text-color'
-                  icon={emptyViewContent.icon}
-                  width={40}
-                  height={40}
-                />
+            )}
+            {isLibraryEmpty && (
+              <div>
+                <div className={style.noData}>
+                  <div className={style.noDataIconWrapper}>
+                    <Icon
+                      className='secondary-text-color'
+                      icon='plus'
+                      width={40}
+                      height={40}
+                    />
+                  </div>
+                  <h2
+                    className={classNames(
+                      'primary-text-color',
+                      'heading-4-bold',
+                      style.noDataTitle,
+                    )}>
+                    Your library is empty
+                  </h2>
+                  <p
+                    className={classNames(
+                      'secondary-text-color',
+                      'body-md-regular',
+                      style.noDataDescription,
+                    )}>
+                    Start your collection by importing .vpx table files and
+                    their corresponding ROMs.
+                  </p>
+                  <Button
+                    icon='plus'
+                    label='Import now'
+                    onClick={() => setIsImportModalOpen(true)}
+                  />
+                </div>
               </div>
-              <h2
-                className={classNames(
-                  'primary-text-color',
-                  'heading-4-bold',
-                  style.noDataTitle,
-                )}>
-                {emptyViewContent.title}
-              </h2>
-              <p
-                className={classNames(
-                  'secondary-text-color',
-                  'body-md-regular',
-                  style.noDataDescription,
-                )}>
-                {emptyViewContent.description}
-              </p>
-            </div>
-          )}
+            )}
+            {hasNoViewResults && emptyViewContent && (
+              <div className={style.noData}>
+                <div className={style.noDataIconWrapper}>
+                  <Icon
+                    className='secondary-text-color'
+                    icon={emptyViewContent.icon}
+                    width={40}
+                    height={40}
+                  />
+                </div>
+                <h2
+                  className={classNames(
+                    'primary-text-color',
+                    'heading-4-bold',
+                    style.noDataTitle,
+                  )}>
+                  {emptyViewContent.title}
+                </h2>
+                <p
+                  className={classNames(
+                    'secondary-text-color',
+                    'body-md-regular',
+                    style.noDataDescription,
+                  )}>
+                  {emptyViewContent.description}
+                </p>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      </FadeInAnimation>
       {isImportModalOpen && (
         <ImportTablesModal
           onClose={handleCloseImportModal}

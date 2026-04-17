@@ -13,6 +13,7 @@ import { useToastContext } from 'src/providers/toast';
 import { getDefaultVpxExecutablePath } from 'src/utils';
 
 import style from './Settings.module.scss';
+import FadeInAnimation from '../FadeInAnimation';
 import DataSection from './components/DataSection';
 import FilePathsSection from './components/FilePathsSection';
 import MaintenanceSection from './components/MaintenanceSection';
@@ -64,60 +65,62 @@ const Settings: FunctionComponent = () => {
           />
         </div>
       </div>
-      <div className={style.container}>
-        <div className={style.titleWrapper}>
-          <h1 className='primary-text-color heading-6-bold'>
-            Application Settings
-          </h1>
-          <p className='secondary-text-color body-sm-regular'>
-            Configure your Visual Pinball X environment
-          </p>
+      <FadeInAnimation animationKey='settings'>
+        <div className={style.container}>
+          <div className={style.titleWrapper}>
+            <h1 className='primary-text-color heading-6-bold'>
+              Application Settings
+            </h1>
+            <p className='secondary-text-color body-sm-regular'>
+              Configure your Visual Pinball X environment
+            </p>
+          </div>
+          <div className={classNames(style.section, style.filePathsSection)}>
+            <div className={style.sectionHeader}>
+              <Icon
+                className={style.sectionIcon}
+                icon='folder'
+                width={20}
+                height={20}
+              />
+              <h2 className='primary-text-color heading-4-bold'>File Paths</h2>
+            </div>
+            <div>
+              <FilePathsSection />
+            </div>
+          </div>
+          <div className={classNames(style.section, style.dataSection)}>
+            <div className={style.sectionHeader}>
+              <Icon
+                className={style.sectionIcon}
+                icon='database'
+                width={20}
+                height={20}
+              />
+              <h2 className='primary-text-color heading-4-bold'>
+                Data Management
+              </h2>
+            </div>
+            <div>
+              <DataSection />
+            </div>
+          </div>
+          <div className={classNames(style.section, style.maintenanceSection)}>
+            <div className={style.sectionHeader}>
+              <Icon
+                className={style.sectionIcon}
+                icon='shield-checkmark'
+                width={20}
+                height={20}
+              />
+              <h2 className='primary-text-color heading-4-bold'>Maintenance</h2>
+            </div>
+            <div>
+              <MaintenanceSection />
+            </div>
+          </div>
         </div>
-        <div className={classNames(style.section, style.filePathsSection)}>
-          <div className={style.sectionHeader}>
-            <Icon
-              className={style.sectionIcon}
-              icon='folder'
-              width={20}
-              height={20}
-            />
-            <h2 className='primary-text-color heading-4-bold'>File Paths</h2>
-          </div>
-          <div>
-            <FilePathsSection />
-          </div>
-        </div>
-        <div className={classNames(style.section, style.dataSection)}>
-          <div className={style.sectionHeader}>
-            <Icon
-              className={style.sectionIcon}
-              icon='database'
-              width={20}
-              height={20}
-            />
-            <h2 className='primary-text-color heading-4-bold'>
-              Data Management
-            </h2>
-          </div>
-          <div>
-            <DataSection />
-          </div>
-        </div>
-        <div className={classNames(style.section, style.maintenanceSection)}>
-          <div className={style.sectionHeader}>
-            <Icon
-              className={style.sectionIcon}
-              icon='shield-checkmark'
-              width={20}
-              height={20}
-            />
-            <h2 className='primary-text-color heading-4-bold'>Maintenance</h2>
-          </div>
-          <div>
-            <MaintenanceSection />
-          </div>
-        </div>
-      </div>
+      </FadeInAnimation>
     </>
   );
 };
