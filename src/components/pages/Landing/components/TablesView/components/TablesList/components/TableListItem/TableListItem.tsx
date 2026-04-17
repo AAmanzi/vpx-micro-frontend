@@ -7,6 +7,7 @@ import Button, {
 } from 'src/components/Button';
 import Icon from 'src/components/Icon';
 import api from 'src/consts';
+import { DEFAULT_START_TABLE_KEY } from 'src/consts/config';
 import { useTablesContext } from 'src/providers/tables';
 import { useToastContext } from 'src/providers/toast';
 import { Table } from 'src/types/table';
@@ -22,6 +23,8 @@ import style from './TableListItem.module.scss';
 type Props = Table & {
   isSelected?: boolean;
 };
+
+const START_TABLE_KEY = DEFAULT_START_TABLE_KEY;
 
 const TableListItem: FunctionComponent<Props> = ({
   id,
@@ -118,6 +121,34 @@ const TableListItem: FunctionComponent<Props> = ({
 
     fetchTables();
   };
+
+  useEffect(() => {
+    if (!isSelected) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      const tagName = target?.tagName?.toLowerCase();
+      const isTypingTarget =
+        tagName === 'input' ||
+        tagName === 'textarea' ||
+        target?.isContentEditable;
+
+      if (event.key !== START_TABLE_KEY || isTypingTarget) {
+        return;
+      }
+
+      event.preventDefault();
+      handlePlay();
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [handlePlay, isSelected]);
 
   return (
     <div

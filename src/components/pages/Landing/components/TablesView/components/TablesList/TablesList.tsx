@@ -1,5 +1,9 @@
 import { FunctionComponent, useEffect, useState } from 'react';
 
+import {
+  DEFAULT_NEXT_TABLE_KEY,
+  DEFAULT_PREVIOUS_TABLE_KEY,
+} from 'src/consts/config';
 import { ViewType } from 'src/types/config';
 import { Table } from 'src/types/table';
 
@@ -12,8 +16,8 @@ interface Props {
   viewType: ViewType;
 }
 
-const NEXT_TABLE_KEY = 'ArrowDown';
-const PREVIOUS_TABLE_KEY = 'ArrowUp';
+const NEXT_TABLE_KEY = DEFAULT_NEXT_TABLE_KEY;
+const PREVIOUS_TABLE_KEY = DEFAULT_PREVIOUS_TABLE_KEY;
 
 const TablesList: FunctionComponent<Props> = ({ tables, viewType }) => {
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
@@ -36,10 +40,7 @@ const TablesList: FunctionComponent<Props> = ({ tables, viewType }) => {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (
-        event.key !== NEXT_TABLE_KEY &&
-        event.key !== PREVIOUS_TABLE_KEY
-      ) {
+      if (event.key !== NEXT_TABLE_KEY && event.key !== PREVIOUS_TABLE_KEY) {
         return;
       }
 
@@ -130,9 +131,7 @@ const TablesList: FunctionComponent<Props> = ({ tables, viewType }) => {
             <div key={table.id} data-table-id={table.id}>
               <TableListItem
                 {...table}
-                isSelected={
-                  isTableSelectActive && selectedTableId === table.id
-                }
+                isSelected={isTableSelectActive && selectedTableId === table.id}
               />
             </div>
           );
