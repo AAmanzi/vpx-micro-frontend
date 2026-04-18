@@ -30,6 +30,10 @@ export interface Api {
   // Tables
   getAllTables: () => Promise<ApiResult<Array<Table>>>;
   setTableFavorite: (id: string, fav: boolean) => Promise<ApiResult<null>>;
+  setTableForAndroid: (
+    id: string,
+    isForAndroid: boolean,
+  ) => Promise<ApiResult<null>>;
   setTableArchived: (id: string, archived: boolean) => Promise<ApiResult<null>>;
   deleteTable: (id: string) => Promise<ApiResult<null>>;
   renameTable: (id: string, newName: string) => Promise<ApiResult<null>>;
@@ -84,6 +88,9 @@ export interface Api {
   ) => Promise<ApiResult<null>>;
   updateKeepFavoritesOnTop: (
     keepFavoritesOnTop: boolean,
+  ) => Promise<ApiResult<null>>;
+  updateAndroidFeaturesEnabled: (
+    androidFeaturesEnabled: boolean,
   ) => Promise<ApiResult<null>>;
   updateOrder: (order: Config['order']) => Promise<ApiResult<null>>;
   updateViewType: (viewType: Config['viewType']) => Promise<ApiResult<null>>;

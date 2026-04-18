@@ -23,6 +23,7 @@ const defaultConfig: Config = {
   keepFavoritesOnTop: false,
   order: Order.dateAddedDesc,
   viewType: ViewType.grid,
+  androidFeaturesEnabled: false,
 };
 
 const store = new Store<ConfigStoreSchema>({
@@ -124,5 +125,14 @@ export function updateViewType(viewType: Config['viewType']): void {
   store.set('config', {
     ...getStoredConfig(),
     viewType,
+  });
+}
+
+export function updateAndroidFeaturesEnabled(
+  androidFeaturesEnabled: boolean,
+): void {
+  store.set('config', {
+    ...getStoredConfig(),
+    androidFeaturesEnabled,
   });
 }

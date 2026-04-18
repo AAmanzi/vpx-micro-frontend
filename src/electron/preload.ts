@@ -13,6 +13,11 @@ const frontendApi: Api = {
     invoke<ApiResult<Table[]>>('api:getAllTables'),
   setTableFavorite: (id: string, fav: boolean): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:setTableFavorite', id, fav),
+  setTableForAndroid: (
+    id: string,
+    isForAndroid: boolean,
+  ): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:setTableForAndroid', id, isForAndroid),
   setTableArchived: (id: string, archived: boolean): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:setTableArchived', id, archived),
   deleteTable: (id: string): Promise<ApiResult<null>> =>
@@ -116,6 +121,13 @@ const frontendApi: Api = {
     keepFavoritesOnTop: boolean,
   ): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:updateKeepFavoritesOnTop', keepFavoritesOnTop),
+  updateAndroidFeaturesEnabled: (
+    androidFeaturesEnabled: boolean,
+  ): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>(
+      'api:updateAndroidFeaturesEnabled',
+      androidFeaturesEnabled,
+    ),
   updateOrder: (order: Config['order']): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:updateOrder', order),
   updateViewType: (viewType: Config['viewType']): Promise<ApiResult<null>> =>

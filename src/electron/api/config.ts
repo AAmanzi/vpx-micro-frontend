@@ -88,3 +88,14 @@ export function updateViewType(viewType: Config['viewType']): ApiResult<null> {
     return apiFailure(error);
   }
 }
+
+export function updateAndroidFeaturesEnabled(
+  androidFeaturesEnabled: boolean,
+): ApiResult<null> {
+  try {
+    configDb.updateAndroidFeaturesEnabled(androidFeaturesEnabled);
+    return apiSuccess(null);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}

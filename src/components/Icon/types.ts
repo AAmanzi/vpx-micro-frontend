@@ -6,6 +6,7 @@ export type Icon =
   | 'folder'
   | 'play'
   | 'monitor'
+  | 'phone'
   | 'edit'
   | 'trash'
   | 'kebab'

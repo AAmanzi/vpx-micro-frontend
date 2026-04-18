@@ -7,6 +7,7 @@ export interface Config {
   keepFavoritesOnTop: boolean;
   order: Order;
   viewType: ViewType;
+  androidFeaturesEnabled?: boolean;
 }
 
 export enum Order {

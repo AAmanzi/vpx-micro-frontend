@@ -33,6 +33,7 @@ const TablesView: FunctionComponent<Props> = ({
   defaultOrder,
   emptyStateVariant,
   isOrderPickerDisabled = false,
+  isScanLibraryDisabled = false,
   animationKey,
 }) => {
   const { fetchTables } = useTablesContext();
@@ -203,6 +204,13 @@ const TablesView: FunctionComponent<Props> = ({
           description:
             'Archive tables from table settings to keep your active library clean.',
         };
+      case 'android':
+        return {
+          icon: 'phone' as const,
+          title: 'No Android tables yet',
+          description:
+            'Mark tables as Android-compatible from a table card or list item to see them here.',
+        };
       default:
         return null;
     }
@@ -269,20 +277,22 @@ const TablesView: FunctionComponent<Props> = ({
                 />
               </div>
             )}
-            <div className={style.scanButtonWrapper}>
-              <Button
-                icon='scan-search'
-                label='Scan Library'
-                type={
-                  isLibraryEmpty
-                    ? ButtonType.primaryAlt
-                    : ButtonType.primaryAltTransparent
-                }
-                size={ButtonSize.medium}
-                onClick={() => setIsScanLibraryModalOpen(true)}
-                fill
-              />
-            </div>
+            {!isScanLibraryDisabled && (
+              <div className={style.scanButtonWrapper}>
+                <Button
+                  icon='scan-search'
+                  label='Scan Library'
+                  type={
+                    isLibraryEmpty
+                      ? ButtonType.primaryAlt
+                      : ButtonType.primaryAltTransparent
+                  }
+                  size={ButtonSize.medium}
+                  onClick={() => setIsScanLibraryModalOpen(true)}
+                  fill
+                />
+              </div>
+            )}
           </div>
         </div>
 
@@ -398,7 +408,7 @@ const TablesView: FunctionComponent<Props> = ({
           initialFiles={droppedFilesForImport}
         />
       )}
-      {isScanLibraryModalOpen && (
+      {!isScanLibraryDisabled && isScanLibraryModalOpen && (
         <ScanLibraryModal close={() => setIsScanLibraryModalOpen(false)} />
       )}
       <FileUploadOverlay

@@ -11,6 +11,7 @@ export interface Table {
 
   isFavorite: boolean;
   isArchived?: boolean;
+  isForAndroid?: boolean;
   lastPlayedTimestamp?: number;
   dateAddedTimestamp: number;
 

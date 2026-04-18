@@ -7,6 +7,7 @@ import Button, {
 } from 'src/components/Button';
 import Icon from 'src/components/Icon';
 import api from 'src/consts';
+import { useConfigContext } from 'src/providers/config';
 import { useTablesContext } from 'src/providers/tables';
 import { useToastContext } from 'src/providers/toast';
 import { Table } from 'src/types/table';
@@ -24,6 +25,7 @@ type Props = Table;
 const TableCard: FunctionComponent<Props> = ({
   id,
   isFavorite,
+  isForAndroid,
   isArchived,
   name,
   romFile,
@@ -35,9 +37,12 @@ const TableCard: FunctionComponent<Props> = ({
   lastPlayedTimestamp,
 }) => {
   const [favorite, setFavorite] = useState(isFavorite);
+  const [forAndroid, setForAndroid] = useState(Boolean(isForAndroid));
   const [isStarting, setIsStarting] = useState(false);
   const { showErrorToast } = useToastContext();
   const { fetchTables } = useTablesContext();
+  const { config } = useConfigContext();
+  const androidFeaturesEnabled = Boolean(config?.androidFeaturesEnabled);
 
   const handlePlay = async () => {
     if (isStarting) {
@@ -78,6 +83,23 @@ const TableCard: FunctionComponent<Props> = ({
     fetchTables();
   };
 
+  const handleToggleAndroid = async () => {
+    const newValue = !forAndroid;
+
+    setForAndroid(newValue);
+
+    const { error } = await api.setTableForAndroid(id, newValue);
+
+    if (error) {
+      setForAndroid(!newValue);
+      showErrorToast(error.message || 'Failed to update Android flag');
+
+      return;
+    }
+
+    fetchTables();
+  };
+
   return (
     <div className={style.card}>
       <div
@@ -94,6 +116,22 @@ const TableCard: FunctionComponent<Props> = ({
           type={ButtonType.secondary}
         />
       </div>
+
+      {androidFeaturesEnabled && (
+        <button
+          type='button'
+          className={classNames(style.androidButton, {
+            [style.isForAndroid]: forAndroid,
+          })}
+          onClick={handleToggleAndroid}>
+          <Icon
+            className={classNames(style.androidIcon)}
+            icon='phone'
+            width={16}
+            height={16}
+          />
+        </button>
+      )}
 
       <button
         type='button'

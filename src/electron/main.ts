@@ -170,6 +170,11 @@ app.whenReady().then(async () => {
     api.setTableFavorite(id, fav),
   );
   ipcMain.handle(
+    'api:setTableForAndroid',
+    async (_, id: string, isForAndroid: boolean) =>
+      api.setTableForAndroid(id, isForAndroid),
+  );
+  ipcMain.handle(
     'api:setTableArchived',
     async (_, id: string, archived: boolean) =>
       api.setTableArchived(id, archived),
@@ -242,6 +247,11 @@ app.whenReady().then(async () => {
   ipcMain.handle(
     'api:updateViewType',
     async (_, viewType: Config['viewType']) => api.updateViewType(viewType),
+  );
+  ipcMain.handle(
+    'api:updateAndroidFeaturesEnabled',
+    async (_, androidFeaturesEnabled: boolean) =>
+      api.updateAndroidFeaturesEnabled(androidFeaturesEnabled),
   );
   ipcMain.handle('api:startTable', async (_, tableId: string) =>
     api.startTable(tableId),
