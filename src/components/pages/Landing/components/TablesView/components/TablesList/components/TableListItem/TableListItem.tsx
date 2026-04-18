@@ -7,7 +7,7 @@ import Button, {
 } from 'src/components/Button';
 import Icon from 'src/components/Icon';
 import api from 'src/consts';
-import { DEFAULT_START_TABLE_KEY } from 'src/consts/config';
+import { useSelectable } from 'src/providers/selection';
 import { useTablesContext } from 'src/providers/tables';
 import { useToastContext } from 'src/providers/toast';
 import { Table } from 'src/types/table';
@@ -22,16 +22,16 @@ import style from './TableListItem.module.scss';
 
 type Props = Table & {
   isSelected?: boolean;
-  dataTableId?: string;
+  selectionKey: string;
+  selectionOrder: number;
 };
-
-const START_TABLE_KEY = DEFAULT_START_TABLE_KEY;
 
 const TableListItem: FunctionComponent<Props> = ({
   id,
   isFavorite,
   isSelected = false,
-  dataTableId,
+  selectionKey,
+  selectionOrder,
   isArchived,
   name,
   romFile,
@@ -45,6 +45,7 @@ const TableListItem: FunctionComponent<Props> = ({
   const [favorite, setFavorite] = useState(isFavorite);
   const [isStarting, setIsStarting] = useState(false);
   const [isNameTruncated, setIsNameTruncated] = useState(false);
+  const rootRef = useRef<HTMLDivElement | null>(null);
   const titleRef = useRef<HTMLHeadingElement | null>(null);
   const { showErrorToast } = useToastContext();
   const { fetchTables } = useTablesContext();
@@ -124,37 +125,21 @@ const TableListItem: FunctionComponent<Props> = ({
     fetchTables();
   };
 
-  useEffect(() => {
-    if (!isSelected) {
-      return;
-    }
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      const target = event.target as HTMLElement | null;
-      const tagName = target?.tagName?.toLowerCase();
-      const isTypingTarget =
-        tagName === 'input' ||
-        tagName === 'textarea' ||
-        target?.isContentEditable;
-
-      if (event.key !== START_TABLE_KEY || isTypingTarget) {
-        return;
-      }
-
-      event.preventDefault();
-      handlePlay();
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [handlePlay, isSelected]);
+  const { select, selectableKey } = useSelectable({
+    key: selectionKey,
+    type: 'table',
+    id,
+    order: selectionOrder,
+    onAction: handlePlay,
+    getElement: () => rootRef.current,
+  });
 
   return (
     <div
-      data-table-id={dataTableId}
+      ref={rootRef}
+      data-table-id={id}
+      data-selectable-key={selectableKey}
+      onMouseDown={select}
       className={classNames(style.item, {
         [style.selected]: isSelected,
       })}>

@@ -72,3 +72,10 @@
     width: auto;
   }
 }
+
+.randomTableButtonWrapper.selected {
+  button {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 1px rgba(var(--blue-rgb), 0.45);
+  }
+}

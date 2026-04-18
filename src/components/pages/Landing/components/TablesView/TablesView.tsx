@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { FunctionComponent, useEffect, useState } from 'react';
+import { FunctionComponent, useEffect, useRef, useState } from 'react';
 
 import Button, {
   Size as ButtonSize,
@@ -12,6 +12,7 @@ import ImportTablesModal from 'src/components/ImportTablesModal';
 import ScanLibraryModal from 'src/components/ScanLibraryModal';
 import api from 'src/consts';
 import { useConfigContext } from 'src/providers/config';
+import { SelectionProvider, useSelectable } from 'src/providers/selection';
 import { useTablesContext } from 'src/providers/tables';
 import { useToastContext } from 'src/providers/toast';
 import { Order, ViewType } from 'src/types/config';
@@ -24,8 +25,17 @@ import TablesList from './components/TablesList';
 import { Props } from './types';
 
 const MOBILE_TABLE_ACTIONS_BREAKPOINT_PX = 800;
+const RANDOM_TABLE_SELECTION_KEY = 'action:random-table';
 
-const TablesView: FunctionComponent<Props> = ({
+const getTablesHeaderOffset = (): number => {
+  const headerElement = document.querySelector<HTMLElement>(
+    '[data-tables-header]',
+  );
+
+  return headerElement?.getBoundingClientRect().height ?? 0;
+};
+
+const TablesViewContent: FunctionComponent<Props> = ({
   tables,
   librarySize,
   title,
@@ -44,6 +54,7 @@ const TablesView: FunctionComponent<Props> = ({
   const [isScanLibraryModalOpen, setIsScanLibraryModalOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [isCompactTableActions, setIsCompactTableActions] = useState(false);
+  const randomTableButtonRef = useRef<HTMLDivElement | null>(null);
   const [droppedFilesForImport, setDroppedFilesForImport] = useState<
     Array<FileSystemItem>
   >([]);
@@ -229,6 +240,18 @@ const TablesView: FunctionComponent<Props> = ({
     }
   };
 
+  const hasRandomTableButton = orderedTables.length > 0;
+  const { isSelected: isRandomTableSelected, select: selectRandomTable } =
+    useSelectable({
+      key: RANDOM_TABLE_SELECTION_KEY,
+      type: 'action',
+      id: 'random-table',
+      order: 0,
+      onAction: handlePlayRandomTable,
+      getElement: () => randomTableButtonRef.current,
+      enabled: hasRandomTableButton,
+    });
+
   const emptyViewContent = getEmptyViewContent();
 
   return (
@@ -255,8 +278,15 @@ const TablesView: FunctionComponent<Props> = ({
             )}
           </div>
           <div className={style.buttonsWrapper}>
-            {orderedTables.length > 0 && (
-              <div className={style.randomTableButtonWrapper}>
+            {hasRandomTableButton && (
+              <div
+                ref={randomTableButtonRef}
+                data-selectable-key={RANDOM_TABLE_SELECTION_KEY}
+                onMouseDown={selectRandomTable}
+                className={classNames(
+                  style.randomTableButtonWrapper,
+                  isRandomTableSelected && style.selected,
+                )}>
                 <Button
                   icon={isCompactTableActions ? 'shuffle' : 'play'}
                   label={isCompactTableActions ? undefined : 'Random table'}
@@ -409,6 +439,19 @@ const TablesView: FunctionComponent<Props> = ({
         onFilesSelected={handleOverlayFilesSelected}
       />
     </>
+  );
+};
+
+const TablesView: FunctionComponent<Props> = (props) => {
+  return (
+    <SelectionProvider
+      scrollConfig={{
+        getTopOffset: getTablesHeaderOffset,
+        paddingPx: 16,
+        behavior: 'smooth',
+      }}>
+      <TablesViewContent {...props} />
+    </SelectionProvider>
   );
 };
 
