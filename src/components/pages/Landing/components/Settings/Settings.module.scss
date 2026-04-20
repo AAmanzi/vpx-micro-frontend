@@ -62,6 +62,12 @@
     }
   }
 
+  &.androidSection {
+    .sectionIcon {
+      color: var(--blue);
+    }
+  }
+
   &.maintenanceSection {
     .sectionIcon {
       color: var(--red);

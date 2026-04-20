@@ -253,6 +253,17 @@ app.whenReady().then(async () => {
     async (_, androidFeaturesEnabled: boolean) =>
       api.updateAndroidFeaturesEnabled(androidFeaturesEnabled),
   );
+  ipcMain.handle('api:updateAndroidWebServerUrl', async (_, path: string) =>
+    api.updateAndroidWebServerUrl(path),
+  );
+  ipcMain.handle(
+    'api:updateAndroidTablesDirectoryPath',
+    async (_, path: string) => api.updateAndroidTablesDirectoryPath(path),
+  );
+  ipcMain.handle(
+    'api:updateAndroidRomsDirectoryPath',
+    async (_, path: string) => api.updateAndroidRomsDirectoryPath(path),
+  );
   ipcMain.handle('api:startTable', async (_, tableId: string) =>
     api.startTable(tableId),
   );

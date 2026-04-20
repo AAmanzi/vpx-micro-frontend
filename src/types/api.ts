@@ -92,6 +92,9 @@ export interface Api {
   updateAndroidFeaturesEnabled: (
     androidFeaturesEnabled: boolean,
   ) => Promise<ApiResult<null>>;
+  updateAndroidWebServerUrl: (path: string) => Promise<ApiResult<null>>;
+  updateAndroidTablesDirectoryPath: (path: string) => Promise<ApiResult<null>>;
+  updateAndroidRomsDirectoryPath: (path: string) => Promise<ApiResult<null>>;
   updateOrder: (order: Config['order']) => Promise<ApiResult<null>>;
   updateViewType: (viewType: Config['viewType']) => Promise<ApiResult<null>>;
 }

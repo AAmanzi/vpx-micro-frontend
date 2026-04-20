@@ -128,6 +128,14 @@ const frontendApi: Api = {
       'api:updateAndroidFeaturesEnabled',
       androidFeaturesEnabled,
     ),
+  updateAndroidWebServerUrl: (path: string): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:updateAndroidWebServerUrl', path),
+  updateAndroidTablesDirectoryPath: (
+    path: string,
+  ): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:updateAndroidTablesDirectoryPath', path),
+  updateAndroidRomsDirectoryPath: (path: string): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:updateAndroidRomsDirectoryPath', path),
   updateOrder: (order: Config['order']): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:updateOrder', order),
   updateViewType: (viewType: Config['viewType']): Promise<ApiResult<null>> =>

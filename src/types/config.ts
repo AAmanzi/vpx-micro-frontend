@@ -8,6 +8,9 @@ export interface Config {
   order: Order;
   viewType: ViewType;
   androidFeaturesEnabled?: boolean;
+  androidWebServerUrl?: string;
+  androidTablesDirectory?: string;
+  androidRomsDirectory?: string;
 }
 
 export enum Order {

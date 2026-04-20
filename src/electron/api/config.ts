@@ -99,3 +99,30 @@ export function updateAndroidFeaturesEnabled(
     return apiFailure(error);
   }
 }
+
+export function updateAndroidWebServerUrl(path: string): ApiResult<null> {
+  try {
+    configDb.updateAndroidWebServerUrl(path);
+    return apiSuccess(null);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}
+
+export function updateAndroidTablesDirectoryPath(path: string): ApiResult<null> {
+  try {
+    configDb.updateAndroidTablesDirectoryPath(path);
+    return apiSuccess(null);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}
+
+export function updateAndroidRomsDirectoryPath(path: string): ApiResult<null> {
+  try {
+    configDb.updateAndroidRomsDirectoryPath(path);
+    return apiSuccess(null);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}
