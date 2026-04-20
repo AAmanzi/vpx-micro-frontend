@@ -16,7 +16,7 @@ interface Props {
 }
 
 const SyncAndroidLibraryModal: FunctionComponent<Props> = ({ close }) => {
-  const { showErrorToast } = useToastContext();
+  const { showErrorToast, showWarningToast } = useToastContext();
 
   const [isLoading, setIsLoading] = useState(true);
   const [connectionError, setConnectionError] = useState(false);
@@ -57,6 +57,13 @@ const SyncAndroidLibraryModal: FunctionComponent<Props> = ({ close }) => {
 
     if (result.success) {
       setScanResult(result.data);
+
+      if (result.warning) {
+        showWarningToast(
+          result.warning.message ||
+            'Some local files were missing and were skipped during scan.',
+        );
+      }
 
       setIsLoading(false);
       return;

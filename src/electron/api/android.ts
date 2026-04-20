@@ -28,6 +28,29 @@ const isVpxFile = (name: string): boolean =>
 const isZipFile = (name: string): boolean =>
   normalizeName(name).endsWith('.zip');
 
+const getLocalFileSize = (filePath: string): number | null => {
+  try {
+    return fs.statSync(filePath).size;
+  } catch {
+    return null;
+  }
+};
+
+const buildMissingFilesWarning = (missingPaths: string[]) => {
+  if (missingPaths.length === 0) {
+    return undefined;
+  }
+
+  const preview = missingPaths.slice(0, 3).join(', ');
+  const hiddenCount = missingPaths.length - 3;
+  const suffix = hiddenCount > 0 ? ` and ${hiddenCount} more` : '';
+
+  return {
+    code: 'ANDROID_LOCAL_FILES_MISSING',
+    message: `Some local files were missing and were skipped during scan: ${preview}${suffix}.`,
+  };
+};
+
 const buildRemoteFilePath = (directory: string, fileName: string): string => {
   const normalizedDirectory = directory.trim().replace(/\/+$/, '');
 
@@ -57,6 +80,8 @@ export async function scanAndroidLibrary(): Promise<
   ApiResult<AndroidScanResult>
 > {
   try {
+    const missingPaths = new Set<string>();
+
     const tables = tablesDb
       .getAll()
       .filter(
@@ -101,19 +126,30 @@ export async function scanAndroidLibrary(): Promise<
     );
 
     const tablesToUpload = tableFileModels.filter((table) => {
+      const localSize = getLocalFileSize(table.filePath);
+      if (localSize === null) {
+        missingPaths.add(table.filePath);
+        return false;
+      }
+
       const remoteSize = androidTableFileSizes.get(
         normalizeName(table.fileName),
       );
       if (remoteSize === undefined) return true;
-      const localSize = fs.statSync(table.filePath).size;
       return remoteSize !== localSize;
     });
+
     const tablesInSync = tableFileModels.filter((table) => {
+      const localSize = getLocalFileSize(table.filePath);
+      if (localSize === null) {
+        missingPaths.add(table.filePath);
+        return false;
+      }
+
       const remoteSize = androidTableFileSizes.get(
         normalizeName(table.fileName),
       );
       if (remoteSize === undefined) return false;
-      const localSize = fs.statSync(table.filePath).size;
       return remoteSize === localSize;
     });
 
@@ -129,9 +165,14 @@ export async function scanAndroidLibrary(): Promise<
         romNamesFromTablesInSync.has(normalizeName(romFile.name)),
       )
       .filter((romFile) => {
+        const localSize = getLocalFileSize(romFile.path);
+        if (localSize === null) {
+          missingPaths.add(romFile.path);
+          return false;
+        }
+
         const remoteSize = androidRomFileSizes.get(normalizeName(romFile.name));
         if (remoteSize === undefined) return true;
-        const localSize = fs.statSync(romFile.path).size;
         return remoteSize !== localSize;
       });
 
@@ -160,12 +201,15 @@ export async function scanAndroidLibrary(): Promise<
         })),
     ];
 
-    return apiSuccess({
-      tablesToUpload,
-      unsyncedRomsToUpload,
-      filesToDelete,
-      tablesInSync,
-    });
+    return apiSuccess(
+      {
+        tablesToUpload,
+        unsyncedRomsToUpload,
+        filesToDelete,
+        tablesInSync,
+      },
+      buildMissingFilesWarning(Array.from(missingPaths)),
+    );
   } catch (error) {
     return apiFailure(error);
   }
