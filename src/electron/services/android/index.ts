@@ -4,11 +4,64 @@ import https from 'https';
 import type { ApiError } from 'src/types/api';
 
 const DEFAULT_REQUEST_TIMEOUT_MS = 5000;
+const UPLOAD_REQUEST_TIMEOUT_MS = 30000;
+const DELETE_REQUEST_TIMEOUT_MS = 15000;
+const UPLOAD_CHUNK_SIZE_BYTES = 1024 * 1024;
+const MAX_RETRIES = 3;
 
 const createAndroidError = (code: string, message: string): ApiError => ({
   code,
   message,
 });
+
+const sleep = (ms: number): Promise<void> =>
+  new Promise((resolve) => setTimeout(resolve, ms));
+
+const isTransientNetworkError = (error: unknown): boolean => {
+  if (!error || typeof error !== 'object') {
+    return false;
+  }
+
+  const code =
+    'code' in error && typeof (error as { code?: unknown }).code === 'string'
+      ? (error as { code: string }).code
+      : '';
+  const message =
+    'message' in error &&
+    typeof (error as { message?: unknown }).message === 'string'
+      ? (error as { message: string }).message.toLowerCase()
+      : '';
+
+  return (
+    code === 'EPIPE' ||
+    code === 'ECONNRESET' ||
+    code === 'ECONNABORTED' ||
+    code === 'ETIMEDOUT' ||
+    message.includes('epipe') ||
+    message.includes('socket hang up') ||
+    message.includes('timed out')
+  );
+};
+
+const withRetry = async <T>(operation: () => Promise<T>): Promise<T> => {
+  let lastError: unknown;
+
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt += 1) {
+    try {
+      return await operation();
+    } catch (error) {
+      lastError = error;
+
+      if (!isTransientNetworkError(error) || attempt === MAX_RETRIES) {
+        throw error;
+      }
+
+      await sleep(250 * attempt);
+    }
+  }
+
+  throw lastError;
+};
 
 export interface AndroidRemoteFile {
   name: string;
@@ -50,6 +103,18 @@ const normalizeAndroidServerUrl = (rawUrl: string): URL => {
 };
 
 type HttpMethod = 'GET' | 'POST' | 'DELETE';
+
+const getAndroidFailureCode = (method: HttpMethod): string => {
+  switch (method) {
+    case 'POST':
+      return 'ANDROID_UPLOAD_FAILED';
+    case 'DELETE':
+      return 'ANDROID_DELETE_FAILED';
+    case 'GET':
+    default:
+      return 'ANDROID_LIST_FAILED';
+  }
+};
 
 const androidApiRequest = async (
   url: URL,
@@ -99,7 +164,7 @@ const androidApiRequest = async (
 
           rejectOnce(
             createAndroidError(
-              'ANDROID_LIST_FAILED',
+              getAndroidFailureCode(method),
               `Android server responded with HTTP ${statusCode}.`,
             ),
           );
@@ -120,7 +185,7 @@ const androidApiRequest = async (
     request.on('error', (error) => {
       rejectOnce(
         createAndroidError(
-          'ANDROID_LIST_FAILED',
+          getAndroidFailureCode(method),
           error.message || 'Failed to reach Android server.',
         ),
       );
@@ -199,7 +264,7 @@ export const getAndroidFiles = async (
 export const deleteAndroidFile = async (
   serverUrl: string,
   remotePath: string,
-  timeoutMs: number = DEFAULT_REQUEST_TIMEOUT_MS,
+  timeoutMs: number = DELETE_REQUEST_TIMEOUT_MS,
 ): Promise<void> => {
   const normalizedUrl = normalizeAndroidServerUrl(serverUrl);
   const deleteUrl = new URL(
@@ -207,7 +272,9 @@ export const deleteAndroidFile = async (
   );
   deleteUrl.searchParams.set('q', remotePath);
 
-  await androidApiRequest(deleteUrl, 'DELETE', undefined, timeoutMs);
+  await withRetry(() =>
+    androidApiRequest(deleteUrl, 'DELETE', undefined, timeoutMs),
+  );
 };
 
 export const uploadAndroidFile = async (
@@ -215,18 +282,30 @@ export const uploadAndroidFile = async (
   remotePath: string,
   fileData: Buffer | Uint8Array,
   offset: number = 0,
-  timeoutMs: number = DEFAULT_REQUEST_TIMEOUT_MS,
+  timeoutMs: number = UPLOAD_REQUEST_TIMEOUT_MS,
 ): Promise<void> => {
   const normalizedUrl = normalizeAndroidServerUrl(serverUrl);
-  const uploadUrl = new URL(
-    `${normalizedUrl.toString().replace(/\/?$/, '/')}upload`,
-  );
-  uploadUrl.searchParams.set('q', remotePath);
-  uploadUrl.searchParams.set('offset', String(Math.floor(offset)));
-
   const body = Buffer.isBuffer(fileData) ? fileData : Buffer.from(fileData);
 
-  await androidApiRequest(uploadUrl, 'POST', body, timeoutMs);
+  let currentOffset = Math.max(0, Math.floor(offset));
+
+  while (currentOffset < body.length) {
+    const chunk = body.subarray(
+      currentOffset,
+      currentOffset + UPLOAD_CHUNK_SIZE_BYTES,
+    );
+
+    const uploadUrl = new URL(
+      `${normalizedUrl.toString().replace(/\/?$/, '/')}upload`,
+    );
+    uploadUrl.searchParams.set('q', remotePath);
+    uploadUrl.searchParams.set('offset', String(currentOffset));
+
+    await withRetry(() =>
+      androidApiRequest(uploadUrl, 'POST', chunk, timeoutMs),
+    );
+    currentOffset += chunk.length;
+  }
 };
 
 export const pingAndroidServer = async (

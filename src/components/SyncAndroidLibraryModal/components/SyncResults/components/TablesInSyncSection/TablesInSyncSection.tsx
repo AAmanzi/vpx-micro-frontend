@@ -1,6 +1,6 @@
 import { FunctionComponent } from 'react';
 
-import Tag from 'src/components/Tag';
+import Tag, { Type as TagType } from 'src/components/Tag';
 import type { TableFile } from 'src/types/file';
 
 import style from './TablesInSyncSection.module.scss';
@@ -20,7 +20,13 @@ const TablesInSyncSection: FunctionComponent<Props> = ({ tables }) => {
             </span>
             <div className={style.tags}>
               <Tag icon='file-code' label={table.fileName} />
-              {table.rom && <Tag icon='package' label={table.rom.name} />}
+              {table.rom && (
+                <Tag
+                  icon='package'
+                  label={table.rom.name}
+                  type={TagType.success}
+                />
+              )}
             </div>
           </div>
         </div>

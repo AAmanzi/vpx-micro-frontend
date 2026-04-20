@@ -1,4 +1,5 @@
 import { apiFailure, apiSuccess } from '.';
+import fs from 'fs';
 
 import {
   VPX_DEFAULT_ANDROID_ROMS_PATH,
@@ -14,7 +15,11 @@ import type { FileSystemItem, TableFile } from 'src/types/file';
 
 import * as configDb from '../database/config';
 import * as tablesDb from '../database/tables';
-import { getAndroidFiles } from '../services/android';
+import {
+  deleteAndroidFile,
+  getAndroidFiles,
+  uploadAndroidFile,
+} from '../services/android';
 
 const normalizeName = (value: string): string => value.trim().toLowerCase();
 const isVpxFile = (name: string): boolean =>
@@ -152,13 +157,62 @@ export async function scanAndroidLibrary(): Promise<
   }
 }
 
-export function applyAndroidSync({
+export async function applyAndroidSync({
   filesToDelete,
   tablesToUpload,
   unsyncedRomsToUpload,
-}: AndroidSyncApplyPayload): ApiResult<null> {
-  return apiFailure({
-    code: 'ANDROID_NOT_IMPLEMENTED',
-    message: 'Android sync apply is not implemented yet.',
-  });
+}: AndroidSyncApplyPayload): Promise<ApiResult<null>> {
+  try {
+    const config = configDb.getConfig();
+
+    const serverUrl = config.androidWebServerUrl || '';
+    const tablesDirectory =
+      config.androidTablesDirectory || VPX_DEFAULT_ANDROID_TABLES_PATH;
+    const romsDirectory =
+      config.androidRomsDirectory || VPX_DEFAULT_ANDROID_ROMS_PATH;
+
+    const uploadedRomNames = new Set<string>();
+
+    for (const table of tablesToUpload) {
+      const fileData = await fs.promises.readFile(table.filePath);
+      const remotePath = buildRemoteFilePath(tablesDirectory, table.fileName);
+
+      await uploadAndroidFile(serverUrl, remotePath, fileData);
+
+      if (table.rom) {
+        const normalizedRomName = normalizeName(table.rom.name);
+
+        if (!uploadedRomNames.has(normalizedRomName)) {
+          const romFileData = await fs.promises.readFile(table.rom.path);
+          const remoteRomPath = buildRemoteFilePath(romsDirectory, table.rom.name);
+
+          await uploadAndroidFile(serverUrl, remoteRomPath, romFileData);
+          uploadedRomNames.add(normalizedRomName);
+        }
+      }
+    }
+
+    for (const rom of unsyncedRomsToUpload) {
+      const normalizedRomName = normalizeName(rom.name);
+
+      if (uploadedRomNames.has(normalizedRomName)) {
+        continue;
+      }
+
+      const fileData = await fs.promises.readFile(rom.path);
+      const remotePath = buildRemoteFilePath(romsDirectory, rom.name);
+
+      await uploadAndroidFile(serverUrl, remotePath, fileData);
+      uploadedRomNames.add(normalizedRomName);
+    }
+
+    for (const file of filesToDelete) {
+      await deleteAndroidFile(serverUrl, file.path);
+    }
+
+    return apiSuccess(null);
+  } catch (error) {
+    console.log(error);
+    return apiFailure(error);
+  }
 }
