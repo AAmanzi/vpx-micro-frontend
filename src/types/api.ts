@@ -1,3 +1,4 @@
+import { AndroidScanResult, AndroidSyncApplyPayload } from './android';
 import { Config } from './config';
 import { FileSystemItem, TableFile } from './file';
 import { GroupType, ScanResult, Table } from './table';
@@ -59,6 +60,12 @@ export interface Api {
     exportGroup: GroupType,
   ) => Promise<ApiResult<null>>;
   startRandomTable: (tables: Array<Table>) => Promise<ApiResult<null>>;
+
+  // Android Sync
+  scanAndroidLibrary: () => Promise<ApiResult<AndroidScanResult>>;
+  applyAndroidSync: (
+    payload: AndroidSyncApplyPayload,
+  ) => Promise<ApiResult<null>>;
 
   // FileSystem
   getPathForFile: (file: File) => ApiResult<string>;

@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer, webUtils } from 'electron';
 
 import type { Api, ApiResult } from 'src/types/api';
+import type { AndroidScanResult, AndroidSyncApplyPayload } from 'src/types/android';
 import type { Config } from 'src/types/config';
 import type { FileSystemItem } from 'src/types/file';
 import type { GroupType, ScanResult, Table } from 'src/types/table';
@@ -93,6 +94,12 @@ const frontendApi: Api = {
     invoke<ApiResult<null>>('api:clearTables'),
   scanVpxLibrary: (): Promise<ApiResult<ScanResult>> =>
     invoke<ApiResult<ScanResult>>('api:scanVpxLibrary'),
+  scanAndroidLibrary: (): Promise<ApiResult<AndroidScanResult>> =>
+    invoke<ApiResult<AndroidScanResult>>('api:scanAndroidLibrary'),
+  applyAndroidSync: (
+    payload: AndroidSyncApplyPayload,
+  ): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:applyAndroidSync', payload),
   applyScanResult: (scanResult: ScanResult): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:applyScanResult', scanResult),
   exportTables: (

@@ -7,6 +7,7 @@ import path from 'path';
 import type { Config } from 'src/types/config';
 import type { TableFile } from 'src/types/file';
 import type { GroupType, ScanResult, Table } from 'src/types/table';
+import type { AndroidSyncApplyPayload } from 'src/types/android';
 
 import * as api from './api';
 import * as db from './database/tables';
@@ -269,6 +270,11 @@ app.whenReady().then(async () => {
   );
   ipcMain.handle('api:clearTables', async () => api.clearTables());
   ipcMain.handle('api:scanVpxLibrary', async () => api.scanVpxLibrary());
+  ipcMain.handle('api:scanAndroidLibrary', async () => api.scanAndroidLibrary());
+  ipcMain.handle(
+    'api:applyAndroidSync',
+    async (_, payload: AndroidSyncApplyPayload) => api.applyAndroidSync(payload),
+  );
   ipcMain.handle('api:applyScanResult', async (_, scanResult: ScanResult) =>
     api.applyScanResult(scanResult),
   );

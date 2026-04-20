@@ -10,5 +10,6 @@ export interface Props {
   emptyStateVariant?: 'favorites' | 'recentlyPlayed' | 'archive' | 'android';
   isOrderPickerDisabled?: boolean;
   isScanLibraryDisabled?: boolean;
+  androidFeaturesEnabled?: boolean;
   animationKey: string;
 }

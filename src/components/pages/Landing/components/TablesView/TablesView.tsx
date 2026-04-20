@@ -10,6 +10,7 @@ import FileUploadOverlay from 'src/components/FileUploadOverlay';
 import Icon from 'src/components/Icon';
 import ImportTablesModal from 'src/components/ImportTablesModal';
 import ScanLibraryModal from 'src/components/ScanLibraryModal';
+import SyncAndroidLibraryModal from 'src/components/SyncAndroidLibraryModal';
 import api from 'src/consts';
 import { useConfigContext } from 'src/providers/config';
 import { useTablesContext } from 'src/providers/tables';
@@ -34,6 +35,7 @@ const TablesView: FunctionComponent<Props> = ({
   emptyStateVariant,
   isOrderPickerDisabled = false,
   isScanLibraryDisabled = false,
+  androidFeaturesEnabled = false,
   animationKey,
 }) => {
   const { fetchTables } = useTablesContext();
@@ -43,6 +45,7 @@ const TablesView: FunctionComponent<Props> = ({
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isRandomTableStarting, setIsRandomTableStarting] = useState(false);
   const [isScanLibraryModalOpen, setIsScanLibraryModalOpen] = useState(false);
+  const [isSyncAndroidModalOpen, setIsSyncAndroidModalOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [isCompactTableActions, setIsCompactTableActions] = useState(false);
   const [droppedFilesForImport, setDroppedFilesForImport] = useState<
@@ -293,6 +296,18 @@ const TablesView: FunctionComponent<Props> = ({
                 />
               </div>
             )}
+            {androidFeaturesEnabled && (
+              <div className={style.scanButtonWrapper}>
+                <Button
+                  icon='phone'
+                  label='Sync Android'
+                  type={ButtonType.primaryAltTransparent}
+                  size={ButtonSize.medium}
+                  onClick={() => setIsSyncAndroidModalOpen(true)}
+                  fill
+                />
+              </div>
+            )}
           </div>
         </div>
 
@@ -410,6 +425,9 @@ const TablesView: FunctionComponent<Props> = ({
       )}
       {!isScanLibraryDisabled && isScanLibraryModalOpen && (
         <ScanLibraryModal close={() => setIsScanLibraryModalOpen(false)} />
+      )}
+      {isSyncAndroidModalOpen && (
+        <SyncAndroidLibraryModal close={() => setIsSyncAndroidModalOpen(false)} />
       )}
       <FileUploadOverlay
         label='Drop files to import'

@@ -17,30 +17,3 @@ export interface AndroidSyncApplyPayload {
   unsyncedRomsToUpload: Array<FileSystemItem>;
   filesToDelete: Array<AndroidFileSystemItem>;
 }
-
-export type AndroidSyncPhase = 'upload' | 'delete';
-
-export interface AndroidSyncProgressEvent {
-  operationId: string;
-  phase: AndroidSyncPhase;
-  fileName: string;
-  processedBytes: number;
-  totalBytes: number;
-  processedFiles: number;
-  totalFiles: number;
-}
-
-export interface AndroidSyncApplyItemResult {
-  fileName: string;
-  path: string;
-  phase: AndroidSyncPhase;
-  success: boolean;
-  errorCode?: string;
-  errorMessage?: string;
-}
-
-export interface AndroidSyncApplyResult {
-  operationId: string;
-  completed: Array<AndroidSyncApplyItemResult>;
-  failed: Array<AndroidSyncApplyItemResult>;
-}

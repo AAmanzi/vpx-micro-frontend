@@ -71,6 +71,7 @@ const Landing: FunctionComponent<Props> = () => {
             title='Android'
             emptyStateVariant='android'
             isScanLibraryDisabled
+            androidFeaturesEnabled
           />
         );
       case View.recentlyPlayed:

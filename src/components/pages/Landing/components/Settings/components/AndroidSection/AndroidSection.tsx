@@ -1,11 +1,11 @@
 import { FunctionComponent, useState } from 'react';
 
 import Input from 'src/components/Input';
+import api from 'src/consts';
 import {
   VPX_DEFAULT_ANDROID_ROMS_PATH,
   VPX_DEFAULT_ANDROID_TABLES_PATH,
 } from 'src/consts/vpx';
-import api from 'src/consts';
 import { useConfigContext } from 'src/providers/config';
 import { useToastContext } from 'src/providers/toast';
 
@@ -19,7 +19,8 @@ const AndroidSection: FunctionComponent = () => {
   const [_androidTablesDirectory, setAndroidTablesDirectory] = useState('');
   const [_androidRomsDirectory, setAndroidRomsDirectory] = useState('');
 
-  const androidWebServerUrl = _androidWebServerUrl || config?.androidWebServerUrl || '';
+  const androidWebServerUrl =
+    _androidWebServerUrl || config?.androidWebServerUrl || '';
   const androidTablesDirectory =
     _androidTablesDirectory ||
     config?.androidTablesDirectory ||
@@ -75,7 +76,9 @@ const AndroidSection: FunctionComponent = () => {
     const { error } = await api.updateAndroidRomsDirectoryPath(nextValue);
 
     if (error) {
-      showErrorToast(error.message || 'Failed to update Android ROMs directory');
+      showErrorToast(
+        error.message || 'Failed to update Android ROMs directory',
+      );
       return;
     }
 
@@ -89,7 +92,7 @@ const AndroidSection: FunctionComponent = () => {
         value={androidWebServerUrl}
         onChange={setAndroidWebServerUrl}
         onBlur={handleSaveAndroidWebServerUrl}
-        placeholder='http://192.168.0.65:2112'
+        placeholder='192.168.0.0:2112'
       />
       <Input
         label='Android Tables Directory'
