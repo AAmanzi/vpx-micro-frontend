@@ -17,3 +17,9 @@ export interface AndroidSyncApplyPayload {
   unsyncedRomsToUpload: Array<FileSystemItem>;
   filesToDelete: Array<AndroidFileSystemItem>;
 }
+
+export interface AndroidSyncProgressEvent {
+  step: number;
+  totalSteps: number;
+  label: string;
+}

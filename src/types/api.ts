@@ -1,4 +1,4 @@
-import { AndroidScanResult, AndroidSyncApplyPayload } from './android';
+import { AndroidScanResult, AndroidSyncApplyPayload, AndroidSyncProgressEvent } from './android';
 import { Config } from './config';
 import { FileSystemItem, TableFile } from './file';
 import { GroupType, ScanResult, Table } from './table';
@@ -66,6 +66,9 @@ export interface Api {
   applyAndroidSync: (
     payload: AndroidSyncApplyPayload,
   ) => Promise<ApiResult<null>>;
+  onAndroidSyncProgress: (
+    callback: (event: AndroidSyncProgressEvent) => void,
+  ) => () => void;
 
   // FileSystem
   getPathForFile: (file: File) => ApiResult<string>;

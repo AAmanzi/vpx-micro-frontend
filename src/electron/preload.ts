@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer, webUtils } from 'electron';
 
 import type { Api, ApiResult } from 'src/types/api';
-import type { AndroidScanResult, AndroidSyncApplyPayload } from 'src/types/android';
+import type { AndroidScanResult, AndroidSyncApplyPayload, AndroidSyncProgressEvent } from 'src/types/android';
 import type { Config } from 'src/types/config';
 import type { FileSystemItem } from 'src/types/file';
 import type { GroupType, ScanResult, Table } from 'src/types/table';
@@ -100,6 +100,16 @@ const frontendApi: Api = {
     payload: AndroidSyncApplyPayload,
   ): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:applyAndroidSync', payload),
+  onAndroidSyncProgress: (
+    callback: (event: AndroidSyncProgressEvent) => void,
+  ): (() => void) => {
+    const handler = (
+      _: Electron.IpcRendererEvent,
+      data: AndroidSyncProgressEvent,
+    ) => callback(data);
+    ipcRenderer.on('event:androidSyncProgress', handler);
+    return () => ipcRenderer.removeListener('event:androidSyncProgress', handler);
+  },
   applyScanResult: (scanResult: ScanResult): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:applyScanResult', scanResult),
   exportTables: (

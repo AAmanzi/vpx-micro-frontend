@@ -9,6 +9,7 @@ import type {
   AndroidFileSystemItem,
   AndroidScanResult,
   AndroidSyncApplyPayload,
+  AndroidSyncProgressEvent,
 } from 'src/types/android';
 import type { ApiResult } from 'src/types/api';
 import type { FileSystemItem, TableFile } from 'src/types/file';
@@ -157,11 +158,14 @@ export async function scanAndroidLibrary(): Promise<
   }
 }
 
-export async function applyAndroidSync({
-  filesToDelete,
-  tablesToUpload,
-  unsyncedRomsToUpload,
-}: AndroidSyncApplyPayload): Promise<ApiResult<null>> {
+export async function applyAndroidSync(
+  {
+    filesToDelete,
+    tablesToUpload,
+    unsyncedRomsToUpload,
+  }: AndroidSyncApplyPayload,
+  onProgress?: (event: AndroidSyncProgressEvent) => void,
+): Promise<ApiResult<null>> {
   try {
     const config = configDb.getConfig();
 
@@ -171,9 +175,23 @@ export async function applyAndroidSync({
     const romsDirectory =
       config.androidRomsDirectory || VPX_DEFAULT_ANDROID_ROMS_PATH;
 
+    const romUploadsFromTables = tablesToUpload.filter((t) => !!t.rom);
+    const totalSteps =
+      tablesToUpload.length +
+      romUploadsFromTables.length +
+      unsyncedRomsToUpload.length +
+      filesToDelete.length;
+    let step = 0;
+
+    const emitProgress = (label: string) => {
+      step += 1;
+      onProgress?.({ step, totalSteps, label });
+    };
+
     const uploadedRomNames = new Set<string>();
 
     for (const table of tablesToUpload) {
+      emitProgress(`Uploading ${table.fileName}`);
       const fileData = await fs.promises.readFile(table.filePath);
       const remotePath = buildRemoteFilePath(tablesDirectory, table.fileName);
 
@@ -183,11 +201,15 @@ export async function applyAndroidSync({
         const normalizedRomName = normalizeName(table.rom.name);
 
         if (!uploadedRomNames.has(normalizedRomName)) {
+          emitProgress(`Uploading ROM ${table.rom.name}`);
           const romFileData = await fs.promises.readFile(table.rom.path);
           const remoteRomPath = buildRemoteFilePath(romsDirectory, table.rom.name);
 
           await uploadAndroidFile(serverUrl, remoteRomPath, romFileData);
           uploadedRomNames.add(normalizedRomName);
+        } else {
+          // Still count the step even if we skip the duplicate
+          step += 1;
         }
       }
     }
@@ -196,9 +218,11 @@ export async function applyAndroidSync({
       const normalizedRomName = normalizeName(rom.name);
 
       if (uploadedRomNames.has(normalizedRomName)) {
+        step += 1;
         continue;
       }
 
+      emitProgress(`Uploading ROM ${rom.name}`);
       const fileData = await fs.promises.readFile(rom.path);
       const remotePath = buildRemoteFilePath(romsDirectory, rom.name);
 
@@ -207,6 +231,7 @@ export async function applyAndroidSync({
     }
 
     for (const file of filesToDelete) {
+      emitProgress(`Deleting ${file.name}`);
       await deleteAndroidFile(serverUrl, file.path);
     }
 

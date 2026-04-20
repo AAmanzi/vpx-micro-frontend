@@ -9,7 +9,11 @@ import Form from 'src/components/Form';
 import Icon from 'src/components/Icon';
 import { api } from 'src/consts';
 import { useToastContext } from 'src/providers/toast';
-import { AndroidScanResult, AndroidSyncApplyPayload } from 'src/types/android';
+import {
+  AndroidScanResult,
+  AndroidSyncApplyPayload,
+  AndroidSyncProgressEvent,
+} from 'src/types/android';
 
 import style from './SyncResults.module.scss';
 import Collapsible from './components/Collapsible';
@@ -34,6 +38,8 @@ const SyncResults: FunctionComponent<Props> = ({
   const { showErrorToast, showSuccessToast } = useToastContext();
 
   const [isApplying, setIsApplying] = useState(false);
+  const [applyProgress, setApplyProgress] =
+    useState<AndroidSyncProgressEvent | null>(null);
 
   const [isTablesToUploadOpen, setIsTablesToUploadOpen] = useState(false);
   const [isUnsyncedRomsOpen, setIsUnsyncedRomsOpen] = useState(false);
@@ -202,6 +208,11 @@ const SyncResults: FunctionComponent<Props> = ({
     }
 
     setIsApplying(true);
+    setApplyProgress(null);
+
+    const removeProgressListener = api.onAndroidSyncProgress((event) =>
+      setApplyProgress(event),
+    );
 
     const payload: AndroidSyncApplyPayload = {
       tablesToUpload: tablesToUpload.filter(
@@ -217,7 +228,9 @@ const SyncResults: FunctionComponent<Props> = ({
 
     const result = await api.applyAndroidSync(payload);
 
+    removeProgressListener();
     setIsApplying(false);
+    setApplyProgress(null);
 
     if (!result.success) {
       showErrorToast(
@@ -319,7 +332,30 @@ const SyncResults: FunctionComponent<Props> = ({
           </Collapsible>
         )}
 
-        {!isLibraryInSync && (
+        {isApplying && applyProgress && (
+          <div className={style.progressWrapper}>
+            <div className={style.progressLabel}>
+              <span className='secondary-text-color body-xs-regular'>
+                {applyProgress.label}
+              </span>
+              <span className='secondary-text-color body-xs-regular'>
+                {applyProgress.step} / {applyProgress.totalSteps}
+              </span>
+            </div>
+            <div className={style.progressBar}>
+              <div
+                className={style.progressBarFill}
+                style={{
+                  width: `${Math.round(
+                    (applyProgress.step / applyProgress.totalSteps) * 100,
+                  )}%`,
+                }}
+              />
+            </div>
+          </div>
+        )}
+
+        {!isLibraryInSync && !isApplying && (
           <p
             className={classNames(
               'secondary-text-color',

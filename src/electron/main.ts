@@ -273,7 +273,10 @@ app.whenReady().then(async () => {
   ipcMain.handle('api:scanAndroidLibrary', async () => api.scanAndroidLibrary());
   ipcMain.handle(
     'api:applyAndroidSync',
-    async (_, payload: AndroidSyncApplyPayload) => api.applyAndroidSync(payload),
+    async (event, payload: AndroidSyncApplyPayload) =>
+      api.applyAndroidSync(payload, (progress) => {
+        event.sender.send('event:androidSyncProgress', progress);
+      }),
   );
   ipcMain.handle('api:applyScanResult', async (_, scanResult: ScanResult) =>
     api.applyScanResult(scanResult),
