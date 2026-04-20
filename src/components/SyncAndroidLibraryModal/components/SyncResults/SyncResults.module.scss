@@ -1,22 +1,3 @@
-.content {
-  margin: 24px;
-  max-height: calc(100vh - 200px);
-  overflow-y: auto;
-}
-
-.loadingWrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 32px;
-  text-align: center;
-}
-
-.loadingTitle {
-  margin-top: 32px;
-  margin-bottom: 4px;
-}
-
 .resultsWrapper {
   display: flex;
   flex-direction: column;
@@ -34,19 +15,8 @@
   text-align: center;
 }
 
-.successIcon {
-  color: var(--green);
-}
-
 .shieldIcon {
   color: var(--purple);
-}
-
-.errorWrapper {
-  border: thin solid var(--red);
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 16px;
 }
 
 .actions {

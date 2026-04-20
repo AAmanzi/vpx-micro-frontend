@@ -1,20 +1,15 @@
 import classNames from 'classnames';
-import { FunctionComponent, useEffect, useMemo, useState } from 'react';
+import { FunctionComponent, useEffect, useState } from 'react';
 
 import Modal, { Size as ModalSize } from 'src/components/Modal';
 import Spinner from 'src/components/Spinner';
-import api from 'src/consts';
-import { useConfigContext } from 'src/providers/config';
+import { api } from 'src/consts';
 import { useToastContext } from 'src/providers/toast';
+import { AndroidScanResult } from 'src/types/android';
 
 import style from './SyncAndroidLibraryModal.module.scss';
 import RetryConnectionForm from './components/RetryConnectionForm';
-
-enum Status {
-  loading = 'loading',
-  connectionError = 'connectionError',
-  success = 'success',
-}
+import SyncResults from './components/SyncResults';
 
 interface Props {
   close: () => void;
@@ -23,64 +18,60 @@ interface Props {
 const SyncAndroidLibraryModal: FunctionComponent<Props> = ({ close }) => {
   const { showErrorToast } = useToastContext();
 
-  const [status, setStatus] = useState(Status.loading);
-  const [isRetrying, setIsRetrying] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [connectionError, setConnectionError] = useState(false);
+  const [scanResult, setScanResult] = useState<AndroidScanResult | null>(null);
+
+  const getTitle = () => {
+    if (isLoading) {
+      return 'Sync Android Library';
+    }
+
+    if (connectionError) {
+      return 'Connection Error';
+    }
+
+    return 'Android Scan Results';
+  };
+  const title = getTitle();
+
+  const getDescription = () => {
+    if (isLoading) {
+      return 'Loading...';
+    }
+
+    if (connectionError) {
+      return 'Failed to connect to the Android server. Please check your connection and try again.';
+    }
+
+    return '';
+  };
+  const description = getDescription();
 
   const scanAndroidLibrary = async () => {
-    setStatus(Status.loading);
+    setIsLoading(true);
+    setConnectionError(false);
+    setScanResult(null);
 
     const result = await api.scanAndroidLibrary();
 
     if (result.success) {
-      setStatus(Status.success);
+      setScanResult(result.data);
+
+      setIsLoading(false);
       return;
     }
 
+    setConnectionError(true);
     showErrorToast(
       result.error.message || 'Failed to connect to Android server',
     );
-
-    setStatus(Status.connectionError);
+    setIsLoading(false);
   };
 
   useEffect(() => {
     scanAndroidLibrary();
   }, []);
-
-  const handleRetry = async () => {
-    if (isRetrying) {
-      return;
-    }
-
-    setIsRetrying(true);
-
-    await scanAndroidLibrary();
-    setIsRetrying(false);
-  };
-
-  const title = useMemo(() => {
-    switch (status) {
-      case Status.success:
-        return 'Android Scan Results';
-      case Status.connectionError:
-        return 'Android Server Unreachable';
-      case Status.loading:
-      default:
-        return 'Sync Android Library';
-    }
-  }, [status]);
-
-  const description = useMemo(() => {
-    switch (status) {
-      case Status.success:
-        return 'Review the results of the scan and apply changes to your library.';
-      case Status.connectionError:
-        return 'Update the Android server URL and try again.';
-      case Status.loading:
-      default:
-        return 'Trying to contact the configured Android web server...';
-    }
-  }, [status]);
 
   return (
     <Modal
@@ -88,9 +79,9 @@ const SyncAndroidLibraryModal: FunctionComponent<Props> = ({ close }) => {
       description={description}
       onExitClick={close}
       size={ModalSize.large}
-      color={status === Status.connectionError ? 'red' : 'purple'}>
+      color='purple'>
       <div className={style.content}>
-        {status === Status.loading && (
+        {isLoading && (
           <div className={style.loadingWrapper}>
             <Spinner size={54} />
             <p
@@ -100,16 +91,21 @@ const SyncAndroidLibraryModal: FunctionComponent<Props> = ({ close }) => {
           </div>
         )}
 
-        {status === Status.connectionError && (
+        {connectionError && (
           <RetryConnectionForm
             close={close}
-            handleRetry={handleRetry}
-            isRetrying={isRetrying}
+            isRetrying={isLoading}
+            handleRetry={scanAndroidLibrary}
           />
         )}
 
-        {status === Status.success && (
-          <div className={style.successWrapper}></div>
+        {!isLoading && scanResult && !connectionError && (
+          <SyncResults
+            close={close}
+            scanResult={scanResult}
+            onRescan={scanAndroidLibrary}
+            isRescanning={isLoading}
+          />
         )}
       </div>
     </Modal>
