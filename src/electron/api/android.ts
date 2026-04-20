@@ -216,7 +216,10 @@ export async function applyAndroidSync(
         if (!uploadedRomNames.has(normalizedRomName)) {
           emitProgress(`Uploading ROM ${table.rom.name}`);
           const romFileData = await fs.promises.readFile(table.rom.path);
-          const remoteRomPath = buildRemoteFilePath(romsDirectory, table.rom.name);
+          const remoteRomPath = buildRemoteFilePath(
+            romsDirectory,
+            table.rom.name,
+          );
 
           await uploadAndroidFile(serverUrl, remoteRomPath, romFileData);
           uploadedRomNames.add(normalizedRomName);
@@ -250,7 +253,6 @@ export async function applyAndroidSync(
 
     return apiSuccess(null);
   } catch (error) {
-    console.log(error);
     return apiFailure(error);
   }
 }
