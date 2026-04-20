@@ -13,6 +13,7 @@ interface Props {
   color: 'yellow' | 'blue' | 'red';
   count: number;
   isOpen: boolean;
+  disabled?: boolean;
   onToggle: () => void;
   children: ReactNode;
 }
@@ -24,12 +25,17 @@ const Collapsible: FunctionComponent<Props> = ({
   color,
   count,
   isOpen,
+  disabled = false,
   onToggle,
   children,
 }) => {
   return (
     <section className={classNames(style.container, style[color])}>
-      <button type='button' className={style.header} onClick={onToggle}>
+      <button
+        type='button'
+        className={style.header}
+        onClick={onToggle}
+        disabled={disabled}>
         <div className={style.iconWrapper}>
           <Icon icon={icon} className={classNames(style.icon)} />
         </div>

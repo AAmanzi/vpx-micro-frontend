@@ -14,6 +14,7 @@ interface Props {
   onToggleInclude: (filePath: string) => void;
   onSelectAll: () => void;
   onDeselectAll: () => void;
+  disabled?: boolean;
 }
 
 const TablesToUploadSection: FunctionComponent<Props> = ({
@@ -22,6 +23,7 @@ const TablesToUploadSection: FunctionComponent<Props> = ({
   onToggleInclude,
   onSelectAll,
   onDeselectAll,
+  disabled = false,
 }) => {
   return (
     <div>
@@ -30,6 +32,7 @@ const TablesToUploadSection: FunctionComponent<Props> = ({
         title={`${Object.values(includedByPath).filter(Boolean).length} of ${tables.length} selected for upload`}
         onSelectAll={onSelectAll}
         onDeselectAll={onDeselectAll}
+        disabled={disabled}
       />
       <div className={style.list}>
         {tables.map((table) => {
@@ -42,7 +45,8 @@ const TablesToUploadSection: FunctionComponent<Props> = ({
                 [style.selected]: isIncluded,
               })}
               onClick={() => onToggleInclude(table.filePath)}
-              type='button'>
+              type='button'
+              disabled={disabled}>
               <Checkbox checked={isIncluded} onChange={() => {}} color='blue' />
               <div className={style.info}>
                 <span className='primary-text-color body-md-semibold'>

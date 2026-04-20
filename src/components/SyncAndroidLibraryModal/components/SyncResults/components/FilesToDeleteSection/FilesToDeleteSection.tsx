@@ -13,6 +13,7 @@ interface Props {
   onToggleInclude: (filePath: string) => void;
   onSelectAll: () => void;
   onDeselectAll: () => void;
+  disabled?: boolean;
 }
 
 const FilesToDeleteSection: FunctionComponent<Props> = ({
@@ -21,6 +22,7 @@ const FilesToDeleteSection: FunctionComponent<Props> = ({
   onToggleInclude,
   onSelectAll,
   onDeselectAll,
+  disabled = false,
 }) => {
   return (
     <div>
@@ -29,6 +31,7 @@ const FilesToDeleteSection: FunctionComponent<Props> = ({
         title={`${Object.values(includedByPath).filter(Boolean).length} of ${files.length} selected for deletion`}
         onSelectAll={onSelectAll}
         onDeselectAll={onDeselectAll}
+        disabled={disabled}
         warningIcon='circle-alert'
         warningText='These files exist on Android but are not in your local Android library selection.'
       />
@@ -43,7 +46,8 @@ const FilesToDeleteSection: FunctionComponent<Props> = ({
                 [style.selected]: isIncluded,
               })}
               onClick={() => onToggleInclude(file.path)}
-              type='button'>
+              type='button'
+              disabled={disabled}>
               <Checkbox checked={isIncluded} onChange={() => {}} color='red' />
               <div className={style.info}>
                 <span className='primary-text-color body-md-semibold'>

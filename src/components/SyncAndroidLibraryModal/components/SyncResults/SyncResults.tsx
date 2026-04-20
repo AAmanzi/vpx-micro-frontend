@@ -27,6 +27,7 @@ interface Props {
   scanResult: AndroidScanResult;
   onRescan: () => Promise<void>;
   isRescanning: boolean;
+  onApplyStateChange?: (isApplying: boolean) => void;
 }
 
 const SyncResults: FunctionComponent<Props> = ({
@@ -34,6 +35,7 @@ const SyncResults: FunctionComponent<Props> = ({
   scanResult,
   onRescan,
   isRescanning,
+  onApplyStateChange,
 }) => {
   const { showErrorToast, showSuccessToast } = useToastContext();
 
@@ -99,6 +101,10 @@ const SyncResults: FunctionComponent<Props> = ({
     unsyncedRomsToUpload.length === 0 &&
     filesToDelete.length === 0;
 
+  useEffect(() => {
+    onApplyStateChange?.(isApplying);
+  }, [isApplying, onApplyStateChange]);
+
   const selectedTablesToUploadCount = tablesToUpload.filter(
     (table) => includedTablesToUploadByPath[table.filePath] ?? true,
   ).length;
@@ -110,6 +116,10 @@ const SyncResults: FunctionComponent<Props> = ({
   ).length;
 
   const toggleTableToUploadInclude = (filePath: string) => {
+    if (isApplying) {
+      return;
+    }
+
     setIncludedTablesToUploadByPath((prev) => ({
       ...prev,
       [filePath]: !(prev[filePath] ?? true),
@@ -117,6 +127,10 @@ const SyncResults: FunctionComponent<Props> = ({
   };
 
   const toggleUnsyncedRomInclude = (romPath: string) => {
+    if (isApplying) {
+      return;
+    }
+
     setIncludedUnsyncedRomsByPath((prev) => ({
       ...prev,
       [romPath]: !(prev[romPath] ?? true),
@@ -124,6 +138,10 @@ const SyncResults: FunctionComponent<Props> = ({
   };
 
   const toggleFileToDeleteInclude = (filePath: string) => {
+    if (isApplying) {
+      return;
+    }
+
     setIncludedFilesToDeleteByPath((prev) => ({
       ...prev,
       [filePath]: !(prev[filePath] ?? false),
@@ -131,6 +149,10 @@ const SyncResults: FunctionComponent<Props> = ({
   };
 
   const selectAllTablesToUpload = () => {
+    if (isApplying) {
+      return;
+    }
+
     setIncludedTablesToUploadByPath(
       tablesToUpload.reduce<Record<string, boolean>>(
         (acc, table) => ({
@@ -143,6 +165,10 @@ const SyncResults: FunctionComponent<Props> = ({
   };
 
   const deselectAllTablesToUpload = () => {
+    if (isApplying) {
+      return;
+    }
+
     setIncludedTablesToUploadByPath(
       tablesToUpload.reduce<Record<string, boolean>>(
         (acc, table) => ({
@@ -155,6 +181,10 @@ const SyncResults: FunctionComponent<Props> = ({
   };
 
   const selectAllUnsyncedRoms = () => {
+    if (isApplying) {
+      return;
+    }
+
     setIncludedUnsyncedRomsByPath(
       unsyncedRomsToUpload.reduce<Record<string, boolean>>(
         (acc, rom) => ({
@@ -167,6 +197,10 @@ const SyncResults: FunctionComponent<Props> = ({
   };
 
   const deselectAllUnsyncedRoms = () => {
+    if (isApplying) {
+      return;
+    }
+
     setIncludedUnsyncedRomsByPath(
       unsyncedRomsToUpload.reduce<Record<string, boolean>>(
         (acc, rom) => ({
@@ -179,6 +213,10 @@ const SyncResults: FunctionComponent<Props> = ({
   };
 
   const selectAllFilesToDelete = () => {
+    if (isApplying) {
+      return;
+    }
+
     setIncludedFilesToDeleteByPath(
       filesToDelete.reduce<Record<string, boolean>>(
         (acc, file) => ({
@@ -191,6 +229,10 @@ const SyncResults: FunctionComponent<Props> = ({
   };
 
   const deselectAllFilesToDelete = () => {
+    if (isApplying) {
+      return;
+    }
+
     setIncludedFilesToDeleteByPath(
       filesToDelete.reduce<Record<string, boolean>>(
         (acc, file) => ({
@@ -270,6 +312,7 @@ const SyncResults: FunctionComponent<Props> = ({
             color='blue'
             count={tablesToUpload.length}
             isOpen={isTablesToUploadOpen}
+            disabled={isApplying}
             onToggle={() => setIsTablesToUploadOpen((prev) => !prev)}>
             <TablesToUploadSection
               tables={tablesToUpload}
@@ -277,6 +320,7 @@ const SyncResults: FunctionComponent<Props> = ({
               onToggleInclude={toggleTableToUploadInclude}
               onSelectAll={selectAllTablesToUpload}
               onDeselectAll={deselectAllTablesToUpload}
+              disabled={isApplying}
             />
           </Collapsible>
         )}
@@ -289,6 +333,7 @@ const SyncResults: FunctionComponent<Props> = ({
             color='yellow'
             count={unsyncedRomsToUpload.length}
             isOpen={isUnsyncedRomsOpen}
+            disabled={isApplying}
             onToggle={() => setIsUnsyncedRomsOpen((prev) => !prev)}>
             <UnsyncedRomsToUploadSection
               roms={unsyncedRomsToUpload}
@@ -296,6 +341,7 @@ const SyncResults: FunctionComponent<Props> = ({
               onToggleInclude={toggleUnsyncedRomInclude}
               onSelectAll={selectAllUnsyncedRoms}
               onDeselectAll={deselectAllUnsyncedRoms}
+              disabled={isApplying}
             />
           </Collapsible>
         )}
@@ -308,6 +354,7 @@ const SyncResults: FunctionComponent<Props> = ({
             color='red'
             count={filesToDelete.length}
             isOpen={isFilesToDeleteOpen}
+            disabled={isApplying}
             onToggle={() => setIsFilesToDeleteOpen((prev) => !prev)}>
             <FilesToDeleteSection
               files={filesToDelete}
@@ -315,6 +362,7 @@ const SyncResults: FunctionComponent<Props> = ({
               onToggleInclude={toggleFileToDeleteInclude}
               onSelectAll={selectAllFilesToDelete}
               onDeselectAll={deselectAllFilesToDelete}
+              disabled={isApplying}
             />
           </Collapsible>
         )}
@@ -327,6 +375,7 @@ const SyncResults: FunctionComponent<Props> = ({
             color='blue'
             count={tablesInSync.length}
             isOpen={isTablesInSyncOpen}
+            disabled={isApplying}
             onToggle={() => setIsTablesInSyncOpen((prev) => !prev)}>
             <TablesInSyncSection tables={tablesInSync} />
           </Collapsible>
@@ -375,6 +424,7 @@ const SyncResults: FunctionComponent<Props> = ({
               onClick={close}
               type={ButtonType.transparent}
               size={ButtonSize.small}
+              disabled={isApplying}
             />
             <Button
               label='Rescan'

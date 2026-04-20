@@ -13,6 +13,7 @@ interface Props {
   onToggleInclude: (romPath: string) => void;
   onSelectAll: () => void;
   onDeselectAll: () => void;
+  disabled?: boolean;
 }
 
 const UnsyncedRomsToUploadSection: FunctionComponent<Props> = ({
@@ -21,6 +22,7 @@ const UnsyncedRomsToUploadSection: FunctionComponent<Props> = ({
   onToggleInclude,
   onSelectAll,
   onDeselectAll,
+  disabled = false,
 }) => {
   return (
     <div>
@@ -29,6 +31,7 @@ const UnsyncedRomsToUploadSection: FunctionComponent<Props> = ({
         title={`${Object.values(includedByPath).filter(Boolean).length} of ${roms.length} selected for upload`}
         onSelectAll={onSelectAll}
         onDeselectAll={onDeselectAll}
+        disabled={disabled}
         warningIcon='triangle-alert'
         warningText='These ROM files are missing on Android but required by the selected tables.'
       />
@@ -43,7 +46,8 @@ const UnsyncedRomsToUploadSection: FunctionComponent<Props> = ({
                 [style.selected]: isIncluded,
               })}
               onClick={() => onToggleInclude(rom.path)}
-              type='button'>
+              type='button'
+              disabled={disabled}>
               <Checkbox
                 checked={isIncluded}
                 onChange={() => {}}

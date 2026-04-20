@@ -20,7 +20,16 @@ const SyncAndroidLibraryModal: FunctionComponent<Props> = ({ close }) => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [connectionError, setConnectionError] = useState(false);
+  const [isApplyInProgress, setIsApplyInProgress] = useState(false);
   const [scanResult, setScanResult] = useState<AndroidScanResult | null>(null);
+
+  const handleClose = () => {
+    if (isApplyInProgress) {
+      return;
+    }
+
+    close();
+  };
 
   const getTitle = () => {
     if (isLoading) {
@@ -84,7 +93,7 @@ const SyncAndroidLibraryModal: FunctionComponent<Props> = ({ close }) => {
     <Modal
       title={title}
       description={description}
-      onExitClick={close}
+      onExitClick={handleClose}
       size={ModalSize.large}
       color='purple'>
       <div className={style.content}>
@@ -100,7 +109,7 @@ const SyncAndroidLibraryModal: FunctionComponent<Props> = ({ close }) => {
 
         {connectionError && (
           <RetryConnectionForm
-            close={close}
+            close={handleClose}
             isRetrying={isLoading}
             handleRetry={scanAndroidLibrary}
           />
@@ -108,10 +117,11 @@ const SyncAndroidLibraryModal: FunctionComponent<Props> = ({ close }) => {
 
         {!isLoading && scanResult && !connectionError && (
           <SyncResults
-            close={close}
+            close={handleClose}
             scanResult={scanResult}
             onRescan={scanAndroidLibrary}
             isRescanning={isLoading}
+            onApplyStateChange={setIsApplyInProgress}
           />
         )}
       </div>

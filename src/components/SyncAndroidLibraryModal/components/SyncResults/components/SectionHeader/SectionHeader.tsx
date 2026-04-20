@@ -11,6 +11,7 @@ interface Props {
   onSelectAll: () => void;
   onDeselectAll: () => void;
   color: 'yellow' | 'blue' | 'red';
+  disabled?: boolean;
   warningIcon?: IconType;
   warningText?: string;
 }
@@ -20,6 +21,7 @@ const SectionHeader: FunctionComponent<Props> = ({
   onDeselectAll,
   onSelectAll,
   title,
+  disabled = false,
   warningIcon,
   warningText,
 }) => {
@@ -51,6 +53,7 @@ const SectionHeader: FunctionComponent<Props> = ({
           <button
             type='button'
             onClick={onSelectAll}
+            disabled={disabled}
             className={classNames('body-sm-regular', style.selectAllButton)}>
             Select All
           </button>
@@ -58,6 +61,7 @@ const SectionHeader: FunctionComponent<Props> = ({
           <button
             type='button'
             onClick={onDeselectAll}
+            disabled={disabled}
             className={classNames(
               'body-sm-regular',
               'primary-text-color',
