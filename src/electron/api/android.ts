@@ -75,16 +75,16 @@ export async function scanAndroidLibrary(): Promise<
       getAndroidFiles(serverUrl, romsDirectory),
     ]);
 
-    const androidTableFileNames = new Set(
+    const androidTableFileSizes = new Map(
       androidTableFiles
         .filter((file) => !file.isDir && isVpxFile(file.name))
-        .map((file) => normalizeName(file.name)),
+        .map((file) => [normalizeName(file.name), file.size]),
     );
 
-    const androidRomFileNames = new Set(
+    const androidRomFileSizes = new Map(
       androidRomFiles
         .filter((file) => !file.isDir && isZipFile(file.name))
-        .map((file) => normalizeName(file.name)),
+        .map((file) => [normalizeName(file.name), file.size]),
     );
 
     const tableFileModels = tables.map(toTableFile);
@@ -100,12 +100,22 @@ export async function scanAndroidLibrary(): Promise<
       localRomFiles.map((romFile) => normalizeName(romFile.name)),
     );
 
-    const tablesToUpload = tableFileModels.filter(
-      (table) => !androidTableFileNames.has(normalizeName(table.fileName)),
-    );
-    const tablesInSync = tableFileModels.filter((table) =>
-      androidTableFileNames.has(normalizeName(table.fileName)),
-    );
+    const tablesToUpload = tableFileModels.filter((table) => {
+      const remoteSize = androidTableFileSizes.get(
+        normalizeName(table.fileName),
+      );
+      if (remoteSize === undefined) return true;
+      const localSize = fs.statSync(table.filePath).size;
+      return remoteSize !== localSize;
+    });
+    const tablesInSync = tableFileModels.filter((table) => {
+      const remoteSize = androidTableFileSizes.get(
+        normalizeName(table.fileName),
+      );
+      if (remoteSize === undefined) return false;
+      const localSize = fs.statSync(table.filePath).size;
+      return remoteSize === localSize;
+    });
 
     const romNamesFromTablesInSync = new Set(
       tablesInSync
@@ -118,9 +128,12 @@ export async function scanAndroidLibrary(): Promise<
       .filter((romFile) =>
         romNamesFromTablesInSync.has(normalizeName(romFile.name)),
       )
-      .filter(
-        (romFile) => !androidRomFileNames.has(normalizeName(romFile.name)),
-      );
+      .filter((romFile) => {
+        const remoteSize = androidRomFileSizes.get(normalizeName(romFile.name));
+        if (remoteSize === undefined) return true;
+        const localSize = fs.statSync(romFile.path).size;
+        return remoteSize !== localSize;
+      });
 
     const filesToDelete: AndroidFileSystemItem[] = [
       ...androidTableFiles
