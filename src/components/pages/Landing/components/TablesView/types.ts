@@ -7,7 +7,9 @@ export interface Props {
   tables: Array<Table>;
   librarySize: number;
   defaultOrder?: Order;
-  emptyStateVariant?: 'favorites' | 'recentlyPlayed' | 'archive';
+  emptyStateVariant?: 'favorites' | 'recentlyPlayed' | 'archive' | 'android';
   isOrderPickerDisabled?: boolean;
+  isScanLibraryDisabled?: boolean;
+  androidFeaturesEnabled?: boolean;
   animationKey: string;
 }

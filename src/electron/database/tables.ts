@@ -51,6 +51,16 @@ export function setFavorite(id: string, fav: boolean): Table | null {
   return existing;
 }
 
+export function setForAndroid(id: string, isForAndroid: boolean): Table | null {
+  const tables = store.get('tables') || {};
+  const existing = tables[id];
+  if (!existing) return null;
+  existing.isForAndroid = isForAndroid;
+  tables[id] = existing;
+  store.set('tables', tables);
+  return existing;
+}
+
 export function setArchived(id: string, archived: boolean): Table | null {
   const tables = store.get('tables') || {};
   const existing = tables[id];

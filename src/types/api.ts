@@ -1,3 +1,4 @@
+import { AndroidScanResult, AndroidSyncApplyPayload, AndroidSyncProgressEvent } from './android';
 import { Config } from './config';
 import { FileSystemItem, TableFile } from './file';
 import { GroupType, ScanResult, Table } from './table';
@@ -30,6 +31,10 @@ export interface Api {
   // Tables
   getAllTables: () => Promise<ApiResult<Array<Table>>>;
   setTableFavorite: (id: string, fav: boolean) => Promise<ApiResult<null>>;
+  setTableForAndroid: (
+    id: string,
+    isForAndroid: boolean,
+  ) => Promise<ApiResult<null>>;
   setTableArchived: (id: string, archived: boolean) => Promise<ApiResult<null>>;
   deleteTable: (id: string) => Promise<ApiResult<null>>;
   renameTable: (id: string, newName: string) => Promise<ApiResult<null>>;
@@ -55,6 +60,15 @@ export interface Api {
     exportGroup: GroupType,
   ) => Promise<ApiResult<null>>;
   startRandomTable: (tables: Array<Table>) => Promise<ApiResult<null>>;
+
+  // Android Sync
+  scanAndroidLibrary: () => Promise<ApiResult<AndroidScanResult>>;
+  applyAndroidSync: (
+    payload: AndroidSyncApplyPayload,
+  ) => Promise<ApiResult<null>>;
+  onAndroidSyncProgress: (
+    callback: (event: AndroidSyncProgressEvent) => void,
+  ) => () => void;
 
   // FileSystem
   getPathForFile: (file: File) => ApiResult<string>;
@@ -85,6 +99,12 @@ export interface Api {
   updateKeepFavoritesOnTop: (
     keepFavoritesOnTop: boolean,
   ) => Promise<ApiResult<null>>;
+  updateAndroidFeaturesEnabled: (
+    androidFeaturesEnabled: boolean,
+  ) => Promise<ApiResult<null>>;
+  updateAndroidWebServerUrl: (path: string) => Promise<ApiResult<null>>;
+  updateAndroidTablesDirectoryPath: (path: string) => Promise<ApiResult<null>>;
+  updateAndroidRomsDirectoryPath: (path: string) => Promise<ApiResult<null>>;
   updateOrder: (order: Config['order']) => Promise<ApiResult<null>>;
   updateViewType: (viewType: Config['viewType']) => Promise<ApiResult<null>>;
 }

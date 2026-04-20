@@ -26,6 +26,7 @@ const Navigation: FunctionComponent<Props> = ({
   const { fetchTables } = useTablesContext();
   const { config } = useConfigContext();
   const fullVpxPath = config?.vpxRootPath || '';
+  const androidFeaturesEnabled = Boolean(config?.androidFeaturesEnabled);
 
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
@@ -93,6 +94,20 @@ const Navigation: FunctionComponent<Props> = ({
                 Recent
               </span>
             </button>
+            {androidFeaturesEnabled && (
+              <button
+                onClick={() => setView(View.android)}
+                className={classNames(style.button, style.green, {
+                  [style.active]: view === View.android,
+                })}>
+                <div className={style.iconWrapper}>
+                  <Icon icon='phone' className={style.icon} />
+                </div>
+                <span className={classNames('label-md-bold', style.label)}>
+                  Android
+                </span>
+              </button>
+            )}
             {archivedTablesCount > 0 && (
               <button
                 onClick={() => setView(View.archive)}

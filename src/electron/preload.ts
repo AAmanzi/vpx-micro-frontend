@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer, webUtils } from 'electron';
 
 import type { Api, ApiResult } from 'src/types/api';
+import type { AndroidScanResult, AndroidSyncApplyPayload, AndroidSyncProgressEvent } from 'src/types/android';
 import type { Config } from 'src/types/config';
 import type { FileSystemItem } from 'src/types/file';
 import type { GroupType, ScanResult, Table } from 'src/types/table';
@@ -13,6 +14,11 @@ const frontendApi: Api = {
     invoke<ApiResult<Table[]>>('api:getAllTables'),
   setTableFavorite: (id: string, fav: boolean): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:setTableFavorite', id, fav),
+  setTableForAndroid: (
+    id: string,
+    isForAndroid: boolean,
+  ): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:setTableForAndroid', id, isForAndroid),
   setTableArchived: (id: string, archived: boolean): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:setTableArchived', id, archived),
   deleteTable: (id: string): Promise<ApiResult<null>> =>
@@ -88,6 +94,22 @@ const frontendApi: Api = {
     invoke<ApiResult<null>>('api:clearTables'),
   scanVpxLibrary: (): Promise<ApiResult<ScanResult>> =>
     invoke<ApiResult<ScanResult>>('api:scanVpxLibrary'),
+  scanAndroidLibrary: (): Promise<ApiResult<AndroidScanResult>> =>
+    invoke<ApiResult<AndroidScanResult>>('api:scanAndroidLibrary'),
+  applyAndroidSync: (
+    payload: AndroidSyncApplyPayload,
+  ): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:applyAndroidSync', payload),
+  onAndroidSyncProgress: (
+    callback: (event: AndroidSyncProgressEvent) => void,
+  ): (() => void) => {
+    const handler = (
+      _: Electron.IpcRendererEvent,
+      data: AndroidSyncProgressEvent,
+    ) => callback(data);
+    ipcRenderer.on('event:androidSyncProgress', handler);
+    return () => ipcRenderer.removeListener('event:androidSyncProgress', handler);
+  },
   applyScanResult: (scanResult: ScanResult): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:applyScanResult', scanResult),
   exportTables: (
@@ -116,6 +138,21 @@ const frontendApi: Api = {
     keepFavoritesOnTop: boolean,
   ): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:updateKeepFavoritesOnTop', keepFavoritesOnTop),
+  updateAndroidFeaturesEnabled: (
+    androidFeaturesEnabled: boolean,
+  ): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>(
+      'api:updateAndroidFeaturesEnabled',
+      androidFeaturesEnabled,
+    ),
+  updateAndroidWebServerUrl: (path: string): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:updateAndroidWebServerUrl', path),
+  updateAndroidTablesDirectoryPath: (
+    path: string,
+  ): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:updateAndroidTablesDirectoryPath', path),
+  updateAndroidRomsDirectoryPath: (path: string): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:updateAndroidRomsDirectoryPath', path),
   updateOrder: (order: Config['order']): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:updateOrder', order),
   updateViewType: (viewType: Config['viewType']): Promise<ApiResult<null>> =>

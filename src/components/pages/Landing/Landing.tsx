@@ -1,5 +1,6 @@
 import { FunctionComponent, useEffect, useState } from 'react';
 
+import { useConfigContext } from 'src/providers/config';
 import { useTablesContext } from 'src/providers/tables';
 import { Order } from 'src/types/config';
 
@@ -17,6 +18,8 @@ const Landing: FunctionComponent<Props> = () => {
   const [view, setView] = useState<View>(View.allTables);
 
   const { tables: allTables } = useTablesContext();
+  const { config } = useConfigContext();
+  const androidFeaturesEnabled = Boolean(config?.androidFeaturesEnabled);
 
   const handleChangeView = (value: View) => {
     setView(value);
@@ -30,6 +33,12 @@ const Landing: FunctionComponent<Props> = () => {
       setView(View.allTables);
     }
   }, [view, archivedTables.length]);
+
+  useEffect(() => {
+    if (!androidFeaturesEnabled && view === View.android) {
+      setView(View.allTables);
+    }
+  }, [androidFeaturesEnabled, view]);
 
   const getView = () => {
     switch (view) {
@@ -51,6 +60,18 @@ const Landing: FunctionComponent<Props> = () => {
             librarySize={tables.length}
             title='Favorites'
             emptyStateVariant='favorites'
+          />
+        );
+      case View.android:
+        return (
+          <TablesView
+            animationKey={view}
+            tables={tables.filter((table) => table.isForAndroid)}
+            librarySize={tables.length}
+            title='Android'
+            emptyStateVariant='android'
+            isScanLibraryDisabled
+            androidFeaturesEnabled
           />
         );
       case View.recentlyPlayed:

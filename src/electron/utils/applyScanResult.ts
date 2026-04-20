@@ -29,6 +29,7 @@ export function registerTableFiles(tables: Array<TableFile>): void {
       vpxFilePath: tableFile.filePath,
       romFilePath: tableFile.rom?.path,
       isFavorite: false,
+      isForAndroid: false,
       isArchived: false,
       dateAddedTimestamp: Date.now(),
     };

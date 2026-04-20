@@ -14,6 +14,7 @@ import { useToastContext } from 'src/providers/toast';
 import { getDefaultVpxExecutablePath } from 'src/utils';
 
 import style from './Settings.module.scss';
+import AndroidSection from './components/AndroidSection';
 import DataSection from './components/DataSection';
 import FilePathsSection from './components/FilePathsSection';
 import MaintenanceSection from './components/MaintenanceSection';
@@ -23,6 +24,7 @@ const Settings: FunctionComponent = () => {
   const { showErrorToast } = useToastContext();
 
   const vpxRootPath = config?.vpxRootPath || '';
+  const androidFeaturesEnabled = Boolean(config?.androidFeaturesEnabled);
   const vpxExecutablePath =
     config?.vpxExecutablePath || getDefaultVpxExecutablePath(vpxRootPath);
 
@@ -105,6 +107,22 @@ const Settings: FunctionComponent = () => {
               <DataSection />
             </div>
           </div>
+          {androidFeaturesEnabled && (
+            <div className={classNames(style.section, style.androidSection)}>
+              <div className={style.sectionHeader}>
+                <Icon
+                  className={style.sectionIcon}
+                  icon='phone'
+                  width={20}
+                  height={20}
+                />
+                <h2 className='primary-text-color heading-4-bold'>Android</h2>
+              </div>
+              <div>
+                <AndroidSection />
+              </div>
+            </div>
+          )}
           <div className={classNames(style.section, style.maintenanceSection)}>
             <div className={style.sectionHeader}>
               <Icon

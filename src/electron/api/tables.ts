@@ -59,6 +59,29 @@ export function setTableFavorite(id: string, fav: boolean): ApiResult<null> {
   }
 }
 
+export function setTableForAndroid(
+  id: string,
+  isForAndroid: boolean,
+): ApiResult<null> {
+  try {
+    const table = tablesDb.setForAndroid(id, isForAndroid);
+
+    if (!table) {
+      return {
+        success: false,
+        error: {
+          code: 'TABLE_NOT_FOUND',
+          message: `Table not found: ${id}`,
+        },
+      };
+    }
+
+    return apiSuccess(null);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}
+
 export function setTableArchived(
   id: string,
   archived: boolean,
@@ -363,6 +386,7 @@ export function importTables(
           vpxFile: tableFile.fileName,
           romFile: tableFile.rom?.name,
           isFavorite: false,
+          isForAndroid: false,
           isArchived: false,
           vpxFilePath: vpxDestinationFilePath,
           romFilePath: romDestinationFilePath,

@@ -28,6 +28,10 @@
   <symbol id="icon-monitor" viewBox="0 0 20 20">
     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.666" d="M16.664 2.5H3.333c-.92 0-1.666.746-1.666 1.666v8.332c0 .92.746 1.666 1.666 1.666h13.33c.921 0 1.667-.746 1.667-1.666V4.166c0-.92-.746-1.666-1.666-1.666M6.665 17.497h5M9.998 14.158v3"/>
   </symbol>
+  <symbol id="icon-phone" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+    <path d="M12 18h.01"/>
+  </symbol>
   <symbol id="icon-edit" viewBox="0 0 14 14">
     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.167" d="M6.999 11.665h5.25M9.552 2.113a1.238 1.238 0 1 1 1.75 1.75L4.299 10.87c-.14.139-.31.24-.5.295l-1.674.49a.292.292 0 0 1-.362-.362l.489-1.676c.055-.188.156-.36.295-.498z"/>
   </symbol>

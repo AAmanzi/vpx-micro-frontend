@@ -7,6 +7,7 @@ import path from 'path';
 import type { Config } from 'src/types/config';
 import type { TableFile } from 'src/types/file';
 import type { GroupType, ScanResult, Table } from 'src/types/table';
+import type { AndroidSyncApplyPayload } from 'src/types/android';
 
 import * as api from './api';
 import * as db from './database/tables';
@@ -170,6 +171,11 @@ app.whenReady().then(async () => {
     api.setTableFavorite(id, fav),
   );
   ipcMain.handle(
+    'api:setTableForAndroid',
+    async (_, id: string, isForAndroid: boolean) =>
+      api.setTableForAndroid(id, isForAndroid),
+  );
+  ipcMain.handle(
     'api:setTableArchived',
     async (_, id: string, archived: boolean) =>
       api.setTableArchived(id, archived),
@@ -243,11 +249,35 @@ app.whenReady().then(async () => {
     'api:updateViewType',
     async (_, viewType: Config['viewType']) => api.updateViewType(viewType),
   );
+  ipcMain.handle(
+    'api:updateAndroidFeaturesEnabled',
+    async (_, androidFeaturesEnabled: boolean) =>
+      api.updateAndroidFeaturesEnabled(androidFeaturesEnabled),
+  );
+  ipcMain.handle('api:updateAndroidWebServerUrl', async (_, path: string) =>
+    api.updateAndroidWebServerUrl(path),
+  );
+  ipcMain.handle(
+    'api:updateAndroidTablesDirectoryPath',
+    async (_, path: string) => api.updateAndroidTablesDirectoryPath(path),
+  );
+  ipcMain.handle(
+    'api:updateAndroidRomsDirectoryPath',
+    async (_, path: string) => api.updateAndroidRomsDirectoryPath(path),
+  );
   ipcMain.handle('api:startTable', async (_, tableId: string) =>
     api.startTable(tableId),
   );
   ipcMain.handle('api:clearTables', async () => api.clearTables());
   ipcMain.handle('api:scanVpxLibrary', async () => api.scanVpxLibrary());
+  ipcMain.handle('api:scanAndroidLibrary', async () => api.scanAndroidLibrary());
+  ipcMain.handle(
+    'api:applyAndroidSync',
+    async (event, payload: AndroidSyncApplyPayload) =>
+      api.applyAndroidSync(payload, (progress) => {
+        event.sender.send('event:androidSyncProgress', progress);
+      }),
+  );
   ipcMain.handle('api:applyScanResult', async (_, scanResult: ScanResult) =>
     api.applyScanResult(scanResult),
   );

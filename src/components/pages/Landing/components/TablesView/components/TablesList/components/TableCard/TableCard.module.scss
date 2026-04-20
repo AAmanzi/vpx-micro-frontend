@@ -28,6 +28,35 @@
   position: relative;
 }
 
+.androidButton {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background-color: rgba(var(--gray-rgb), 0.5);
+  border: thin solid rgba(var(--white-rgb), 0.1);
+  border-radius: 50%;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 200ms ease-in;
+
+  & .androidIcon {
+    color: var(--gray-300);
+    fill: transparent;
+    transition:
+      fill 200ms ease-in,
+      color 200ms ease-in;
+  }
+
+  &.isForAndroid {
+    & .androidIcon {
+      color: var(--green);
+      fill: var(--green);
+    }
+  }
+}
+
 .favoriteButton {
   position: absolute;
   top: 12px;
