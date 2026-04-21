@@ -270,7 +270,7 @@ const TablesView: FunctionComponent<Props> = ({
               <div className={style.randomTableButtonWrapper}>
                 <Button
                   icon={isCompactTableActions ? 'shuffle' : 'play'}
-                  label={isCompactTableActions ? undefined : 'Random table'}
+                  label={isCompactTableActions ? undefined : 'Random Table'}
                   type={ButtonType.successTransparent}
                   size={ButtonSize.medium}
                   onClick={handlePlayRandomTable}

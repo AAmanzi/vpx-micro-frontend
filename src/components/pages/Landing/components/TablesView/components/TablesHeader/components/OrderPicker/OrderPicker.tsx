@@ -13,7 +13,7 @@ const ORDER_OPTIONS: Array<{ value: Order; label: string }> = [
   { value: Order.nameDesc, label: 'Name (Z-A)' },
   { value: Order.dateAddedAsc, label: 'Oldest First' },
   { value: Order.dateAddedDesc, label: 'Newest First' },
-  { value: Order.recentlyPlayed, label: 'Recently Played' },
+  { value: Order.recentlyPlayed, label: 'Recent' },
   { value: Order.leastPlayed, label: 'Least Played' },
 ];
 
