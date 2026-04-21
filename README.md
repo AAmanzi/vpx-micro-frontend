@@ -3,16 +3,20 @@
 This guide explains how to use the app day-to-day to manage your Visual Pinball X tables and ROMs.
 
 ![VPX Micro Frontend dashboard](public/readme/hero-dashboard.png)
+<!-- ASSET UPDATE NEEDED: Dashboard hero image should show archive button, image icons, and new UI for v1.1.0 -->
 
 ## What you can do
 
 - Import `.vpx` tables and `.zip` ROM files
 - Scan your VPX folder and auto-detect tables/ROMs
 - Search, sort, and favorite tables
+- Auto-detect table image with manual overrides
+- Play a random table from your selected library
 - Launch tables from the app
-- Rename or delete entries
+- Rename, delete, or archive entries
 - View recently played tables
-- Export a bundle of tables + ROMs
+- Export tables (all, favorites, or archived)
+- Connect Android mobile devices to sync selected tables and ROMs (experimental)
 
 ## Install
 
@@ -80,10 +84,17 @@ If you already have an existing VPX setup, start with Scan Library first.
 - Use search to match table name, `.vpx` filename, or ROM filename.
 - Use the order picker to sort.
 - Toggle **Keep favorites on top**.
+- Click **Random Table** to play a random table from your library.
 
 ### Favorites
 
 - Click the ⭐ on a table card to favorite/unfavorite.
+
+### Archive
+
+- Archive tables you want to hide from your active library.
+- Archived tables remain in your database and can be restored anytime.
+- Use the **Archive** tab to view and manage archived tables.
 
 ### Recently Played
 
@@ -93,13 +104,29 @@ If you already have an existing VPX setup, start with Scan Library first.
 ### Table card actions
 
 ![Table card actions](public/readme/table-card-actions.png)
+<!-- ASSET UPDATE NEEDED: Image card actions should show: Play, Edit Image, Archive, Kebab menu (Rename, Edit ROM, VPX Executable, Delete) -->
 
 - **Play** button launches the table.
 - **Kebab menu** lets you:
   - Rename table
   - Edit ROM — set the ROM file associated with this table
+  - Table Image (if available from VPS DB) — click to view or edit image selection from alternate results.
   - VPX Executable — set a different VPX exe file per table (overrides the global one)
   - Delete Table — removes the DB entry and deletes the table's files from VPX folders
+  - Archive / Unarchive table — archive the table to hide it from your active library.
+
+### Table Images
+
+Table images are automatically fetched from the [Virtual Pinball Spreadsheet database](https://virtualpinballspreadsheet.github.io/vps-db/). If an image isn't available or you want to use a different one:
+
+1. Open the table **Kebab menu** and click **Table Image**.
+2. Browse alternate image results for that table.
+3. Select the image you prefer.
+
+<!-- ASSET NEEDED: Screenshot showing image selection modal with alternate results -->
+
+Images are cached locally; if the VPS DB is unavailable, your previously cached images remain visible.
+There's also a snapshot of VPS DB as backup at [VPS Backup snapshot](https://aamanzi.github.io/vps-db/db/vpsdb.json)
 
 ## Settings reference
 
@@ -115,17 +142,39 @@ If you already have an existing VPX setup, start with Scan Library first.
 
 ![Data Management settings](public/readme/settings-data-management.png)
 
-- **Scan VPX Library**
-- **Export Tables** (create a shareable bundle)
+- **Scan VPX Library** — detect and auto-match tables and ROMs
+- **Export Tables** — create a shareable bundle with options:
+  - Export all tables
+  - Export favorites only
+  - Export archived tables only
 
 ![Export tables modal](public/readme/export-tables-modal.png)
+<!-- ASSET UPDATE NEEDED: Export modal should show radio buttons/tabs for All / Favorites / Archive options -->
 
 ![Export result](public/readme/export-result.png)
+
+### Android (Experimental)
+
+<!-- ASSET NEEDED: New section with screenshot showing Android setup/pairing instructions -->
+![Android sync workflow](public/readme/android-sync-workflow.png)
+<!-- ASSET NEEDED: Add this image at public/readme/android-sync-workflow.png -->
+
+- Enable Android Features in Settings > Maintenance
+- Mark tables as "Android" and preview them in the Android tab
+- From the **Android tab**, select **Sync Android**
+- Preview Changes and sync your libraries
+
+#### Android Settings
+
+- **Android Web Server URL**
+- **Android Tables Directory** — advanced setting; change only if you know what you're doing
+- **Android ROMs Directory** — advanced setting; change only if you know what you're doing
 
 ### Maintenance
 
 - **Clear Library Data** resets app metadata/list only.
 - It does **not** delete your actual VPX/ROM files.
+- **Database Migrations** run automatically on app update to keep existing data compatible.
 
 ### VPX utilities
 
