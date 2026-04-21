@@ -3,7 +3,6 @@
 This guide explains how to use the app day-to-day to manage your Visual Pinball X tables and ROMs.
 
 ![VPX Micro Frontend dashboard](public/readme/hero-dashboard.png)
-<!-- ASSET UPDATE NEEDED: Dashboard hero image should show archive button, image icons, and new UI for v1.1.0 -->
 
 ## What you can do
 
@@ -104,7 +103,6 @@ If you already have an existing VPX setup, start with Scan Library first.
 ### Table card actions
 
 ![Table card actions](public/readme/table-card-actions.png)
-<!-- ASSET UPDATE NEEDED: Image card actions should show: Play, Edit Image, Archive, Kebab menu (Rename, Edit ROM, VPX Executable, Delete) -->
 
 - **Play** button launches the table.
 - **Kebab menu** lets you:
@@ -117,13 +115,13 @@ If you already have an existing VPX setup, start with Scan Library first.
 
 ### Table Images
 
-Table images are automatically fetched from the [Virtual Pinball Spreadsheet database](https://virtualpinballspreadsheet.github.io/vps-db/). If an image isn't available or you want to use a different one:
+Table images are automatically fetched from the [Virtual Pinball Spreadsheet database](https://virtualpinballspreadsheet.github.io/vps-db/db/vpsdb.json). If an image isn't available or you want to use a different one:
 
 1. Open the table **Kebab menu** and click **Table Image**.
 2. Browse alternate image results for that table.
 3. Select the image you prefer.
 
-<!-- ASSET NEEDED: Screenshot showing image selection modal with alternate results -->
+![Image Select Modal](public/readme/image-select-modal.png)
 
 Images are cached locally; if the VPS DB is unavailable, your previously cached images remain visible.
 There's also a snapshot of VPS DB as backup at [VPS Backup snapshot](https://aamanzi.github.io/vps-db/db/vpsdb.json)
@@ -149,20 +147,21 @@ There's also a snapshot of VPS DB as backup at [VPS Backup snapshot](https://aam
   - Export archived tables only
 
 ![Export tables modal](public/readme/export-tables-modal.png)
-<!-- ASSET UPDATE NEEDED: Export modal should show radio buttons/tabs for All / Favorites / Archive options -->
 
 ![Export result](public/readme/export-result.png)
 
 ### Android (Experimental)
 
-<!-- ASSET NEEDED: New section with screenshot showing Android setup/pairing instructions -->
-![Android sync workflow](public/readme/android-sync-workflow.png)
-<!-- ASSET NEEDED: Add this image at public/readme/android-sync-workflow.png -->
+![Android sync workflow](public/readme/android-sync-workflow.gif)
 
 - Enable Android Features in Settings > Maintenance
 - Mark tables as "Android" and preview them in the Android tab
 - From the **Android tab**, select **Sync Android**
 - Preview Changes and sync your libraries
+
+
+![Enable android features](public/readme/android-features-enabled.png)
+![Mark table for android](public/readme/mark-for-android.png)
 
 #### Android Settings
 
