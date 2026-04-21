@@ -5,11 +5,14 @@ import Icon from 'src/components/Icon';
 import api from 'src/consts';
 import { useTablesContext } from 'src/providers/tables';
 import { useToastContext } from 'src/providers/toast';
+import type { Table } from 'src/types/table';
+import { getTableGradientVariant } from 'src/utils';
 import useClickOutside from 'src/utils/useClickOutside';
 
 import style from './Settings.module.scss';
 import DeleteTableModal from './components/DeleteTableModal';
 import EditTableExecutableModal from './components/EditTableExecutableModal';
+import EditTableImageModal from './components/EditTableImageModal/EditTableImageModal';
 import EditTableRomModal from './components/EditTableRomModal/EditTableRomModal';
 import RenameTableModal from './components/RenameTableModal';
 
@@ -18,6 +21,8 @@ interface Props {
   name: string;
   romFile?: string;
   romFilePath?: string;
+  imgUrl?: string;
+  imagePreference?: Table['imagePreference'];
   vpxExecutablePath?: string;
   isArchived?: boolean;
   vpxFile: string;
@@ -30,6 +35,8 @@ const Settings: FunctionComponent<Props> = ({
   name,
   romFile,
   romFilePath,
+  imgUrl,
+  imagePreference,
   vpxExecutablePath,
   isArchived,
   vpxFile,
@@ -44,6 +51,8 @@ const Settings: FunctionComponent<Props> = ({
 
   const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
   const [isEditTableRomModalOpen, setIsEditTableRomModalOpen] = useState(false);
+  const [isEditTableImageModalOpen, setIsEditTableImageModalOpen] =
+    useState(false);
   const [isEditExecutableModalOpen, setIsEditExecutableModalOpen] =
     useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -62,6 +71,12 @@ const Settings: FunctionComponent<Props> = ({
 
   const closeEditTableRomModal = () => {
     setIsEditTableRomModalOpen(false);
+    fetchTables();
+    close();
+  };
+
+  const closeEditTableImageModal = () => {
+    setIsEditTableImageModalOpen(false);
     fetchTables();
     close();
   };
@@ -108,6 +123,16 @@ const Settings: FunctionComponent<Props> = ({
         </span>
       </button>
       <button
+        onClick={() => setIsEditTableImageModalOpen(true)}
+        className={style.button}>
+        <div className={style.iconWrapper}>
+          <Icon icon='folder' className={style.icon} />
+        </div>
+        <span className={classNames('body-sm-semibold', style.label)}>
+          Table Image
+        </span>
+      </button>
+      <button
         onClick={() => setIsEditExecutableModalOpen(true)}
         className={style.button}>
         <div className={style.iconWrapper}>
@@ -145,6 +170,20 @@ const Settings: FunctionComponent<Props> = ({
           currentRomName={romFile}
           currentRomPath={romFilePath}
           close={closeEditTableRomModal}
+        />
+      )}
+      {isEditTableImageModalOpen && (
+        <EditTableImageModal
+          id={id}
+          name={name}
+          currentImgUrl={imgUrl}
+          currentImagePreference={imagePreference}
+          close={closeEditTableImageModal}
+          gradientClassName={getTableGradientVariant({
+            romFile,
+            vpxFile,
+            id,
+          } as Table)}
         />
       )}
       {isEditExecutableModalOpen && (

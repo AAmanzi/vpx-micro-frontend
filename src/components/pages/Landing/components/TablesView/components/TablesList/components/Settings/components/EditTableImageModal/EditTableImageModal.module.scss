@@ -1,0 +1,83 @@
+.modal {
+  padding-bottom: 0;
+}
+
+.content {
+  margin: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.optionsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.option {
+  border: thin solid var(--gray);
+  border-radius: 16px;
+  background-color: rgba(var(--gray-rgb), 0.18);
+  overflow: hidden;
+  transition:
+    border-color 200ms ease-out,
+    background-color 200ms ease-out,
+    transform 200ms ease-out;
+
+  &:hover {
+    border-color: rgba(var(--white-rgb), 0.18);
+    background-color: rgba(var(--white-rgb), 0.05);
+    transform: translateY(-1px);
+  }
+
+  &.selected {
+    border-color: var(--blue);
+    background-color: rgba(var(--blue-rgb), 0.12);
+  }
+}
+
+.optionButton {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.preview,
+.emptyPreview {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background-size: cover;
+  background-position: center;
+}
+
+.preview {
+  background-color: rgba(0, 0, 0, 0.24);
+}
+
+.emptyPreview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emptyPreviewLabel {
+  color: var(--white);
+  letter-spacing: 0.04em;
+}
+
+.emptyState {
+  padding: 16px;
+  border: thin dashed var(--gray);
+  border-radius: 12px;
+  background-color: rgba(var(--gray-rgb), 0.14);
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  margin: 24px;
+  gap: 12px;
+}

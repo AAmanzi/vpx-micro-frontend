@@ -1,5 +1,7 @@
 import { FileSystemItem, TableFile } from './file';
 
+export type TableImagePreference = 'manual' | 'none';
+
 export interface Table {
   id: string;
   name: string;
@@ -16,6 +18,8 @@ export interface Table {
   dateAddedTimestamp: number;
 
   vpxExecutablePath?: string;
+  imgUrl?: string;
+  imagePreference?: TableImagePreference;
 }
 
 export interface ScanResult {

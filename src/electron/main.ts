@@ -194,6 +194,17 @@ app.whenReady().then(async () => {
     async (_, tableId: string, executablePath: string | null) =>
       api.updateTableVpxExecutablePath(tableId, executablePath),
   );
+  ipcMain.handle('api:getTableImageCandidates', async (_, tableId: string) =>
+    api.getTableImageCandidates(tableId),
+  );
+  ipcMain.handle(
+    'api:updateTableImage',
+    async (_, tableId: string, imgUrl: string) =>
+      api.updateTableImage(tableId, imgUrl),
+  );
+  ipcMain.handle('api:clearTableImage', async (_, tableId: string) =>
+    api.clearTableImage(tableId),
+  );
   ipcMain.handle(
     'api:importTables',
     async (_, tables: Array<TableFile>, deleteAfterImport: boolean) =>

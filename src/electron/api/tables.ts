@@ -27,6 +27,10 @@ import {
   scanNewTables,
 } from '../utils/scanVpxLibrary';
 import { startVpxTable } from '../utils/startVpxTable';
+import {
+  lookupTableImageCandidates,
+  lookupTableImageUrl,
+} from '../utils/tableImages';
 
 const isZipFile = (name: string): boolean =>
   path.extname(name).toLowerCase() === '.zip';
@@ -323,10 +327,99 @@ export function updateTableVpxExecutablePath(
   }
 }
 
-export function importTables(
+export async function getTableImageCandidates(
+  tableId: string,
+): Promise<ApiResult<Array<string>>> {
+  try {
+    const table = tablesDb.get(tableId);
+
+    if (!table) {
+      return {
+        success: false,
+        error: {
+          code: 'TABLE_NOT_FOUND',
+          message: `Table not found: ${tableId}`,
+        },
+      };
+    }
+
+    const imgUrls = await lookupTableImageCandidates({
+      tableName: table.name,
+      vpxFileName: table.vpxFile,
+      romFileName: table.romFile,
+    });
+
+    return apiSuccess(imgUrls);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}
+
+export function updateTableImage(
+  tableId: string,
+  imgUrl: string,
+): ApiResult<null> {
+  try {
+    const normalizedImgUrl = imgUrl.trim();
+
+    if (!normalizedImgUrl) {
+      return {
+        success: false,
+        error: {
+          code: 'INVALID_IMAGE_URL',
+          message: 'Image URL is required',
+        },
+      };
+    }
+
+    const updatedTable = tablesDb.update(tableId, {
+      imgUrl: normalizedImgUrl,
+      imagePreference: 'manual',
+    });
+
+    if (!updatedTable) {
+      return {
+        success: false,
+        error: {
+          code: 'TABLE_NOT_FOUND',
+          message: `Table not found: ${tableId}`,
+        },
+      };
+    }
+
+    return apiSuccess(null);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}
+
+export function clearTableImage(tableId: string): ApiResult<null> {
+  try {
+    const updatedTable = tablesDb.update(tableId, {
+      imgUrl: undefined,
+      imagePreference: 'none',
+    });
+
+    if (!updatedTable) {
+      return {
+        success: false,
+        error: {
+          code: 'TABLE_NOT_FOUND',
+          message: `Table not found: ${tableId}`,
+        },
+      };
+    }
+
+    return apiSuccess(null);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}
+
+export async function importTables(
   tableFiles: Array<TableFile>,
   deleteAfterImport: boolean,
-): ApiResult<null> {
+): Promise<ApiResult<null>> {
   try {
     const transferFile = deleteAfterImport ? moveFile : copyFile;
     const movedSourceFilePaths = new Set<string>();
@@ -341,7 +434,7 @@ export function importTables(
         .map((table) => normalizePathForComparison(table.vpxFilePath)),
     );
 
-    tableFiles.forEach((tableFile) => {
+    for (const tableFile of tableFiles) {
       try {
         const vpxSourceFilePath = tableFile.filePath;
         const romSourceFilePath = tableFile.rom?.path;
@@ -359,7 +452,7 @@ export function importTables(
         );
 
         if (existingVpxPaths.has(normalizedDestinationPath)) {
-          return;
+          continue;
         }
 
         if (vpxSourceFilePath !== vpxDestinationFilePath) {
@@ -380,6 +473,12 @@ export function importTables(
           }
         }
 
+        const imgUrl = await lookupTableImageUrl({
+          tableName: tableFile.name,
+          vpxFileName: tableFile.fileName,
+          romFileName: tableFile.rom?.name,
+        });
+
         const nextTable: Table = {
           id: uuidv4(),
           name: tableFile.name,
@@ -391,6 +490,7 @@ export function importTables(
           vpxFilePath: vpxDestinationFilePath,
           romFilePath: romDestinationFilePath,
           dateAddedTimestamp: Date.now(),
+          imgUrl,
         };
 
         tablesDb.create(nextTable);
@@ -404,7 +504,7 @@ export function importTables(
           error.message.includes('does not exist')
         ) {
           missingSourceFailures += 1;
-          return;
+          continue;
         }
 
         if (
@@ -414,12 +514,12 @@ export function importTables(
           (error.code === 'EACCES' || error.code === 'EPERM')
         ) {
           permissionFailures += 1;
-          return;
+          continue;
         }
 
         throw error;
       }
-    });
+    }
 
     if (deleteAfterImport) {
       Array.from(movedSourceFilePaths).forEach((sourceFilePath) => {
@@ -556,9 +656,11 @@ export function scanVpxLibrary(): ApiResult<ScanResult> {
   });
 }
 
-export function applyScanResult(scanResult: ScanResult): ApiResult<null> {
+export async function applyScanResult(
+  scanResult: ScanResult,
+): Promise<ApiResult<null>> {
   try {
-    registerTableFiles(scanResult.newTables);
+    await registerTableFiles(scanResult.newTables);
     deleteUnusedRoms(scanResult.unmatchedRoms);
     cleanTablesWithMissingFiles(scanResult.tablesWithMissingFiles);
 

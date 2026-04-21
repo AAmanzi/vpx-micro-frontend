@@ -41,6 +41,17 @@ const frontendApi: Api = {
       tableId,
       executablePath,
     ),
+  getTableImageCandidates: (
+    tableId: string,
+  ): Promise<ApiResult<Array<string>>> =>
+    invoke<ApiResult<Array<string>>>('api:getTableImageCandidates', tableId),
+  updateTableImage: (
+    tableId: string,
+    imgUrl: string,
+  ): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:updateTableImage', tableId, imgUrl),
+  clearTableImage: (tableId: string): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:clearTableImage', tableId),
   getExpectedRomName: (
     vpxFilePath: string,
   ): Promise<ApiResult<string | null>> =>

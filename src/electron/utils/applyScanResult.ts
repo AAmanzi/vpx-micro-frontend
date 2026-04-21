@@ -6,20 +6,29 @@ import type { ScanResult, Table } from 'src/types/table';
 import * as tablesDb from '../database/tables';
 import { deleteFile } from './fileManagement';
 import { normalizePathForComparison } from './path';
+import { lookupTableImageUrl } from './tableImages';
 
-export function registerTableFiles(tables: Array<TableFile>): void {
+export async function registerTableFiles(
+  tables: Array<TableFile>,
+): Promise<void> {
   const existingVpxPaths = new Set(
     tablesDb
       .getAll()
       .map((table) => normalizePathForComparison(table.vpxFilePath)),
   );
 
-  tables.forEach((tableFile) => {
+  for (const tableFile of tables) {
     const normalizedVpxPath = normalizePathForComparison(tableFile.filePath);
 
     if (existingVpxPaths.has(normalizedVpxPath)) {
-      return;
+      continue;
     }
+
+    const imgUrl = await lookupTableImageUrl({
+      tableName: tableFile.name,
+      vpxFileName: tableFile.fileName,
+      romFileName: tableFile.rom?.name,
+    });
 
     const nextTable: Table = {
       id: uuidv4(),
@@ -32,11 +41,12 @@ export function registerTableFiles(tables: Array<TableFile>): void {
       isForAndroid: false,
       isArchived: false,
       dateAddedTimestamp: Date.now(),
+      imgUrl,
     };
 
     tablesDb.create(nextTable);
     existingVpxPaths.add(normalizedVpxPath);
-  });
+  }
 }
 
 export function deleteUnusedRoms(roms: Array<FileSystemItem>): void {

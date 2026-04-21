@@ -3,6 +3,7 @@ import { Icon } from 'src/components/Icon/types';
 export enum Type {
   primary = 'primary',
   secondary = 'secondary',
+  secondaryTransparent = 'secondaryTransparent',
   transparent = 'transparent',
   danger = 'danger',
   primaryAlt = 'primaryAlt',
