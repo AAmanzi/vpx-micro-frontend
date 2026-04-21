@@ -22,6 +22,12 @@ import style from './TableCard.module.scss';
 
 type Props = Table;
 
+const getPlayAreaStyle = (imgUrl?: string) => ({
+  backgroundImage: imgUrl
+    ? `linear-gradient(180deg, rgba(0, 0, 0, 0.15) 15%, rgba(0, 0, 0, 0.78) 100%), url("${imgUrl}")`
+    : undefined,
+});
+
 const TableCard: FunctionComponent<Props> = ({
   id,
   isFavorite,
@@ -33,6 +39,7 @@ const TableCard: FunctionComponent<Props> = ({
   vpxFile,
   vpxFilePath,
   vpxExecutablePath,
+  imgUrl,
   dateAddedTimestamp,
   lastPlayedTimestamp,
 }) => {
@@ -106,14 +113,15 @@ const TableCard: FunctionComponent<Props> = ({
         className={classNames(
           style.playArea,
           getTableGradientVariant({ romFile, vpxFile, id } as Table),
-        )}>
+        )}
+        style={getPlayAreaStyle(imgUrl)}>
         <Button
           circle
           icon='play'
           loading={isStarting}
           onClick={handlePlay}
           size={ButtonSize.large}
-          type={ButtonType.secondary}
+          type={ButtonType.secondaryTransparent}
         />
       </div>
 

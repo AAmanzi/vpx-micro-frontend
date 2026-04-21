@@ -30,6 +30,7 @@ const Button: FunctionComponent<Props> = ({
       className={classNames(style.content, {
         [style.primary]: type === Type.primary,
         [style.secondary]: type === Type.secondary,
+        [style.secondaryTransparent]: type === Type.secondaryTransparent,
         [style.transparent]: type === Type.transparent,
         [style.danger]: type === Type.danger,
         [style.primaryAlt]: type === Type.primaryAlt,

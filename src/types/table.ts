@@ -16,6 +16,7 @@ export interface Table {
   dateAddedTimestamp: number;
 
   vpxExecutablePath?: string;
+  imgUrl?: string;
 }
 
 export interface ScanResult {
