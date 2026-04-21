@@ -47,6 +47,14 @@ export interface Api {
     tableId: string,
     executablePath: string | null,
   ) => Promise<ApiResult<null>>;
+  getTableImageCandidates: (
+    tableId: string,
+  ) => Promise<ApiResult<Array<string>>>;
+  updateTableImage: (
+    tableId: string,
+    imgUrl: string,
+  ) => Promise<ApiResult<null>>;
+  clearTableImage: (tableId: string) => Promise<ApiResult<null>>;
   importTables: (
     tables: Array<TableFile>,
     deleteAfterImport: boolean,

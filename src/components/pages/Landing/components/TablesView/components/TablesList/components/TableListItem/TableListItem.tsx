@@ -40,6 +40,7 @@ const TableListItem: FunctionComponent<Props> = ({
   vpxFilePath,
   vpxExecutablePath,
   imgUrl,
+  imagePreference,
   dateAddedTimestamp,
   lastPlayedTimestamp,
 }) => {
@@ -253,6 +254,8 @@ const TableListItem: FunctionComponent<Props> = ({
           vpxFile={vpxFile}
           romFilePath={romFilePath}
           romFile={romFile}
+          imgUrl={imgUrl}
+          imagePreference={imagePreference}
           triggerClassName={style.settingsTrigger}
         />
       </div>

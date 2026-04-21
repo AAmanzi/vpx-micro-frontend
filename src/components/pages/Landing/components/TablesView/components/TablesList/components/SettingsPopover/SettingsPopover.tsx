@@ -8,6 +8,7 @@ import {
 } from 'react';
 
 import Icon from 'src/components/Icon';
+import type { Table } from 'src/types/table';
 
 import Settings from '../Settings';
 
@@ -16,6 +17,8 @@ interface Props {
   name: string;
   romFile?: string;
   romFilePath?: string;
+  imgUrl?: string;
+  imagePreference?: Table['imagePreference'];
   vpxExecutablePath?: string;
   isArchived?: boolean;
   vpxFile: string;
@@ -31,6 +34,8 @@ const SettingsPopover: FunctionComponent<Props> = ({
   name,
   romFile,
   romFilePath,
+  imgUrl,
+  imagePreference,
   vpxExecutablePath,
   isArchived,
   vpxFile,
@@ -140,6 +145,8 @@ const SettingsPopover: FunctionComponent<Props> = ({
             name={name}
             romFile={romFile}
             romFilePath={romFilePath}
+            imgUrl={imgUrl}
+            imagePreference={imagePreference}
             vpxExecutablePath={vpxExecutablePath}
             isArchived={isArchived}
             vpxFile={vpxFile}

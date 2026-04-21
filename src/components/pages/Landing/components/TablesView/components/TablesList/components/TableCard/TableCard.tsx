@@ -40,6 +40,7 @@ const TableCard: FunctionComponent<Props> = ({
   vpxFilePath,
   vpxExecutablePath,
   imgUrl,
+  imagePreference,
   dateAddedTimestamp,
   lastPlayedTimestamp,
 }) => {
@@ -175,6 +176,8 @@ const TableCard: FunctionComponent<Props> = ({
               vpxFile={vpxFile}
               romFilePath={romFilePath}
               romFile={romFile}
+              imgUrl={imgUrl}
+              imagePreference={imagePreference}
               triggerClassName={style.settingsTrigger}
             />
           </div>

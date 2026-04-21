@@ -27,7 +27,10 @@ import {
   scanNewTables,
 } from '../utils/scanVpxLibrary';
 import { startVpxTable } from '../utils/startVpxTable';
-import { lookupTableImageUrl } from '../utils/tableImages';
+import {
+  lookupTableImageCandidates,
+  lookupTableImageUrl,
+} from '../utils/tableImages';
 
 const isZipFile = (name: string): boolean =>
   path.extname(name).toLowerCase() === '.zip';
@@ -306,6 +309,95 @@ export function updateTableVpxExecutablePath(
     const normalizedPath = executablePath?.trim();
     const updatedTable = tablesDb.update(tableId, {
       vpxExecutablePath: normalizedPath || undefined,
+    });
+
+    if (!updatedTable) {
+      return {
+        success: false,
+        error: {
+          code: 'TABLE_NOT_FOUND',
+          message: `Table not found: ${tableId}`,
+        },
+      };
+    }
+
+    return apiSuccess(null);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}
+
+export async function getTableImageCandidates(
+  tableId: string,
+): Promise<ApiResult<Array<string>>> {
+  try {
+    const table = tablesDb.get(tableId);
+
+    if (!table) {
+      return {
+        success: false,
+        error: {
+          code: 'TABLE_NOT_FOUND',
+          message: `Table not found: ${tableId}`,
+        },
+      };
+    }
+
+    const imgUrls = await lookupTableImageCandidates({
+      tableName: table.name,
+      vpxFileName: table.vpxFile,
+      romFileName: table.romFile,
+    });
+
+    return apiSuccess(imgUrls);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}
+
+export function updateTableImage(
+  tableId: string,
+  imgUrl: string,
+): ApiResult<null> {
+  try {
+    const normalizedImgUrl = imgUrl.trim();
+
+    if (!normalizedImgUrl) {
+      return {
+        success: false,
+        error: {
+          code: 'INVALID_IMAGE_URL',
+          message: 'Image URL is required',
+        },
+      };
+    }
+
+    const updatedTable = tablesDb.update(tableId, {
+      imgUrl: normalizedImgUrl,
+      imagePreference: 'manual',
+    });
+
+    if (!updatedTable) {
+      return {
+        success: false,
+        error: {
+          code: 'TABLE_NOT_FOUND',
+          message: `Table not found: ${tableId}`,
+        },
+      };
+    }
+
+    return apiSuccess(null);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}
+
+export function clearTableImage(tableId: string): ApiResult<null> {
+  try {
+    const updatedTable = tablesDb.update(tableId, {
+      imgUrl: undefined,
+      imagePreference: 'none',
     });
 
     if (!updatedTable) {

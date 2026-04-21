@@ -1,5 +1,6 @@
-import fs from 'fs/promises';
 import path from 'path';
+
+import fs from 'fs/promises';
 
 const VPS_PRIMARY_URL =
   'https://virtualpinballspreadsheet.github.io/vps-db/db/vpsdb.json';
@@ -237,14 +238,15 @@ const fetchJsonWithTimeout = async (url: string): Promise<unknown> => {
   }
 };
 
-const loadDevelopmentDatabase = async (): Promise<Array<VpsGameRecord> | null> => {
-  try {
-    const fileContents = await fs.readFile(DEV_DB_PATH, 'utf8');
-    return normalizeDatabasePayload(JSON.parse(fileContents));
-  } catch {
-    return null;
-  }
-};
+const loadDevelopmentDatabase =
+  async (): Promise<Array<VpsGameRecord> | null> => {
+    try {
+      const fileContents = await fs.readFile(DEV_DB_PATH, 'utf8');
+      return normalizeDatabasePayload(JSON.parse(fileContents));
+    } catch {
+      return null;
+    }
+  };
 
 const loadRemoteDatabase = async (): Promise<Array<VpsGameRecord> | null> => {
   for (const url of [VPS_PRIMARY_URL, VPS_FALLBACK_URL]) {
@@ -310,6 +312,80 @@ const hasLooseMatch = (
   return false;
 };
 
+const addUniqueCandidate = (
+  candidates: Array<string>,
+  seenCandidates: Set<string>,
+  imgUrl?: string,
+): void => {
+  if (!imgUrl || seenCandidates.has(imgUrl)) {
+    return;
+  }
+
+  seenCandidates.add(imgUrl);
+  candidates.push(imgUrl);
+};
+
+export const lookupTableImageCandidates = async ({
+  tableName,
+  vpxFileName,
+  romFileName,
+}: {
+  tableName: string;
+  vpxFileName?: string;
+  romFileName?: string;
+}): Promise<Array<string>> => {
+  const imageIndex = await getImageIndex();
+
+  if (!imageIndex) {
+    return [];
+  }
+
+  const candidates: Array<string> = [];
+  const seenCandidates = new Set<string>();
+  const exactTableKeys = [
+    tableName,
+    stripTrailingMetadata(tableName),
+    vpxFileName,
+  ]
+    .filter(isNonEmptyString)
+    .map((value) => toCompactKey(value));
+  const exactRomKeys = [romFileName]
+    .filter(isNonEmptyString)
+    .map((value) => toCompactKey(value));
+
+  for (const exactRomKey of exactRomKeys) {
+    addUniqueCandidate(
+      candidates,
+      seenCandidates,
+      imageIndex.exactRomMatches.get(exactRomKey),
+    );
+  }
+
+  for (const exactTableKey of exactTableKeys) {
+    addUniqueCandidate(
+      candidates,
+      seenCandidates,
+      imageIndex.exactTableMatches.get(exactTableKey),
+    );
+  }
+
+  const fuzzyTableKeys = exactTableKeys.filter(Boolean);
+
+  for (const entry of imageIndex.entries) {
+    if (hasLooseMatch(fuzzyTableKeys, entry.tableKeys)) {
+      addUniqueCandidate(candidates, seenCandidates, entry.imgUrl);
+    }
+  }
+
+  for (const entry of imageIndex.entries) {
+    if (hasLooseMatch(exactRomKeys, entry.romKeys)) {
+      addUniqueCandidate(candidates, seenCandidates, entry.imgUrl);
+    }
+  }
+
+  return candidates;
+};
+
 export const lookupTableImageUrl = async ({
   tableName,
   vpxFileName,
@@ -319,48 +395,11 @@ export const lookupTableImageUrl = async ({
   vpxFileName?: string;
   romFileName?: string;
 }): Promise<string | undefined> => {
-  const imageIndex = await getImageIndex();
+  const candidates = await lookupTableImageCandidates({
+    tableName,
+    vpxFileName,
+    romFileName,
+  });
 
-  if (!imageIndex) {
-    return undefined;
-  }
-
-  const exactTableKeys = [tableName, stripTrailingMetadata(tableName), vpxFileName]
-    .filter(isNonEmptyString)
-    .map((value) => toCompactKey(value));
-  const exactRomKeys = [romFileName]
-    .filter(isNonEmptyString)
-    .map((value) => toCompactKey(value));
-
-  for (const exactRomKey of exactRomKeys) {
-    const exactRomMatch = imageIndex.exactRomMatches.get(exactRomKey);
-
-    if (exactRomMatch) {
-      return exactRomMatch;
-    }
-  }
-
-  for (const exactTableKey of exactTableKeys) {
-    const exactTableMatch = imageIndex.exactTableMatches.get(exactTableKey);
-
-    if (exactTableMatch) {
-      return exactTableMatch;
-    }
-  }
-
-  const fuzzyTableKeys = exactTableKeys.filter(Boolean);
-
-  for (const entry of imageIndex.entries) {
-    if (hasLooseMatch(fuzzyTableKeys, entry.tableKeys)) {
-      return entry.imgUrl;
-    }
-  }
-
-  for (const entry of imageIndex.entries) {
-    if (hasLooseMatch(exactRomKeys, entry.romKeys)) {
-      return entry.imgUrl;
-    }
-  }
-
-  return undefined;
+  return candidates[0];
 };
