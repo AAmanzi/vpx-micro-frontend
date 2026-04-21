@@ -4,12 +4,13 @@ import fs from 'fs';
 import http from 'http';
 import path from 'path';
 
+import type { AndroidSyncApplyPayload } from 'src/types/android';
 import type { Config } from 'src/types/config';
 import type { TableFile } from 'src/types/file';
 import type { GroupType, ScanResult, Table } from 'src/types/table';
-import type { AndroidSyncApplyPayload } from 'src/types/android';
 
 import * as api from './api';
+import { runAppMigrations } from './database/migrations';
 import * as db from './database/tables';
 
 const logFile = path.join(process.cwd(), 'backend.log');
@@ -162,6 +163,8 @@ app.whenReady().then(async () => {
     }
   }
 
+  await runAppMigrations(app.getVersion());
+
   // register IPC handlers that call the api layer
   ipcMain.handle('api:getAllTables', async () => api.getAllTables());
   ipcMain.handle('api:deleteTable', async (_, id: string) =>
@@ -281,7 +284,9 @@ app.whenReady().then(async () => {
   );
   ipcMain.handle('api:clearTables', async () => api.clearTables());
   ipcMain.handle('api:scanVpxLibrary', async () => api.scanVpxLibrary());
-  ipcMain.handle('api:scanAndroidLibrary', async () => api.scanAndroidLibrary());
+  ipcMain.handle('api:scanAndroidLibrary', async () =>
+    api.scanAndroidLibrary(),
+  );
   ipcMain.handle(
     'api:applyAndroidSync',
     async (event, payload: AndroidSyncApplyPayload) =>
@@ -297,9 +302,8 @@ app.whenReady().then(async () => {
     async (_, destinationPath: string, exportGroup: GroupType) =>
       api.exportTables(destinationPath, exportGroup),
   );
-  ipcMain.handle(
-    'api:startRandomTable',
-    async (_, tables: Table[]) => api.startRandomTable(tables),
+  ipcMain.handle('api:startRandomTable', async (_, tables: Table[]) =>
+    api.startRandomTable(tables),
   );
 
   createWindow();
