@@ -1,11 +1,8 @@
 import path from 'path';
 
-import fs from 'fs/promises';
-
 const VPS_PRIMARY_URL =
   'https://virtualpinballspreadsheet.github.io/vps-db/db/vpsdb.json';
 const VPS_FALLBACK_URL = 'https://aamanzi.github.io/vps-db/db/vpsdb.json';
-const DEV_DB_PATH = path.resolve(process.cwd(), 'gitignore', 'db.json');
 const LOOKUP_TIMEOUT_MS = 5000;
 
 type VpsFileRecord = {
@@ -238,16 +235,6 @@ const fetchJsonWithTimeout = async (url: string): Promise<unknown> => {
   }
 };
 
-const loadDevelopmentDatabase =
-  async (): Promise<Array<VpsGameRecord> | null> => {
-    try {
-      const fileContents = await fs.readFile(DEV_DB_PATH, 'utf8');
-      return normalizeDatabasePayload(JSON.parse(fileContents));
-    } catch {
-      return null;
-    }
-  };
-
 const loadRemoteDatabase = async (): Promise<Array<VpsGameRecord> | null> => {
   for (const url of [VPS_PRIMARY_URL, VPS_FALLBACK_URL]) {
     try {
@@ -266,12 +253,6 @@ const loadRemoteDatabase = async (): Promise<Array<VpsGameRecord> | null> => {
 };
 
 const loadImageIndex = async (): Promise<ImageIndex | null> => {
-  const developmentGames = await loadDevelopmentDatabase();
-
-  if (developmentGames && developmentGames.length > 0) {
-    return createImageIndex(developmentGames);
-  }
-
   const remoteGames = await loadRemoteDatabase();
 
   if (!remoteGames || remoteGames.length === 0) {
