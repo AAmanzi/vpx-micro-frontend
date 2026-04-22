@@ -14,6 +14,7 @@ import { Table } from 'src/types/table';
 import {
   displayDate,
   displayRelativeDate,
+  getTableGradientVariable,
   getTableGradientVariant,
 } from 'src/utils';
 
@@ -22,9 +23,9 @@ import style from './TableListItem.module.scss';
 
 type Props = Table;
 
-const getPlayAreaStyle = (imgUrl?: string) => ({
+const getPlayAreaStyle = (gradientColor: string, imgUrl?: string) => ({
   backgroundImage: imgUrl
-    ? `linear-gradient(180deg, rgba(0, 0, 0, 0.15) 15%, rgba(0, 0, 0, 0.78) 100%), url("${imgUrl}")`
+    ? `linear-gradient(180deg, rgba(0, 0, 0, 0.15) 15%, rgba(0, 0, 0, 0.78) 100%), url("${imgUrl}"), ${gradientColor}`
     : undefined,
 });
 
@@ -48,6 +49,8 @@ const TableListItem: FunctionComponent<Props> = ({
   const [forAndroid, setForAndroid] = useState(Boolean(isForAndroid));
   const [isStarting, setIsStarting] = useState(false);
   const [isNameTruncated, setIsNameTruncated] = useState(false);
+  const tableGradient = getTableGradientVariant({ romFile, vpxFile, id } as Table);
+  const tableGradientColor = getTableGradientVariable({ romFile, vpxFile, id } as Table);
   const titleRef = useRef<HTMLHeadingElement | null>(null);
   const { showErrorToast } = useToastContext();
   const { fetchTables } = useTablesContext();
@@ -149,11 +152,8 @@ const TableListItem: FunctionComponent<Props> = ({
   return (
     <div className={style.item}>
       <div
-        className={classNames(
-          style.playArea,
-          getTableGradientVariant({ romFile, vpxFile, id } as Table),
-        )}
-        style={getPlayAreaStyle(imgUrl)}>
+        className={classNames(style.playArea, tableGradient)}
+        style={getPlayAreaStyle(tableGradientColor, imgUrl)}>
         <Button
           circle
           icon='play'

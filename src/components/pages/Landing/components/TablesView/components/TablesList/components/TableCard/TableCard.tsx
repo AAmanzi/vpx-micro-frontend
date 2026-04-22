@@ -14,6 +14,7 @@ import { Table } from 'src/types/table';
 import {
   displayDate,
   displayRelativeDate,
+  getTableGradientVariable,
   getTableGradientVariant,
 } from 'src/utils';
 
@@ -22,9 +23,9 @@ import style from './TableCard.module.scss';
 
 type Props = Table;
 
-const getPlayAreaStyle = (imgUrl?: string) => ({
+const getPlayAreaStyle = (gradientColor: string, imgUrl?: string) => ({
   backgroundImage: imgUrl
-    ? `linear-gradient(180deg, rgba(0, 0, 0, 0.15) 15%, rgba(0, 0, 0, 0.78) 100%), url("${imgUrl}")`
+    ? `linear-gradient(180deg, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.84) 100%), url("${imgUrl}"), ${gradientColor}`
     : undefined,
 });
 
@@ -47,6 +48,8 @@ const TableCard: FunctionComponent<Props> = ({
   const [favorite, setFavorite] = useState(isFavorite);
   const [forAndroid, setForAndroid] = useState(Boolean(isForAndroid));
   const [isStarting, setIsStarting] = useState(false);
+  const tableGradient = getTableGradientVariant({ romFile, vpxFile, id } as Table);
+  const tableGradientColor = getTableGradientVariable({ romFile, vpxFile, id } as Table);
   const { showErrorToast } = useToastContext();
   const { fetchTables } = useTablesContext();
   const { config } = useConfigContext();
@@ -111,11 +114,8 @@ const TableCard: FunctionComponent<Props> = ({
   return (
     <div className={style.card}>
       <div
-        className={classNames(
-          style.playArea,
-          getTableGradientVariant({ romFile, vpxFile, id } as Table),
-        )}
-        style={getPlayAreaStyle(imgUrl)}>
+        className={classNames(style.playArea, tableGradient)}
+        style={getPlayAreaStyle(tableGradientColor, imgUrl)}>
         <Button
           circle
           icon='play'
