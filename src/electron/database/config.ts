@@ -1,6 +1,10 @@
 import Store from 'electron-store';
 
-import { VPX_DEFAULT_ROOT_PATH } from 'src/consts/vpx';
+import {
+  VPX_DEFAULT_ANDROID_ROMS_PATH,
+  VPX_DEFAULT_ANDROID_TABLES_PATH,
+  VPX_DEFAULT_ROOT_PATH,
+} from 'src/consts/vpx';
 import { Config, Order, ViewType } from 'src/types/config';
 import {
   getDefaultRomsDirectory,
@@ -23,6 +27,10 @@ const defaultConfig: Config = {
   keepFavoritesOnTop: false,
   order: Order.dateAddedDesc,
   viewType: ViewType.grid,
+  androidFeaturesEnabled: false,
+  androidWebServerUrl: '',
+  androidTablesDirectory: VPX_DEFAULT_ANDROID_TABLES_PATH,
+  androidRomsDirectory: VPX_DEFAULT_ANDROID_ROMS_PATH,
 };
 
 const store = new Store<ConfigStoreSchema>({
@@ -124,5 +132,39 @@ export function updateViewType(viewType: Config['viewType']): void {
   store.set('config', {
     ...getStoredConfig(),
     viewType,
+  });
+}
+
+export function updateAndroidFeaturesEnabled(
+  androidFeaturesEnabled: boolean,
+): void {
+  store.set('config', {
+    ...getStoredConfig(),
+    androidFeaturesEnabled,
+  });
+}
+
+export function updateAndroidWebServerUrl(androidWebServerUrl: string): void {
+  store.set('config', {
+    ...getStoredConfig(),
+    androidWebServerUrl,
+  });
+}
+
+export function updateAndroidTablesDirectoryPath(
+  androidTablesDirectory: string,
+): void {
+  store.set('config', {
+    ...getStoredConfig(),
+    androidTablesDirectory,
+  });
+}
+
+export function updateAndroidRomsDirectoryPath(
+  androidRomsDirectory: string,
+): void {
+  store.set('config', {
+    ...getStoredConfig(),
+    androidRomsDirectory,
   });
 }

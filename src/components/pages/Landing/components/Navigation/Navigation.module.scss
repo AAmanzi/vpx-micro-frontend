@@ -64,6 +64,10 @@
       background-color: rgba(var(--green-rgb), 0.1);
     }
 
+    &.red {
+      background-color: rgba(var(--red-rgb), 0.1);
+    }
+
     & .icon,
     & .label {
       color: var(--white);
@@ -87,6 +91,10 @@
 
     &.green {
       background-color: rgba(var(--green-rgb), 0.2);
+    }
+
+    &.red {
+      background-color: rgba(var(--red-rgb), 0.2);
     }
 
     & .icon,

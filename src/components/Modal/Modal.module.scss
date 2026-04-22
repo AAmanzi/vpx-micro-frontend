@@ -4,7 +4,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 6;
+  z-index: 100;
   background:
     radial-gradient(
       circle at 50% 45%,
@@ -35,6 +35,7 @@
 }
 
 .modal {
+  animation: fadeInModal 200ms ease-out;
   background-color: var(--gray-800);
   padding-bottom: 24px;
   border-radius: 24px;
@@ -145,5 +146,23 @@
 
   &:hover {
     background-color: rgba(var(--white-rgb), 0.1);
+  }
+}
+
+@keyframes fadeInModal {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal {
+    animation: none;
   }
 }

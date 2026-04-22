@@ -1,5 +1,7 @@
 import { FileSystemItem, TableFile } from './file';
 
+export type TableImagePreference = 'manual' | 'none';
+
 export interface Table {
   id: string;
   name: string;
@@ -10,10 +12,14 @@ export interface Table {
   romFilePath?: string;
 
   isFavorite: boolean;
+  isArchived?: boolean;
+  isForAndroid?: boolean;
   lastPlayedTimestamp?: number;
   dateAddedTimestamp: number;
 
   vpxExecutablePath?: string;
+  imgUrl?: string;
+  imagePreference?: TableImagePreference;
 }
 
 export interface ScanResult {
@@ -24,4 +30,11 @@ export interface ScanResult {
     missingVpxFile: boolean;
     missingRomFile: boolean;
   }>;
+}
+
+export enum GroupType {
+  allTables = 'allTables',
+  favorites = 'favorites',
+  archived = 'archived',
+  allTablesIncludingArchived = 'allTablesIncludingArchived',
 }

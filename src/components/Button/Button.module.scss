@@ -43,6 +43,19 @@
   }
 }
 
+.secondaryTransparent {
+  background-color: rgba(var(--gray-rgb), 0.7);
+  color: var(--white);
+
+  .icon {
+    color: var(--white);
+  }
+
+  &:hover {
+    background-color: rgba(var(--gray-rgb), 0.9);
+  }
+}
+
 .transparent {
   background-color: transparent;
   color: var(--gray-300);
@@ -92,6 +105,19 @@
 
   &:hover {
     background-color: var(--green);
+  }
+}
+
+.successTransparent {
+  background-color: rgba(var(--green-rgb), 0.1);
+  color: var(--green);
+
+  .icon {
+    color: var(--green);
+  }
+
+  &:hover {
+    background-color: rgba(var(--green-rgb), 0.2);
   }
 }
 

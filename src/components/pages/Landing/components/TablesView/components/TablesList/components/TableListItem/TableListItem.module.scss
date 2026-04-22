@@ -128,6 +128,35 @@
   white-space: nowrap;
 }
 
+.androidButton {
+  background-color: transparent;
+  border: none;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 200ms ease-in;
+  flex-shrink: 0;
+  cursor: pointer;
+  margin-right: 4px;
+  margin-left: 8px;
+
+  & .androidIcon {
+    color: var(--gray-300);
+    fill: transparent;
+    transition:
+      fill 200ms ease-in,
+      color 200ms ease-in;
+  }
+
+  &.isForAndroid {
+    & .androidIcon {
+      color: var(--green);
+      fill: var(--green);
+    }
+  }
+}
+
 .favoriteButton {
   background-color: transparent;
   border: none;

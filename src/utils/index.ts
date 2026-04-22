@@ -126,3 +126,12 @@ export const getTableGradientVariant = (table: Table): string => {
   );
   return `tableGradient${variant}`;
 };
+
+export const getTableGradientVariable = (table: Table): string => {
+  const variant = getDeterministicVariant(
+    table?.romFile || table.vpxFile || table.id,
+    8,
+  );
+
+  return `var(--table-gradient-color-${variant})`;
+};

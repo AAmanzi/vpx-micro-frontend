@@ -28,6 +28,10 @@
   <symbol id="icon-monitor" viewBox="0 0 20 20">
     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.666" d="M16.664 2.5H3.333c-.92 0-1.666.746-1.666 1.666v8.332c0 .92.746 1.666 1.666 1.666h13.33c.921 0 1.667-.746 1.667-1.666V4.166c0-.92-.746-1.666-1.666-1.666M6.665 17.497h5M9.998 14.158v3"/>
   </symbol>
+  <symbol id="icon-phone" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+    <path d="M12 18h.01"/>
+  </symbol>
   <symbol id="icon-edit" viewBox="0 0 14 14">
     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.167" d="M6.999 11.665h5.25M9.552 2.113a1.238 1.238 0 1 1 1.75 1.75L4.299 10.87c-.14.139-.31.24-.5.295l-1.674.49a.292.292 0 0 1-.362-.362l.489-1.676c.055-.188.156-.36.295-.498z"/>
   </symbol>
@@ -151,6 +155,13 @@
   </symbol>
   <symbol id="icon-list" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
     <path d="M3 12h.01M3 18h.01M3 6h.01M8 12h13M8 18h13M8 6h13"/>
+  </symbol>
+  <symbol id="icon-shuffle" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+    <path d="m18 14 4 4-4 4"/>
+    <path d="m18 2 4 4-4 4"/>
+    <path d="M2 18h1.973a4 4 0 0 0 3.3-1.7l5.454-8.6a4 4 0 0 1 3.3-1.7H22"/>
+    <path d="M2 6h1.972a4 4 0 0 1 3.6 2.2"/>
+    <path d="M22 18h-6.041a4 4 0 0 1-3.3-1.8l-.359-.45"/>
   </symbol>
   <symbol id="icon-external-link" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
     <path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>

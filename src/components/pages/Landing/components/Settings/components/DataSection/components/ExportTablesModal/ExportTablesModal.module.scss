@@ -8,9 +8,27 @@
   gap: 12px;
 }
 
+.controlsDisabled {
+  opacity: 0.65;
+  transition: opacity 150ms ease-in;
+}
+
+.spacer {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  margin-left: -24px;
+  margin-right: -24px;
+  flex: 1;
+  border-bottom: thin solid var(--gray);
+}
+
+.exportGroupWrapper {
+  margin-bottom: 24px;
+}
+
 .note {
   margin-top: 8px;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .summary {

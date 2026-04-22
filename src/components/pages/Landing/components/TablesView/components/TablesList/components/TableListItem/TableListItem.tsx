@@ -7,39 +7,55 @@ import Button, {
 } from 'src/components/Button';
 import Icon from 'src/components/Icon';
 import api from 'src/consts';
+import { useConfigContext } from 'src/providers/config';
 import { useTablesContext } from 'src/providers/tables';
 import { useToastContext } from 'src/providers/toast';
 import { Table } from 'src/types/table';
 import {
   displayDate,
   displayRelativeDate,
+  getTableGradientVariable,
   getTableGradientVariant,
 } from 'src/utils';
 
-import Settings from '../Settings';
+import SettingsPopover from '../SettingsPopover';
 import style from './TableListItem.module.scss';
 
 type Props = Table;
 
+const getPlayAreaStyle = (gradientColor: string, imgUrl?: string) => ({
+  backgroundImage: imgUrl
+    ? `linear-gradient(180deg, rgba(0, 0, 0, 0.15) 15%, rgba(0, 0, 0, 0.78) 100%), url("${imgUrl}"), ${gradientColor}`
+    : undefined,
+});
+
 const TableListItem: FunctionComponent<Props> = ({
   id,
   isFavorite,
+  isForAndroid,
+  isArchived,
   name,
   romFile,
   romFilePath,
   vpxFile,
   vpxFilePath,
   vpxExecutablePath,
+  imgUrl,
+  imagePreference,
   dateAddedTimestamp,
   lastPlayedTimestamp,
 }) => {
   const [favorite, setFavorite] = useState(isFavorite);
+  const [forAndroid, setForAndroid] = useState(Boolean(isForAndroid));
   const [isStarting, setIsStarting] = useState(false);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isNameTruncated, setIsNameTruncated] = useState(false);
+  const tableGradient = getTableGradientVariant({ romFile, vpxFile, id } as Table);
+  const tableGradientColor = getTableGradientVariable({ romFile, vpxFile, id } as Table);
   const titleRef = useRef<HTMLHeadingElement | null>(null);
   const { showErrorToast } = useToastContext();
   const { fetchTables } = useTablesContext();
+  const { config } = useConfigContext();
+  const androidFeaturesEnabled = Boolean(config?.androidFeaturesEnabled);
 
   useEffect(() => {
     const updateTruncation = () => {
@@ -116,28 +132,35 @@ const TableListItem: FunctionComponent<Props> = ({
     fetchTables();
   };
 
-  const openSettings = () => {
-    setIsSettingsOpen(true);
-  };
+  const handleToggleAndroid = async () => {
+    const newValue = !forAndroid;
 
-  const closeSettings = () => {
-    setIsSettingsOpen(false);
+    setForAndroid(newValue);
+
+    const { error } = await api.setTableForAndroid(id, newValue);
+
+    if (error) {
+      setForAndroid(!newValue);
+      showErrorToast(error.message || 'Failed to update Android flag');
+
+      return;
+    }
+
+    fetchTables();
   };
 
   return (
     <div className={style.item}>
       <div
-        className={classNames(
-          style.playArea,
-          getTableGradientVariant({ romFile, vpxFile, id } as Table),
-        )}>
+        className={classNames(style.playArea, tableGradient)}
+        style={getPlayAreaStyle(tableGradientColor, imgUrl)}>
         <Button
           circle
           icon='play'
           loading={isStarting}
           onClick={handlePlay}
           size={ButtonSize.small}
-          type={ButtonType.secondary}
+          type={ButtonType.secondaryTransparent}
         />
       </div>
 
@@ -191,6 +214,22 @@ const TableListItem: FunctionComponent<Props> = ({
           </p>
         </div>
       </div>
+      {androidFeaturesEnabled && (
+        <button
+          type='button'
+          className={classNames(style.androidButton, {
+            [style.isForAndroid]: forAndroid,
+          })}
+          onClick={handleToggleAndroid}>
+          <Icon
+            className={classNames(style.androidIcon)}
+            icon='phone'
+            width={16}
+            height={16}
+          />
+        </button>
+      )}
+
       <button
         type='button'
         className={classNames(style.favoriteButton, {
@@ -206,26 +245,19 @@ const TableListItem: FunctionComponent<Props> = ({
       </button>
 
       <div className={style.settingsButton}>
-        <button
-          type='button'
-          className={style.settingsTrigger}
-          onClick={openSettings}>
-          <Icon className='secondary-text-color' icon='kebab' />
-        </button>
-        {isSettingsOpen && (
-          <div className={style.settingsContainer}>
-            <Settings
-              id={id}
-              name={name}
-              vpxFilePath={vpxFilePath}
-              vpxExecutablePath={vpxExecutablePath}
-              vpxFile={vpxFile}
-              romFilePath={romFilePath}
-              romFile={romFile}
-              close={closeSettings}
-            />
-          </div>
-        )}
+        <SettingsPopover
+          id={id}
+          name={name}
+          isArchived={isArchived}
+          vpxFilePath={vpxFilePath}
+          vpxExecutablePath={vpxExecutablePath}
+          vpxFile={vpxFile}
+          romFilePath={romFilePath}
+          romFile={romFile}
+          imgUrl={imgUrl}
+          imagePreference={imagePreference}
+          triggerClassName={style.settingsTrigger}
+        />
       </div>
     </div>
   );

@@ -14,16 +14,19 @@ interface Props {
   view: View;
   setView: (view: View) => void;
   librarySize: number;
+  archivedTablesCount: number;
 }
 
 const Navigation: FunctionComponent<Props> = ({
   view,
   setView,
   librarySize,
+  archivedTablesCount,
 }) => {
   const { fetchTables } = useTablesContext();
   const { config } = useConfigContext();
   const fullVpxPath = config?.vpxRootPath || '';
+  const androidFeaturesEnabled = Boolean(config?.androidFeaturesEnabled);
 
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
@@ -91,6 +94,34 @@ const Navigation: FunctionComponent<Props> = ({
                 Recent
               </span>
             </button>
+            {androidFeaturesEnabled && (
+              <button
+                onClick={() => setView(View.android)}
+                className={classNames(style.button, style.green, {
+                  [style.active]: view === View.android,
+                })}>
+                <div className={style.iconWrapper}>
+                  <Icon icon='phone' className={style.icon} />
+                </div>
+                <span className={classNames('label-md-bold', style.label)}>
+                  Android
+                </span>
+              </button>
+            )}
+            {archivedTablesCount > 0 && (
+              <button
+                onClick={() => setView(View.archive)}
+                className={classNames(style.button, style.red, {
+                  [style.active]: view === View.archive,
+                })}>
+                <div className={style.iconWrapper}>
+                  <Icon icon='archive' className={style.icon} />
+                </div>
+                <span className={classNames('label-md-bold', style.label)}>
+                  Archive
+                </span>
+              </button>
+            )}
           </div>
           <div className={style.section}>
             <h3

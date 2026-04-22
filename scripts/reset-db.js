@@ -20,10 +20,21 @@ async function resetDb() {
     defaults: {},
   });
 
-  const filesToReset = [configStore.path, tablesStore.path];
+  const migrationsStore = new Store({
+    name: 'app-migrations',
+    cwd: storeDirectory,
+    defaults: {},
+  });
+
+  const filesToReset = [
+    configStore.path,
+    tablesStore.path,
+    migrationsStore.path,
+  ];
 
   configStore.clear();
   tablesStore.clear();
+  migrationsStore.clear();
 
   console.log('Database reset complete.');
   console.log(`Store directory: ${storeDirectory}`);

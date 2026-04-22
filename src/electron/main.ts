@@ -1,18 +1,23 @@
 import { spawn } from 'child_process';
-import { BrowserWindow, app, ipcMain } from 'electron';
+import { BrowserWindow, Menu, app, ipcMain } from 'electron';
 import fs from 'fs';
 import http from 'http';
 import path from 'path';
 
+import type { AndroidSyncApplyPayload } from 'src/types/android';
 import type { Config } from 'src/types/config';
 import type { TableFile } from 'src/types/file';
-import type { ScanResult } from 'src/types/table';
+import type { GroupType, ScanResult, Table } from 'src/types/table';
 
 import * as api from './api';
+import { runAppMigrations } from './database/migrations';
 import * as db from './database/tables';
 
 const logFile = path.join(process.cwd(), 'backend.log');
-const logStream = fs.createWriteStream(logFile, { flags: 'a', encoding: 'utf8' });
+const logStream = fs.createWriteStream(logFile, {
+  flags: 'a',
+  encoding: 'utf8',
+});
 
 const originalLog = console.log;
 const originalError = console.error;
@@ -97,6 +102,8 @@ function waitForServer(port: number, timeout = 30000, interval = 300) {
 }
 
 const createWindow = () => {
+  const isProduction = app.isPackaged;
+
   const win = new BrowserWindow({
     width: 900,
     height: 600,
@@ -105,10 +112,17 @@ const createWindow = () => {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
+      devTools: !isProduction,
     },
   });
 
-  if (app.isPackaged) {
+  if (isProduction) {
+    win.webContents.on('devtools-opened', () => {
+      win.webContents.closeDevTools();
+    });
+  }
+
+  if (isProduction) {
     const indexPath = getProductionIndexPath();
     win.loadFile(indexPath);
     return;
@@ -121,6 +135,10 @@ const createWindow = () => {
 app.whenReady().then(async () => {
   if (process.platform === 'win32') {
     app.setAppUserModelId('com.vpx.microfrontend');
+  }
+
+  if (app.isPackaged) {
+    Menu.setApplicationMenu(null);
   }
 
   if (!app.isPackaged) {
@@ -145,6 +163,8 @@ app.whenReady().then(async () => {
     }
   }
 
+  await runAppMigrations(app.getVersion());
+
   // register IPC handlers that call the api layer
   ipcMain.handle('api:getAllTables', async () => api.getAllTables());
   ipcMain.handle('api:deleteTable', async (_, id: string) =>
@@ -152,6 +172,16 @@ app.whenReady().then(async () => {
   );
   ipcMain.handle('api:setTableFavorite', async (_, id: string, fav: boolean) =>
     api.setTableFavorite(id, fav),
+  );
+  ipcMain.handle(
+    'api:setTableForAndroid',
+    async (_, id: string, isForAndroid: boolean) =>
+      api.setTableForAndroid(id, isForAndroid),
+  );
+  ipcMain.handle(
+    'api:setTableArchived',
+    async (_, id: string, archived: boolean) =>
+      api.setTableArchived(id, archived),
   );
   ipcMain.handle('api:renameTable', async (_, id: string, newName: string) =>
     api.renameTable(id, newName),
@@ -166,6 +196,17 @@ app.whenReady().then(async () => {
     'api:updateTableVpxExecutablePath',
     async (_, tableId: string, executablePath: string | null) =>
       api.updateTableVpxExecutablePath(tableId, executablePath),
+  );
+  ipcMain.handle('api:getTableImageCandidates', async (_, tableId: string) =>
+    api.getTableImageCandidates(tableId),
+  );
+  ipcMain.handle(
+    'api:updateTableImage',
+    async (_, tableId: string, imgUrl: string) =>
+      api.updateTableImage(tableId, imgUrl),
+  );
+  ipcMain.handle('api:clearTableImage', async (_, tableId: string) =>
+    api.clearTableImage(tableId),
   );
   ipcMain.handle(
     'api:importTables',
@@ -218,19 +259,51 @@ app.whenReady().then(async () => {
   ipcMain.handle('api:updateOrder', async (_, order: Config['order']) =>
     api.updateOrder(order),
   );
-  ipcMain.handle('api:updateViewType', async (_, viewType: Config['viewType']) =>
-    api.updateViewType(viewType),
+  ipcMain.handle(
+    'api:updateViewType',
+    async (_, viewType: Config['viewType']) => api.updateViewType(viewType),
+  );
+  ipcMain.handle(
+    'api:updateAndroidFeaturesEnabled',
+    async (_, androidFeaturesEnabled: boolean) =>
+      api.updateAndroidFeaturesEnabled(androidFeaturesEnabled),
+  );
+  ipcMain.handle('api:updateAndroidWebServerUrl', async (_, path: string) =>
+    api.updateAndroidWebServerUrl(path),
+  );
+  ipcMain.handle(
+    'api:updateAndroidTablesDirectoryPath',
+    async (_, path: string) => api.updateAndroidTablesDirectoryPath(path),
+  );
+  ipcMain.handle(
+    'api:updateAndroidRomsDirectoryPath',
+    async (_, path: string) => api.updateAndroidRomsDirectoryPath(path),
   );
   ipcMain.handle('api:startTable', async (_, tableId: string) =>
     api.startTable(tableId),
   );
   ipcMain.handle('api:clearTables', async () => api.clearTables());
   ipcMain.handle('api:scanVpxLibrary', async () => api.scanVpxLibrary());
+  ipcMain.handle('api:scanAndroidLibrary', async () =>
+    api.scanAndroidLibrary(),
+  );
+  ipcMain.handle(
+    'api:applyAndroidSync',
+    async (event, payload: AndroidSyncApplyPayload) =>
+      api.applyAndroidSync(payload, (progress) => {
+        event.sender.send('event:androidSyncProgress', progress);
+      }),
+  );
   ipcMain.handle('api:applyScanResult', async (_, scanResult: ScanResult) =>
     api.applyScanResult(scanResult),
   );
-  ipcMain.handle('api:exportTables', async (_, destinationPath: string) =>
-    api.exportTables(destinationPath),
+  ipcMain.handle(
+    'api:exportTables',
+    async (_, destinationPath: string, exportGroup: GroupType) =>
+      api.exportTables(destinationPath, exportGroup),
+  );
+  ipcMain.handle('api:startRandomTable', async (_, tables: Table[]) =>
+    api.startRandomTable(tables),
   );
 
   createWindow();
@@ -244,7 +317,7 @@ function shutdownNext() {
   if (nextProcess && !nextProcess.killed) {
     try {
       nextProcess.kill();
-    } catch (e) { }
+    } catch (e) {}
   }
 }
 

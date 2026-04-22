@@ -1,27 +1,30 @@
 import classNames from 'classnames';
-import { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useEffect, useState } from 'react';
 
 import Button, {
   Size as ButtonSize,
   Type as ButtonType,
 } from 'src/components/Button';
+import FadeInAnimation from 'src/components/FadeInAnimation';
 import FileUploadOverlay from 'src/components/FileUploadOverlay';
 import Icon from 'src/components/Icon';
 import ImportTablesModal from 'src/components/ImportTablesModal';
-import Input from 'src/components/Input';
 import ScanLibraryModal from 'src/components/ScanLibraryModal';
+import SyncAndroidLibraryModal from 'src/components/SyncAndroidLibraryModal';
 import api from 'src/consts';
 import { useConfigContext } from 'src/providers/config';
 import { useTablesContext } from 'src/providers/tables';
+import { useToastContext } from 'src/providers/toast';
 import { Order, ViewType } from 'src/types/config';
 import { FileSystemItem } from 'src/types/file';
 import type { Table } from 'src/types/table';
 
 import style from './TablesView.module.scss';
-import OrderPicker from './components/OrderPicker';
+import TablesHeader from './components/TablesHeader';
 import TablesList from './components/TablesList';
-import ViewTypeSelect from './components/ViewTypeSelect';
 import { Props } from './types';
+
+const MOBILE_TABLE_ACTIONS_BREAKPOINT_PX = 800;
 
 const TablesView: FunctionComponent<Props> = ({
   tables,
@@ -31,16 +34,44 @@ const TablesView: FunctionComponent<Props> = ({
   defaultOrder,
   emptyStateVariant,
   isOrderPickerDisabled = false,
+  isScanLibraryDisabled = false,
+  androidFeaturesEnabled = false,
+  animationKey,
 }) => {
   const { fetchTables } = useTablesContext();
   const { config, fetchConfig } = useConfigContext();
+  const { showErrorToast } = useToastContext();
 
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isRandomTableStarting, setIsRandomTableStarting] = useState(false);
   const [isScanLibraryModalOpen, setIsScanLibraryModalOpen] = useState(false);
+  const [isSyncAndroidModalOpen, setIsSyncAndroidModalOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const [isCompactTableActions, setIsCompactTableActions] = useState(false);
   const [droppedFilesForImport, setDroppedFilesForImport] = useState<
     Array<FileSystemItem>
   >([]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const mediaQuery = window.matchMedia(
+      `(max-width: ${MOBILE_TABLE_ACTIONS_BREAKPOINT_PX}px)`,
+    );
+
+    const updateCompactTableActions = () => {
+      setIsCompactTableActions(mediaQuery.matches);
+    };
+
+    updateCompactTableActions();
+    mediaQuery.addEventListener('change', updateCompactTableActions);
+
+    return () => {
+      mediaQuery.removeEventListener('change', updateCompactTableActions);
+    };
+  }, []);
 
   const favoritesOnTop = config?.keepFavoritesOnTop ?? true;
   const order = defaultOrder ?? config?.order ?? Order.dateAddedDesc;
@@ -169,8 +200,43 @@ const TablesView: FunctionComponent<Props> = ({
           description:
             'Play a table and it will appear here for quick access next time.',
         };
+      case 'archive':
+        return {
+          icon: 'archive' as const,
+          title: 'No archived tables',
+          description:
+            'Archive tables from table settings to keep your active library clean.',
+        };
+      case 'android':
+        return {
+          icon: 'phone' as const,
+          title: 'No Android tables yet',
+          description:
+            'Mark tables as Android-compatible from a table card or list item to see them here.',
+        };
       default:
         return null;
+    }
+  };
+
+  const handlePlayRandomTable = async () => {
+    if (isRandomTableStarting) {
+      return;
+    }
+
+    setIsRandomTableStarting(true);
+
+    try {
+      const result = await api.startRandomTable(orderedTables);
+
+      if (!result.success) {
+        showErrorToast(result.error.message || 'Failed to start random table');
+        return;
+      }
+
+      fetchTables();
+    } finally {
+      setIsRandomTableStarting(false);
     }
   };
 
@@ -178,29 +244,17 @@ const TablesView: FunctionComponent<Props> = ({
 
   return (
     <>
-      <div className={style.header}>
-        <div className={style.search}>
-          <Input
-            value={query}
-            onChange={setQuery}
-            icon='search'
-            placeholder='Search tables, vpx files or roms...'
-          />
-        </div>
-        <div className={style.infoAndFiltering}>
-          <ViewTypeSelect
-            viewType={viewType}
-            onViewTypeChange={handleViewTypeChange}
-          />
-          <OrderPicker
-            favoritesOnTop={favoritesOnTop}
-            onFavoritesOnTopChange={handleFavoritesOnTopChange}
-            order={order}
-            onOrderChange={handleOrderChange}
-            disabled={isOrderPickerDisabled}
-          />
-        </div>
-      </div>
+      <TablesHeader
+        query={query}
+        onQueryChange={setQuery}
+        viewType={viewType}
+        onViewTypeChange={handleViewTypeChange}
+        favoritesOnTop={favoritesOnTop}
+        onFavoritesOnTopChange={handleFavoritesOnTopChange}
+        order={order}
+        onOrderChange={handleOrderChange}
+        isOrderPickerDisabled={isOrderPickerDisabled}
+      />
       <div className={style.container}>
         <div className={style.titleRow}>
           <div>
@@ -211,67 +265,63 @@ const TablesView: FunctionComponent<Props> = ({
               </p>
             )}
           </div>
-          <div className={style.scanButtonWrapper}>
-            <Button
-              icon='scan-search'
-              label='Scan Library'
-              type={
-                isLibraryEmpty
-                  ? ButtonType.primaryAlt
-                  : ButtonType.primaryAltTransparent
-              }
-              size={ButtonSize.medium}
-              onClick={() => setIsScanLibraryModalOpen(true)}
-              fill
-            />
+          <div className={style.buttonsWrapper}>
+            {orderedTables.length > 0 && (
+              <div className={style.randomTableButtonWrapper}>
+                <Button
+                  icon={isCompactTableActions ? 'shuffle' : 'play'}
+                  label={isCompactTableActions ? undefined : 'Random Table'}
+                  type={ButtonType.successTransparent}
+                  size={ButtonSize.medium}
+                  onClick={handlePlayRandomTable}
+                  loading={isRandomTableStarting}
+                  fill={!isCompactTableActions}
+                  circle={isCompactTableActions}
+                />
+              </div>
+            )}
+            {!isScanLibraryDisabled && (
+              <div className={style.scanButtonWrapper}>
+                <Button
+                  icon='scan-search'
+                  label='Scan Library'
+                  type={
+                    isLibraryEmpty
+                      ? ButtonType.primaryAlt
+                      : ButtonType.primaryAltTransparent
+                  }
+                  size={ButtonSize.medium}
+                  onClick={() => setIsScanLibraryModalOpen(true)}
+                  fill
+                />
+              </div>
+            )}
+            {androidFeaturesEnabled && (
+              <div className={style.scanButtonWrapper}>
+                <Button
+                  icon='phone'
+                  label='Sync Android'
+                  type={ButtonType.primaryAltTransparent}
+                  size={ButtonSize.medium}
+                  onClick={() => setIsSyncAndroidModalOpen(true)}
+                  fill
+                />
+              </div>
+            )}
           </div>
         </div>
 
-        <div className={style.tablesWrapper}>
-          {hasResults && (
-            <TablesList tables={orderedTables} viewType={viewType} />
-          )}{' '}
-          {hasNoSearchResults && (
-            <div className={style.noData}>
-              <div className={style.noDataIconWrapper}>
-                <Icon
-                  className='secondary-text-color'
-                  icon='search'
-                  width={40}
-                  height={40}
-                />
-              </div>
-              <h2
-                className={classNames(
-                  'primary-text-color',
-                  'heading-4-bold',
-                  style.noDataTitle,
-                )}>
-                No tables found
-              </h2>
-              <p
-                className={classNames(
-                  'secondary-text-color',
-                  'body-md-regular',
-                  style.noDataDescription,
-                )}>
-                We couldn't find any tables matching your current filter or
-                search criteria.
-              </p>
-              <Button
-                label='Clear Search'
-                type={ButtonType.secondary}
-                onClick={() => setQuery('')}
-              />
-            </div>
-          )}
-          {isLibraryEmpty && (
-            <div>
+        <FadeInAnimation animationKey={`${animationKey}-${viewType}`}>
+          <div className={style.tablesWrapper}>
+            {hasResults && (
+              <TablesList tables={orderedTables} viewType={viewType} />
+            )}{' '}
+            {hasNoSearchResults && (
               <div className={style.noData}>
                 <div className={style.noDataIconWrapper}>
                   <Icon
                     className='secondary-text-color'
-                    icon='plus'
+                    icon='search'
                     width={40}
                     height={40}
                   />
@@ -282,7 +332,7 @@ const TablesView: FunctionComponent<Props> = ({
                     'heading-4-bold',
                     style.noDataTitle,
                   )}>
-                  Your library is empty
+                  No tables found
                 </h2>
                 <p
                   className={classNames(
@@ -290,46 +340,82 @@ const TablesView: FunctionComponent<Props> = ({
                     'body-md-regular',
                     style.noDataDescription,
                   )}>
-                  Start your collection by importing .vpx table files and their
-                  corresponding ROMs.
+                  We couldn't find any tables matching your current filter or
+                  search criteria.
                 </p>
                 <Button
-                  icon='plus'
-                  label='Import now'
-                  onClick={() => setIsImportModalOpen(true)}
+                  label='Clear Search'
+                  type={ButtonType.secondary}
+                  onClick={() => setQuery('')}
                 />
               </div>
-            </div>
-          )}
-          {hasNoViewResults && emptyViewContent && (
-            <div className={style.noData}>
-              <div className={style.noDataIconWrapper}>
-                <Icon
-                  className='secondary-text-color'
-                  icon={emptyViewContent.icon}
-                  width={40}
-                  height={40}
-                />
+            )}
+            {isLibraryEmpty && (
+              <div>
+                <div className={style.noData}>
+                  <div className={style.noDataIconWrapper}>
+                    <Icon
+                      className='secondary-text-color'
+                      icon='plus'
+                      width={40}
+                      height={40}
+                    />
+                  </div>
+                  <h2
+                    className={classNames(
+                      'primary-text-color',
+                      'heading-4-bold',
+                      style.noDataTitle,
+                    )}>
+                    Your library is empty
+                  </h2>
+                  <p
+                    className={classNames(
+                      'secondary-text-color',
+                      'body-md-regular',
+                      style.noDataDescription,
+                    )}>
+                    Start your collection by importing .vpx table files and
+                    their corresponding ROMs.
+                  </p>
+                  <Button
+                    icon='plus'
+                    label='Import now'
+                    onClick={() => setIsImportModalOpen(true)}
+                  />
+                </div>
               </div>
-              <h2
-                className={classNames(
-                  'primary-text-color',
-                  'heading-4-bold',
-                  style.noDataTitle,
-                )}>
-                {emptyViewContent.title}
-              </h2>
-              <p
-                className={classNames(
-                  'secondary-text-color',
-                  'body-md-regular',
-                  style.noDataDescription,
-                )}>
-                {emptyViewContent.description}
-              </p>
-            </div>
-          )}
-        </div>
+            )}
+            {hasNoViewResults && emptyViewContent && (
+              <div className={style.noData}>
+                <div className={style.noDataIconWrapper}>
+                  <Icon
+                    className='secondary-text-color'
+                    icon={emptyViewContent.icon}
+                    width={40}
+                    height={40}
+                  />
+                </div>
+                <h2
+                  className={classNames(
+                    'primary-text-color',
+                    'heading-4-bold',
+                    style.noDataTitle,
+                  )}>
+                  {emptyViewContent.title}
+                </h2>
+                <p
+                  className={classNames(
+                    'secondary-text-color',
+                    'body-md-regular',
+                    style.noDataDescription,
+                  )}>
+                  {emptyViewContent.description}
+                </p>
+              </div>
+            )}
+          </div>
+        </FadeInAnimation>
       </div>
       {isImportModalOpen && (
         <ImportTablesModal
@@ -337,8 +423,11 @@ const TablesView: FunctionComponent<Props> = ({
           initialFiles={droppedFilesForImport}
         />
       )}
-      {isScanLibraryModalOpen && (
+      {!isScanLibraryDisabled && isScanLibraryModalOpen && (
         <ScanLibraryModal close={() => setIsScanLibraryModalOpen(false)} />
+      )}
+      {isSyncAndroidModalOpen && (
+        <SyncAndroidLibraryModal close={() => setIsSyncAndroidModalOpen(false)} />
       )}
       <FileUploadOverlay
         label='Drop files to import'

@@ -6,6 +6,7 @@ import {
   Size as ButtonSize,
   Type as ButtonType,
 } from 'src/components/Button/types';
+import FadeInAnimation from 'src/components/FadeInAnimation';
 import Icon from 'src/components/Icon';
 import api from 'src/consts';
 import { useConfigContext } from 'src/providers/config';
@@ -13,6 +14,7 @@ import { useToastContext } from 'src/providers/toast';
 import { getDefaultVpxExecutablePath } from 'src/utils';
 
 import style from './Settings.module.scss';
+import AndroidSection from './components/AndroidSection';
 import DataSection from './components/DataSection';
 import FilePathsSection from './components/FilePathsSection';
 import MaintenanceSection from './components/MaintenanceSection';
@@ -22,6 +24,7 @@ const Settings: FunctionComponent = () => {
   const { showErrorToast } = useToastContext();
 
   const vpxRootPath = config?.vpxRootPath || '';
+  const androidFeaturesEnabled = Boolean(config?.androidFeaturesEnabled);
   const vpxExecutablePath =
     config?.vpxExecutablePath || getDefaultVpxExecutablePath(vpxRootPath);
 
@@ -73,50 +76,68 @@ const Settings: FunctionComponent = () => {
             Configure your Visual Pinball X environment
           </p>
         </div>
-        <div className={classNames(style.section, style.filePathsSection)}>
-          <div className={style.sectionHeader}>
-            <Icon
-              className={style.sectionIcon}
-              icon='folder'
-              width={20}
-              height={20}
-            />
-            <h2 className='primary-text-color heading-4-bold'>File Paths</h2>
+        <FadeInAnimation animationKey='settings'>
+          <div className={classNames(style.section, style.filePathsSection)}>
+            <div className={style.sectionHeader}>
+              <Icon
+                className={style.sectionIcon}
+                icon='folder'
+                width={20}
+                height={20}
+              />
+              <h2 className='primary-text-color heading-4-bold'>File Paths</h2>
+            </div>
+            <div>
+              <FilePathsSection />
+            </div>
           </div>
-          <div>
-            <FilePathsSection />
+          <div className={classNames(style.section, style.dataSection)}>
+            <div className={style.sectionHeader}>
+              <Icon
+                className={style.sectionIcon}
+                icon='database'
+                width={20}
+                height={20}
+              />
+              <h2 className='primary-text-color heading-4-bold'>
+                Data Management
+              </h2>
+            </div>
+            <div>
+              <DataSection />
+            </div>
           </div>
-        </div>
-        <div className={classNames(style.section, style.dataSection)}>
-          <div className={style.sectionHeader}>
-            <Icon
-              className={style.sectionIcon}
-              icon='database'
-              width={20}
-              height={20}
-            />
-            <h2 className='primary-text-color heading-4-bold'>
-              Data Management
-            </h2>
+          {androidFeaturesEnabled && (
+            <div className={classNames(style.section, style.androidSection)}>
+              <div className={style.sectionHeader}>
+                <Icon
+                  className={style.sectionIcon}
+                  icon='phone'
+                  width={20}
+                  height={20}
+                />
+                <h2 className='primary-text-color heading-4-bold'>Android</h2>
+              </div>
+              <div>
+                <AndroidSection />
+              </div>
+            </div>
+          )}
+          <div className={classNames(style.section, style.maintenanceSection)}>
+            <div className={style.sectionHeader}>
+              <Icon
+                className={style.sectionIcon}
+                icon='shield-checkmark'
+                width={20}
+                height={20}
+              />
+              <h2 className='primary-text-color heading-4-bold'>Maintenance</h2>
+            </div>
+            <div>
+              <MaintenanceSection />
+            </div>
           </div>
-          <div>
-            <DataSection />
-          </div>
-        </div>
-        <div className={classNames(style.section, style.maintenanceSection)}>
-          <div className={style.sectionHeader}>
-            <Icon
-              className={style.sectionIcon}
-              icon='shield-checkmark'
-              width={20}
-              height={20}
-            />
-            <h2 className='primary-text-color heading-4-bold'>Maintenance</h2>
-          </div>
-          <div>
-            <MaintenanceSection />
-          </div>
-        </div>
+        </FadeInAnimation>
       </div>
     </>
   );

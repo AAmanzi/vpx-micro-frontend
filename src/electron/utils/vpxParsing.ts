@@ -4,6 +4,25 @@ import path from 'path';
 
 import { resolveUserPath } from './path';
 
+const QUOTED_CGAMENAME_REGEX = /\bcGameName\s*=\s*(["'])([^\r\n]*?)\1/i;
+const UNQUOTED_CGAMENAME_REGEX = /\bcGameName\s*=\s*([^\r\n]+)/i;
+
+const ROM_REQUIRED_PATTERNS = [
+  /\bLoadVPM\s*\(/i,
+  /\bvpmInit\s*\(/i,
+  /\bCreateObject\s*\(\s*"VPinMAME\.Controller"\s*\)/i,
+  /\bController\.GameName\s*=\s*cGameName\b/i,
+  /\bWith\s+Controller\b[\s\S]{0,1000}\b\.GameName\s*=\s*cGameName\b/i,
+  /\bController\.Run\s+GetPlayerHWnd\b/i,
+  /\bController\.Games\s*\(\s*cGameName\s*\)/i,
+  /\bUseSolenoids\b/i,
+  /\bUseLamps\b/i,
+  /\bUseGI\b/i,
+];
+
+const QUICK_ROM_HINT_REGEX =
+  /loadvpm|vpminit|vpinmame\.controller|controller\.gamename|with\s+controller|controller\.run|controller\.games|usesolenoids|uselamps|usegi/i;
+
 function normalizeContentBuffer(content: unknown): Buffer | null {
   if (!content) {
     return null;
@@ -88,21 +107,59 @@ function stripCommentAndSpace(value: string): string {
 }
 
 function extractGameName(scriptText: string): string | null {
-  const quotedMatch = scriptText.match(
-    /\bcGameName\s*=\s*(["'])([^\r\n]*?)\1/i,
-  );
+  const quotedMatch = scriptText.match(QUOTED_CGAMENAME_REGEX);
 
   if (quotedMatch?.[2] != null) {
     return stripCommentAndSpace(quotedMatch[2]);
   }
 
-  const unquotedMatch = scriptText.match(/\bcGameName\s*=\s*([^\r\n]+)/i);
+  const unquotedMatch = scriptText.match(UNQUOTED_CGAMENAME_REGEX);
 
   if (unquotedMatch?.[1] != null) {
     return stripCommentAndSpace(unquotedMatch[1]);
   }
 
   return null;
+}
+
+function stripVbLineComment(line: string): string {
+  let inQuote = false;
+
+  for (let i = 0; i < line.length; i += 1) {
+    const char = line[i];
+
+    if (char === '"') {
+      inQuote = !inQuote;
+      continue;
+    }
+
+    if (char === "'" && !inQuote) {
+      return line.slice(0, i);
+    }
+  }
+
+  return line;
+}
+
+function getScriptWithoutComments(scriptText: string): string {
+  return scriptText
+    .split(/\r?\n/)
+    .map((line) => stripVbLineComment(line))
+    .join('\n');
+}
+
+function scriptRequiresRom(scriptText: string): boolean {
+  if (!QUICK_ROM_HINT_REGEX.test(scriptText)) {
+    return false;
+  }
+
+  const script = getScriptWithoutComments(scriptText);
+
+  return ROM_REQUIRED_PATTERNS.some((pattern) => pattern.test(script));
+}
+
+function isLikelyScriptEntryName(entryName: string): boolean {
+  return /^(GameData|Code|Script)$/i.test(entryName.trim());
 }
 
 export function getExpectedRomNameFromVpxFile(
@@ -128,7 +185,14 @@ export function getExpectedRomNameFromVpxFile(
     throw new Error(`Failed to parse file as OLE Compound File: ${message}`);
   }
 
-  for (const entry of cfb.FileIndex || []) {
+  const fileIndex = cfb.FileIndex || [];
+  const prioritizedEntries = fileIndex.filter((entry: { name?: string }) =>
+    isLikelyScriptEntryName(entry?.name || ''),
+  );
+  const entriesToScan =
+    prioritizedEntries.length > 0 ? prioritizedEntries : fileIndex;
+
+  for (const entry of entriesToScan) {
     const streamBuffer = normalizeContentBuffer(entry?.content);
 
     if (!streamBuffer || streamBuffer.length === 0) {
@@ -136,15 +200,21 @@ export function getExpectedRomNameFromVpxFile(
     }
 
     const candidates = getDecodeCandidates(streamBuffer);
+    let detectedRomName: string | null = null;
 
     for (const candidateText of candidates) {
-      const value = extractGameName(candidateText);
+      if (detectedRomName === null) {
+        detectedRomName = extractGameName(candidateText);
+      }
+    }
 
-      // TODO:  check if table actually uses ROM name
-      //        - some VPX files have cGameName but don't actually require a ROM
+    if (detectedRomName === null) {
+      continue;
+    }
 
-      if (value !== null) {
-        return value;
+    for (const candidateText of candidates) {
+      if (scriptRequiresRom(candidateText)) {
+        return detectedRomName;
       }
     }
   }

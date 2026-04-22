@@ -6,6 +6,7 @@ export type Icon =
   | 'folder'
   | 'play'
   | 'monitor'
+  | 'phone'
   | 'edit'
   | 'trash'
   | 'kebab'
@@ -32,6 +33,7 @@ export type Icon =
   | 'shield-checkmark'
   | 'clock-recent'
   | 'list'
+  | 'shuffle'
   | 'external-link';
 
 export interface Props {

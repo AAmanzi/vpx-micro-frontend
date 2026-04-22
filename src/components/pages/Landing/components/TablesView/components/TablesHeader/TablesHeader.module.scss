@@ -1,0 +1,26 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+
+  border-bottom: thin solid var(--gray);
+  align-items: center;
+  height: 80px;
+  padding-left: 32px;
+  padding-right: 32px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: var(--dark);
+}
+
+.search {
+  max-width: 576px;
+  margin-right: 32px;
+  flex: 1;
+}
+
+.infoAndFiltering {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
