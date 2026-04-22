@@ -169,6 +169,28 @@ There's also a snapshot of VPS DB as backup at [VPS Backup snapshot](https://aam
 - **Android Tables Directory** — advanced setting; change only if you know what you're doing
 - **Android ROMs Directory** — advanced setting; change only if you know what you're doing
 
+#### Android Device Setup
+
+The app does not include an Android application. Instead, it syncs files to a folder on your Android device over the network.
+
+To use Android sync, you need a VPX-compatible Android environment on your device.
+
+You can find Android builds here:
+https://github.com/vpinball/vpinball/releases
+
+Install the provided `.apk` (usually included in the release `.zip`).
+
+---
+
+#### Enabling the Android server from device
+
+On your Android device:
+
+1. Start VPX
+2. Open settings for any table (or global settings depending on build)
+3. Enable **Web Server**
+4. A **server URL (IP address)** will be shown
+
 ### Maintenance
 
 - **Clear Library Data** resets app metadata/list only.
