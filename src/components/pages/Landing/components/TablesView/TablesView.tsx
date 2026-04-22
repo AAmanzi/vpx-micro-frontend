@@ -77,6 +77,14 @@ const TablesView: FunctionComponent<Props> = ({
   const order = defaultOrder ?? config?.order ?? Order.dateAddedDesc;
   const viewType = config?.viewType ?? ViewType.grid;
 
+  const scrollToTop = () => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    window.scrollTo(0, 0);
+  };
+
   const handleCloseImportModal = () => {
     setIsImportModalOpen(false);
     setDroppedFilesForImport([]);
@@ -94,6 +102,7 @@ const TablesView: FunctionComponent<Props> = ({
     }
 
     await api.updateKeepFavoritesOnTop(newValue);
+    scrollToTop();
 
     fetchConfig();
   };
@@ -104,6 +113,7 @@ const TablesView: FunctionComponent<Props> = ({
     }
 
     await api.updateOrder(newValue);
+    scrollToTop();
 
     fetchConfig();
   };
