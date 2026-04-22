@@ -761,8 +761,6 @@ export async function startRandomTable(
     const randomIndex = Math.floor(Math.random() * tables.length);
     const table = tables[randomIndex];
 
-    // ALEX TODO: test on windows
-
     await startVpxTable(
       table.vpxFilePath,
       table.vpxExecutablePath || configVpxExecutablePath,

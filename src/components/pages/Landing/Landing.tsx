@@ -40,6 +40,10 @@ const Landing: FunctionComponent<Props> = () => {
     }
   }, [androidFeaturesEnabled, view]);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [view]);
+
   const getView = () => {
     switch (view) {
       case View.allTables:
