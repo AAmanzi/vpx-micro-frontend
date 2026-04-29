@@ -12,16 +12,21 @@ import { useTablesContext } from 'src/providers/tables';
 import { useToastContext } from 'src/providers/toast';
 import { Table } from 'src/types/table';
 import {
-  displayDate,
   displayRelativeDate,
   getTableGradientVariable,
   getTableGradientVariant,
 } from 'src/utils';
 
 import SettingsPopover from '../SettingsPopover';
+import TableDetailsPopover from '../TableDetailsPopover';
 import style from './TableCard.module.scss';
 
 type Props = Table;
+
+const timesPlayed = 12;
+const timePlayed = '3.2h';
+const bestScore = 1245000;
+const formattedBestScore = bestScore.toLocaleString();
 
 const getPlayAreaStyle = (gradientColor: string, imgUrl?: string) => ({
   backgroundImage: imgUrl
@@ -48,8 +53,16 @@ const TableCard: FunctionComponent<Props> = ({
   const [favorite, setFavorite] = useState(isFavorite);
   const [forAndroid, setForAndroid] = useState(Boolean(isForAndroid));
   const [isStarting, setIsStarting] = useState(false);
-  const tableGradient = getTableGradientVariant({ romFile, vpxFile, id } as Table);
-  const tableGradientColor = getTableGradientVariable({ romFile, vpxFile, id } as Table);
+  const tableGradient = getTableGradientVariant({
+    romFile,
+    vpxFile,
+    id,
+  } as Table);
+  const tableGradientColor = getTableGradientVariable({
+    romFile,
+    vpxFile,
+    id,
+  } as Table);
   const { showErrorToast } = useToastContext();
   const { fetchTables } = useTablesContext();
   const { config } = useConfigContext();
@@ -184,31 +197,68 @@ const TableCard: FunctionComponent<Props> = ({
         </div>
 
         <div className={style.meta}>
-          <p className='secondary-text-color body-xs-semibold'>{vpxFile}</p>
-          {romFile && (
-            <div className={style.romPill}>
-              <span className={style.romDot} />
-              <p className='secondary-text-color body-xs-semibold'>{romFile}</p>
-            </div>
-          )}
+          <div className={style.statPills}>
+            <span
+              className={classNames(
+                'secondary-text-color',
+                'body-xs-semibold',
+                style.statPill,
+              )}>
+              {timesPlayed} plays
+            </span>
+            <span
+              className={classNames(
+                'secondary-text-color',
+                'body-xs-semibold',
+                style.statPill,
+              )}>
+              {timePlayed} total
+            </span>
+          </div>
 
-          <div className={style.datesGrid}>
-            <div className={style.dateItem}>
-              <p className='secondary-text-color body-xs-semibold uppercase'>
-                Added
+          <div className={style.scoreBlock}>
+            <p
+              className={classNames(
+                'primary-text-color',
+                'body-xs-semibold',
+                style.metaLabel,
+              )}>
+              Best score
+            </p>
+            <p
+              className={classNames(
+                'secondary-text-color',
+                'body-sm-bold',
+                style.scoreValue,
+              )}>
+              {formattedBestScore}
+            </p>
+          </div>
+
+          <div className={style.footerRow}>
+            <div className={style.lastPlayedBlock}>
+              <p
+                className={classNames(
+                  'primary-text-color',
+                  'body-xs-semibold',
+                  style.metaLabel,
+                )}>
+                Last played
               </p>
-              <p className='secondary-text-color body-xs-semibold uppercase'>
-                {displayDate(dateAddedTimestamp)}
-              </p>
-            </div>
-            <div className={style.dateItem}>
-              <p className='secondary-text-color body-xs-semibold uppercase'>
-                Last Played
-              </p>
-              <p className='secondary-text-color body-xs-semibold uppercase'>
+              <p
+                className={classNames(
+                  'secondary-text-color',
+                  'body-xs-semibold',
+                )}>
                 {displayRelativeDate(lastPlayedTimestamp)}
               </p>
             </div>
+            <TableDetailsPopover
+              vpxFile={vpxFile}
+              romFile={romFile}
+              dateAddedTimestamp={dateAddedTimestamp}
+              triggerClassName={style.detailsTrigger}
+            />
           </div>
         </div>
       </div>

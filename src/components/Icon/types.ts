@@ -21,6 +21,7 @@ export type Icon =
   | 'file-code'
   | 'package'
   | 'circle-alert'
+  | 'circle-info'
   | 'chevron-down'
   | 'chevron-right'
   | 'circle-checkmark'

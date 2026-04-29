@@ -2,7 +2,7 @@
   position: relative;
   background-color: var(--gray-800);
   border: thin solid var(--gray);
-  border-radius: 32px;
+  border-radius: 28px;
   transition: all 0.2s ease;
   display: flex;
   flex-direction: column;
@@ -17,8 +17,8 @@
 .playArea {
   width: 100%;
   aspect-ratio: 16 / 9;
-  border-top-left-radius: 32px;
-  border-top-right-radius: 32px;
+  border-top-left-radius: 28px;
+  border-top-right-radius: 28px;
   background-color: rgba(0, 0, 0, 0.3);
   background-size: cover;
   background-position: center;
@@ -30,12 +30,12 @@
 
 .androidButton {
   position: absolute;
-  top: 12px;
-  left: 12px;
+  top: 10px;
+  left: 10px;
   background-color: rgba(var(--gray-rgb), 0.5);
   border: thin solid rgba(var(--white-rgb), 0.1);
   border-radius: 50%;
-  padding: 8px;
+  padding: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -59,12 +59,12 @@
 
 .favoriteButton {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 10px;
+  right: 10px;
   background-color: rgba(var(--gray-rgb), 0.5);
   border: thin solid rgba(var(--white-rgb), 0.1);
   border-radius: 50%;
-  padding: 8px;
+  padding: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -87,27 +87,31 @@
 }
 
 .content {
-  padding: 16px;
+  padding: 14px 14px 12px;
   flex: 1;
   display: flex;
   flex-direction: column;
+  gap: 10px;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
+  align-items: flex-start;
+  gap: 10px;
 }
 
 .title {
   flex: 1;
   word-break: break-word;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  font-size: 17px;
 }
 
 .settingsButton {
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
   flex-shrink: 0;
   position: relative;
 }
@@ -130,41 +134,75 @@
 .meta {
   display: flex;
   flex-direction: column;
-  gap: 12px;
   flex: 1;
+  gap: 8px;
+  justify-content: flex-start;
 }
 
-.romPill {
+.statPills {
   display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.statPill {
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
-  border: thin solid rgba(var(--white-rgb), 0.1);
+  padding: 4px 8px;
+  border: thin solid rgba(var(--white-rgb), 0.08);
   border-radius: 999px;
-  padding: 10px 14px;
+  background: rgba(var(--white-rgb), 0.03);
+  backdrop-filter: blur(12px);
+  font-size: 11px;
+  line-height: 1;
 }
 
-.romDot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background-color: var(--blue);
-  flex-shrink: 0;
-}
-
-.datesGrid {
-  margin-top: auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.dateItem {
+.scoreBlock {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 3px;
+  padding: 9px 8px;
+  border: thin solid rgba(var(--white-rgb), 0.08);
+  border-radius: 14px;
+  background: linear-gradient(
+    180deg,
+    rgba(var(--white-rgb), 0.05) 0%,
+    rgba(var(--white-rgb), 0.02) 100%
+  );
+}
 
-  &:last-child {
-    align-items: flex-end;
-    text-align: right;
+.metaLabel {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 10px;
+  line-height: 1.2;
+}
+
+.scoreValue {
+  line-height: 1;
+  color: rgba(var(--white-rgb), 0.96);
+}
+
+.footerRow {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 1px;
+}
+
+.lastPlayedBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  :global(.body-xs-semibold:last-child) {
+    font-size: 11px;
   }
+}
+
+.detailsTrigger {
+  flex-shrink: 0;
+  color: var(--gray-300);
 }
