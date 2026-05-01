@@ -4,6 +4,7 @@ import {
   FocusEvent,
   FunctionComponent,
   KeyboardEvent,
+  MouseEvent,
   useEffect,
   useRef,
 } from 'react';
@@ -31,6 +32,7 @@ const Input: FunctionComponent<Props> = ({
   readonly = false,
   icon,
   fontWeight = 'regular',
+  clearable = false,
 }) => {
   const ref = useRef<HTMLInputElement>(null);
 
@@ -56,6 +58,15 @@ const Input: FunctionComponent<Props> = ({
     if (onKeyDown) {
       onKeyDown(event);
     }
+  };
+
+  const handleClearMouseDown = (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+  };
+
+  const handleClear = () => {
+    onChange('');
+    ref.current?.focus();
   };
 
   /* eslint-disable jsx-a11y/no-autofocus */
@@ -96,6 +107,20 @@ const Input: FunctionComponent<Props> = ({
           readOnly={readonly}
           disabled={readonly}
         />
+        {clearable && value && (
+          <button
+            type='button'
+            className={style.clearButton}
+            onMouseDown={handleClearMouseDown}
+            onClick={handleClear}>
+            <Icon
+              className={classNames('secondary-text-color', style.clearIcon)}
+              icon='cross'
+              width={10}
+              height={10}
+            />
+          </button>
+        )}
       </div>
       {errorMessage && (
         <div className={style.messageWrapper}>

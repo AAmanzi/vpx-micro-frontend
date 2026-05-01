@@ -324,7 +324,11 @@ const TablesView: FunctionComponent<Props> = ({
         <FadeInAnimation animationKey={`${animationKey}-${viewType}`}>
           <div className={style.tablesWrapper}>
             {hasResults && (
-              <TablesList tables={orderedTables} viewType={viewType} />
+              <TablesList
+                tables={orderedTables}
+                viewType={viewType}
+                scrollToTopOnTableStart={order === Order.recentlyPlayed}
+              />
             )}{' '}
             {hasNoSearchResults && (
               <div className={style.noData}>
@@ -437,7 +441,9 @@ const TablesView: FunctionComponent<Props> = ({
         <ScanLibraryModal close={() => setIsScanLibraryModalOpen(false)} />
       )}
       {isSyncAndroidModalOpen && (
-        <SyncAndroidLibraryModal close={() => setIsSyncAndroidModalOpen(false)} />
+        <SyncAndroidLibraryModal
+          close={() => setIsSyncAndroidModalOpen(false)}
+        />
       )}
       <FileUploadOverlay
         label='Drop files to import'

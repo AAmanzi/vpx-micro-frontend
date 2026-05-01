@@ -2,6 +2,7 @@ import { apiFailure, apiSuccess } from '.';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 
+import { TABLE_STARTUP_LOCK_MS } from 'src/consts/platform';
 import type { ApiResult } from 'src/types/api';
 import type { FileSystemItem, TableFile } from 'src/types/file';
 import { GroupType, ScanResult, Table } from 'src/types/table';
@@ -34,6 +35,28 @@ import {
 
 const isZipFile = (name: string): boolean =>
   path.extname(name).toLowerCase() === '.zip';
+
+const tableStartLockById = new Map<string, number>();
+
+const canStartTableNow = (tableId: string): boolean => {
+  const lockUntil = tableStartLockById.get(tableId);
+
+  if (!lockUntil) {
+    return true;
+  }
+
+  if (lockUntil <= Date.now()) {
+    tableStartLockById.delete(tableId);
+
+    return true;
+  }
+
+  return false;
+};
+
+const lockTableStart = (tableId: string): void => {
+  tableStartLockById.set(tableId, Date.now() + TABLE_STARTUP_LOCK_MS);
+};
 
 export function getAllTables(): ApiResult<Table[]> {
   try {
@@ -569,10 +592,27 @@ export async function startTable(tableId: string): Promise<ApiResult<null>> {
       };
     }
 
-    await startVpxTable(
-      table.vpxFilePath,
-      table.vpxExecutablePath || configVpxExecutablePath,
-    );
+    if (!canStartTableNow(tableId)) {
+      return {
+        success: false,
+        error: {
+          code: 'TABLE_START_IN_PROGRESS',
+          message: 'Table is still starting. Please wait a moment.',
+        },
+      };
+    }
+
+    lockTableStart(tableId);
+
+    try {
+      await startVpxTable(
+        table.vpxFilePath,
+        table.vpxExecutablePath || configVpxExecutablePath,
+      );
+    } catch (error) {
+      tableStartLockById.delete(tableId);
+      throw error;
+    }
 
     tablesDb.update(tableId, {
       lastPlayedTimestamp: Date.now(),

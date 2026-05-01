@@ -38,6 +38,7 @@ const TablesHeader: FunctionComponent<Props> = ({
           onChange={onQueryChange}
           icon='search'
           placeholder='Search tables, vpx files or roms...'
+          clearable
         />
       </div>
       <div className={style.infoAndFiltering}>
