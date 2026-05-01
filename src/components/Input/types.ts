@@ -34,4 +34,5 @@ export type Props = {
   autoFocus?: boolean;
   readonly?: boolean;
   icon?: Icon;
+  clearable?: boolean;
 };
