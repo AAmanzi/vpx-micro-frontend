@@ -45,6 +45,49 @@
   background: transparent;
 }
 
+.manualSection {
+  padding: 12px;
+  border: thin solid var(--gray);
+  border-radius: 16px;
+  background-color: rgba(var(--gray-rgb), 0.18);
+  transition:
+    border-color 200ms ease-out,
+    background-color 200ms ease-out;
+}
+
+.manualSectionSelected {
+  border-color: var(--blue);
+  background-color: rgba(var(--blue-rgb), 0.12);
+}
+
+.manualContent {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.manualToggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: thin solid var(--gray);
+  border-radius: 12px;
+  background-color: var(--gray-800);
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.manualToggleText {
+  color: var(--blue);
+}
+
+.manualLabel {
+  color: var(--gray-300);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 .preview,
 .emptyPreview {
   width: 100%;

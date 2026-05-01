@@ -5,6 +5,7 @@ import Button, {
   Size as ButtonSize,
   Type as ButtonType,
 } from 'src/components/Button';
+import Input from 'src/components/Input';
 import Modal, { Size as ModalSize } from 'src/components/Modal';
 import api from 'src/consts';
 import { useToastContext } from 'src/providers/toast';
@@ -23,6 +24,12 @@ interface Props {
 
 const dedupeImageUrls = (imgUrls: Array<string>): Array<string> => {
   return imgUrls.filter((imgUrl, index) => imgUrls.indexOf(imgUrl) === index);
+};
+
+const normalizeImageUrl = (imgUrl: string): string | undefined => {
+  const normalizedImgUrl = imgUrl.trim();
+
+  return normalizedImgUrl || undefined;
 };
 
 const EditTableImageModal: FunctionComponent<Props> = ({
@@ -44,6 +51,8 @@ const EditTableImageModal: FunctionComponent<Props> = ({
   const [selectedImgUrl, setSelectedImgUrl] = useState<
     string | null | undefined
   >(currentSelection);
+  const [manualImgUrl, setManualImgUrl] = useState('');
+  const [isManualExpanded, setIsManualExpanded] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -88,6 +97,16 @@ const EditTableImageModal: FunctionComponent<Props> = ({
     () => candidateImgUrls.length > 0,
     [candidateImgUrls],
   );
+  const manualSelection = normalizeImageUrl(manualImgUrl);
+
+  const handleToggleManualSection = () => {
+    setIsManualExpanded((prev) => !prev);
+  };
+
+  const handleManualImgUrlChange = (imgUrl: string) => {
+    setManualImgUrl(imgUrl);
+    setSelectedImgUrl(normalizeImageUrl(imgUrl));
+  };
 
   const handleSave = async () => {
     if (!hasSelectionChanged || selectedImgUrl === undefined) {
@@ -139,7 +158,10 @@ const EditTableImageModal: FunctionComponent<Props> = ({
             <button
               type='button'
               className={style.optionButton}
-              onClick={() => setSelectedImgUrl(null)}>
+              onClick={() => {
+                setIsManualExpanded(false);
+                setSelectedImgUrl(null);
+              }}>
               <div
                 className={classNames(style.emptyPreview, gradientClassName)}>
                 <span
@@ -163,7 +185,10 @@ const EditTableImageModal: FunctionComponent<Props> = ({
               <button
                 type='button'
                 className={style.optionButton}
-                onClick={() => setSelectedImgUrl(candidateImgUrl)}>
+                onClick={() => {
+                  setIsManualExpanded(false);
+                  setSelectedImgUrl(candidateImgUrl);
+                }}>
                 <div
                   className={style.preview}
                   style={{
@@ -173,6 +198,38 @@ const EditTableImageModal: FunctionComponent<Props> = ({
               </button>
             </div>
           ))}
+
+        </div>
+
+        <div
+          className={classNames(style.manualSection, {
+            [style.manualSectionSelected]:
+              Boolean(manualSelection) && selectedImgUrl === manualSelection,
+          })}>
+          <div className={style.manualContent}>
+            <button
+              type='button'
+              className={style.manualToggle}
+              onClick={handleToggleManualSection}
+              aria-expanded={isManualExpanded}>
+              <span className={classNames('body-xs-semibold', style.manualLabel)}>
+                Manual URL
+              </span>
+              <span className={classNames('body-xs-semibold', style.manualToggleText)}>
+                {isManualExpanded ? 'Hide' : 'Add URL'}
+              </span>
+            </button>
+
+            {isManualExpanded && (
+              <Input
+                value={manualImgUrl}
+                onChange={handleManualImgUrlChange}
+                placeholder='https://...'
+                inputType='url'
+                clearable
+              />
+            )}
+          </div>
         </div>
       </div>
       <div className={style.footer}>
