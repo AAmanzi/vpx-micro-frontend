@@ -7,6 +7,7 @@ import Button, {
 } from 'src/components/Button';
 import Icon from 'src/components/Icon';
 import api from 'src/consts';
+import { TABLE_STARTUP_LOCK_MS } from 'src/consts/platform';
 import { useConfigContext } from 'src/providers/config';
 import { useTablesContext } from 'src/providers/tables';
 import { useToastContext } from 'src/providers/toast';
@@ -22,6 +23,19 @@ import SettingsPopover from '../SettingsPopover';
 import style from './TableCard.module.scss';
 
 type Props = Table;
+
+const waitForMinimumLoadingTime = async (startedAt: number): Promise<void> => {
+  const elapsed = Date.now() - startedAt;
+  const remaining = TABLE_STARTUP_LOCK_MS - elapsed;
+
+  if (remaining <= 0) {
+    return;
+  }
+
+  await new Promise<void>((resolve) => {
+    setTimeout(resolve, remaining);
+  });
+};
 
 const getPlayAreaStyle = (gradientColor: string, imgUrl?: string) => ({
   backgroundImage: imgUrl
@@ -48,8 +62,16 @@ const TableCard: FunctionComponent<Props> = ({
   const [favorite, setFavorite] = useState(isFavorite);
   const [forAndroid, setForAndroid] = useState(Boolean(isForAndroid));
   const [isStarting, setIsStarting] = useState(false);
-  const tableGradient = getTableGradientVariant({ romFile, vpxFile, id } as Table);
-  const tableGradientColor = getTableGradientVariable({ romFile, vpxFile, id } as Table);
+  const tableGradient = getTableGradientVariant({
+    romFile,
+    vpxFile,
+    id,
+  } as Table);
+  const tableGradientColor = getTableGradientVariable({
+    romFile,
+    vpxFile,
+    id,
+  } as Table);
   const { showErrorToast } = useToastContext();
   const { fetchTables } = useTablesContext();
   const { config } = useConfigContext();
@@ -60,12 +82,18 @@ const TableCard: FunctionComponent<Props> = ({
       return;
     }
 
+    const startTimestamp = Date.now();
+
     setIsStarting(true);
 
     try {
       const { error } = await api.startTable(id);
 
       if (error) {
+        if (error.code === 'TABLE_START_IN_PROGRESS') {
+          return;
+        }
+
         showErrorToast(error.message || 'Failed to start table');
 
         return;
@@ -73,6 +101,7 @@ const TableCard: FunctionComponent<Props> = ({
 
       fetchTables();
     } finally {
+      await waitForMinimumLoadingTime(startTimestamp);
       setIsStarting(false);
     }
   };
