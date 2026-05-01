@@ -10,17 +10,34 @@ import TableListItem from './components/TableListItem';
 interface Props {
   tables: Array<Table>;
   viewType: ViewType;
+  scrollToTopOnTableStart: boolean;
 }
 
-const TablesList: FunctionComponent<Props> = ({ tables, viewType }) => {
+const TablesList: FunctionComponent<Props> = ({
+  tables,
+  viewType,
+  scrollToTopOnTableStart,
+}) => {
   return (
     <div className={style.container} data-view={viewType}>
       {tables.map((table) => {
         if (viewType === ViewType.list) {
-          return <TableListItem key={table.id} {...table} />;
+          return (
+            <TableListItem
+              key={table.id}
+              {...table}
+              scrollToTopOnTableStart={scrollToTopOnTableStart}
+            />
+          );
         }
 
-        return <TableCard key={table.id} {...table} />;
+        return (
+          <TableCard
+            key={table.id}
+            {...table}
+            scrollToTopOnTableStart={scrollToTopOnTableStart}
+          />
+        );
       })}
     </div>
   );

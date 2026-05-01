@@ -22,7 +22,9 @@ import {
 import SettingsPopover from '../SettingsPopover';
 import style from './TableListItem.module.scss';
 
-type Props = Table;
+type Props = Table & {
+  scrollToTopOnTableStart: boolean;
+};
 
 const waitForMinimumLoadingTime = async (startedAt: number): Promise<void> => {
   const elapsed = Date.now() - startedAt;
@@ -58,6 +60,7 @@ const TableListItem: FunctionComponent<Props> = ({
   imagePreference,
   dateAddedTimestamp,
   lastPlayedTimestamp,
+  scrollToTopOnTableStart,
 }) => {
   const [favorite, setFavorite] = useState(isFavorite);
   const [forAndroid, setForAndroid] = useState(Boolean(isForAndroid));
@@ -135,6 +138,10 @@ const TableListItem: FunctionComponent<Props> = ({
         showErrorToast(error.message || 'Failed to start table');
 
         return;
+      }
+
+      if (scrollToTopOnTableStart) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
 
       fetchTables();
