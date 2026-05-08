@@ -16,6 +16,7 @@ export interface Table {
   isForAndroid?: boolean;
   lastPlayedTimestamp?: number;
   dateAddedTimestamp: number;
+  timesPlayed?: number;
 
   vpxExecutablePath?: string;
   imgUrl?: string;
