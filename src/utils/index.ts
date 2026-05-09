@@ -1,4 +1,5 @@
 import path from 'path';
+
 import {
   VPX_DEFAULT_EXECUTABLE,
   VPX_DEFAULT_ROM_PATH,
@@ -39,7 +40,7 @@ export const getVpxRootPathPermissionWarning = (
 
 export const normalizePath = (inputPath: string): string => {
   return path.normalize((inputPath || '').trim().replace(/\\/g, '/'));
-}
+};
 
 export const getDefaultRomsDirectory = (vpxRootPath: string): string => {
   const result = path.join(vpxRootPath, VPX_DEFAULT_ROM_PATH);

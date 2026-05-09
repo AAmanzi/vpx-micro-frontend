@@ -1,5 +1,9 @@
-import { AndroidScanResult, AndroidSyncApplyPayload, AndroidSyncProgressEvent } from './android';
-import { Config } from './config';
+import {
+  AndroidScanResult,
+  AndroidSyncApplyPayload,
+  AndroidSyncProgressEvent,
+} from './android';
+import { Config, Platform } from './config';
 import { FileSystemItem, TableFile } from './file';
 import { GroupType, ScanResult, Table } from './table';
 
@@ -96,10 +100,14 @@ export interface Api {
   ) => Promise<ApiResult<string | null>>;
 
   // Config
+  getPlatform: () => Promise<ApiResult<Platform>>;
   getConfig: () => Promise<ApiResult<Config>>;
   updateVpxRootPath: (path: string) => Promise<ApiResult<null>>;
   updateRomsDirectoryPath: (path: string) => Promise<ApiResult<null>>;
   updateTablesDirectoryPath: (path: string) => Promise<ApiResult<null>>;
+  setupDefaultLibraryFolders: (
+    libraryFolder: string,
+  ) => Promise<ApiResult<null>>;
   updateVpxExecutablePath: (path: string) => Promise<ApiResult<null>>;
   updateDeleteFilesAfterImport: (
     deleteAfterImport: boolean,
