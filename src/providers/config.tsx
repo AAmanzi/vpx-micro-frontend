@@ -8,10 +8,11 @@ import {
 } from 'react';
 
 import api from 'src/consts';
-import { Config } from 'src/types/config';
+import { Config, Platform } from 'src/types/config';
 
 interface ConfigContextType {
   config: Config | null;
+  platform: Platform | null;
   fetchConfig: () => void;
 }
 
@@ -31,6 +32,7 @@ export const ConfigProvider: FunctionComponent<{ children: ReactNode }> = ({
   children,
 }) => {
   const [config, setConfig] = useState<Config | null>(null);
+  const [platform, setPlatform] = useState<Platform | null>(null);
 
   const fetchConfig = () => {
     api.getConfig().then(({ data }) => {
@@ -41,6 +43,11 @@ export const ConfigProvider: FunctionComponent<{ children: ReactNode }> = ({
   };
 
   useEffect(() => {
+    api.getPlatform().then(({ data }) => {
+      if (data) {
+        setPlatform(data);
+      }
+    });
     fetchConfig();
   }, []);
 
@@ -48,6 +55,7 @@ export const ConfigProvider: FunctionComponent<{ children: ReactNode }> = ({
     <ConfigContext.Provider
       value={{
         config,
+        platform,
         fetchConfig,
       }}>
       {children}

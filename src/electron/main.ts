@@ -233,6 +233,7 @@ app.whenReady().then(async () => {
     async (_, directoryPath: string, acceptedExtensions: string[]) =>
       api.getDirectoryTree(directoryPath, acceptedExtensions),
   );
+  ipcMain.handle('api:getPlatform', async () => api.getPlatform());
   ipcMain.handle('api:getConfig', async () => api.getConfig());
   ipcMain.handle('api:updateVpxRootPath', async (_, path: string) =>
     api.updateVpxRootPath(path),

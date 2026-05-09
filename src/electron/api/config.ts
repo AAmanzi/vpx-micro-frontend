@@ -1,9 +1,17 @@
 import { apiFailure, apiSuccess } from '.';
 
 import type { ApiResult } from 'src/types/api';
-import type { Config } from 'src/types/config';
+import type { Config, Platform } from 'src/types/config';
 
 import * as configDb from '../database/config';
+
+export function getPlatform(): ApiResult<Platform> {
+  try {
+    return apiSuccess(process.platform as Platform);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}
 
 export function getConfig(): ApiResult<Config> {
   try {
@@ -109,7 +117,9 @@ export function updateAndroidWebServerUrl(path: string): ApiResult<null> {
   }
 }
 
-export function updateAndroidTablesDirectoryPath(path: string): ApiResult<null> {
+export function updateAndroidTablesDirectoryPath(
+  path: string,
+): ApiResult<null> {
   try {
     configDb.updateAndroidTablesDirectoryPath(path);
     return apiSuccess(null);

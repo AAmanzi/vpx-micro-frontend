@@ -183,10 +183,13 @@
 }
 
 .metaStat {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: thin solid var(--gray);
   display: flex;
   flex-direction: column;
   gap: 2px;
+
+  &:not(:first-child) {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: thin solid var(--gray);
+  }
 }

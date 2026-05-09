@@ -1,0 +1,9 @@
+.inputWrapper {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+
+  &:not(:last-child) {
+    margin-bottom: 16px;
+  }
+}

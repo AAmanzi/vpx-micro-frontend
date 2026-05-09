@@ -72,22 +72,49 @@ const startVpxAsAdmin = async (
   });
 };
 
+const startVpxOnMac = async (
+  vpxAppPath: string,
+  tablePath: string,
+): Promise<void> => {
+  await new Promise<void>((resolve, reject) => {
+    const child = spawn('open', ['-a', vpxAppPath, tablePath], {
+      detached: true,
+      stdio: 'ignore',
+    });
+
+    child.once('error', (error: NodeJS.ErrnoException) => {
+      reject(new Error(`Failed to start VPX: ${error.message}`));
+    });
+
+    child.once('spawn', () => {
+      child.unref();
+      resolve();
+    });
+  });
+};
+
 export const startVpxTable = async (
   tablePath: string,
   vpxExecutablePath: string,
 ): Promise<void> => {
-  if (process.platform !== 'win32') {
-    throw new Error(
-      'Starting Visual Pinball tables is only supported on Windows.',
-    );
-  }
-
   if (!fs.existsSync(tablePath)) {
     throw new Error(`Table file not found: ${tablePath}`);
   }
 
   if (!fs.existsSync(vpxExecutablePath)) {
     throw new Error(`VPX executable not found: ${vpxExecutablePath}`);
+  }
+
+  if (process.platform === 'darwin') {
+    await startVpxOnMac(vpxExecutablePath, tablePath);
+
+    return;
+  }
+
+  if (process.platform !== 'win32') {
+    throw new Error(
+      'Starting Visual Pinball tables is only supported on Windows and macOS.',
+    );
   }
 
   const vpxDir = path.dirname(vpxExecutablePath);

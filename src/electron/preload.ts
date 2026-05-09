@@ -1,8 +1,12 @@
 import { contextBridge, ipcRenderer, webUtils } from 'electron';
 
+import type {
+  AndroidScanResult,
+  AndroidSyncApplyPayload,
+  AndroidSyncProgressEvent,
+} from 'src/types/android';
 import type { Api, ApiResult } from 'src/types/api';
-import type { AndroidScanResult, AndroidSyncApplyPayload, AndroidSyncProgressEvent } from 'src/types/android';
-import type { Config } from 'src/types/config';
+import type { Config, Platform } from 'src/types/config';
 import type { FileSystemItem } from 'src/types/file';
 import type { GroupType, ScanResult, Table } from 'src/types/table';
 
@@ -119,7 +123,8 @@ const frontendApi: Api = {
       data: AndroidSyncProgressEvent,
     ) => callback(data);
     ipcRenderer.on('event:androidSyncProgress', handler);
-    return () => ipcRenderer.removeListener('event:androidSyncProgress', handler);
+    return () =>
+      ipcRenderer.removeListener('event:androidSyncProgress', handler);
   },
   applyScanResult: (scanResult: ScanResult): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:applyScanResult', scanResult),
@@ -128,6 +133,8 @@ const frontendApi: Api = {
     exportGroup: GroupType,
   ): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:exportTables', destinationPath, exportGroup),
+  getPlatform: (): Promise<ApiResult<Platform>> =>
+    invoke<ApiResult<Platform>>('api:getPlatform'),
   getConfig: (): Promise<ApiResult<Config>> =>
     invoke<ApiResult<Config>>('api:getConfig'),
   updateVpxRootPath: (path: string): Promise<ApiResult<null>> =>
@@ -158,9 +165,7 @@ const frontendApi: Api = {
     ),
   updateAndroidWebServerUrl: (path: string): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:updateAndroidWebServerUrl', path),
-  updateAndroidTablesDirectoryPath: (
-    path: string,
-  ): Promise<ApiResult<null>> =>
+  updateAndroidTablesDirectoryPath: (path: string): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:updateAndroidTablesDirectoryPath', path),
   updateAndroidRomsDirectoryPath: (path: string): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:updateAndroidRomsDirectoryPath', path),
