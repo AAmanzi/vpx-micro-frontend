@@ -1,17 +1,15 @@
-import classNames from 'classnames';
-import { FunctionComponent, MouseEvent, useState } from 'react';
+import { FunctionComponent, useEffect, useState } from 'react';
 
-import FilePicker, {
-  Size as FilePickerSize,
-} from 'src/components/FilePicker/FilePicker';
+import Button, { Type as ButtonType } from 'src/components/Button';
+import FilePicker from 'src/components/FilePicker/FilePicker';
 import FolderPicker from 'src/components/FolderPicker';
-import Icon from 'src/components/Icon';
 import Input from 'src/components/Input';
 import api from 'src/consts';
 import { useConfigContext } from 'src/providers/config';
 import { useToastContext } from 'src/providers/toast';
 
 import style from './MacOsFilePathsSection.module.scss';
+import VpxSetupGuideModal from './components/VpxSetupGuideModal';
 
 const MacOsFilePathsSection: FunctionComponent = () => {
   const { config, fetchConfig } = useConfigContext();
@@ -20,6 +18,17 @@ const MacOsFilePathsSection: FunctionComponent = () => {
   const [_romsDirectory, setRomsDirectory] = useState('');
   const [_tablesDirectory, setTablesDirectory] = useState('');
   const [_vpxExecutablePath, setVpxExecutablePath] = useState('');
+  const [isSetupModalOpen, setIsSetupModalOpen] = useState(false);
+
+  useEffect(() => {
+    setRomsDirectory('');
+  }, [config?.romsDirectory]);
+  useEffect(() => {
+    setTablesDirectory('');
+  }, [config?.tablesDirectory]);
+  useEffect(() => {
+    setVpxExecutablePath('');
+  }, [config?.vpxExecutablePath]);
 
   const romsDirectory = _romsDirectory || config?.romsDirectory || '';
   const tablesDirectory = _tablesDirectory || config?.tablesDirectory || '';
@@ -65,19 +74,28 @@ const MacOsFilePathsSection: FunctionComponent = () => {
     fetchConfig();
   };
 
-  const handleOpenVpxDownload = async () => {
-    const { error } = await api.openExternalUrl(
-      'https://github.com/vpinball/vpinball/releases',
-    );
-
-    if (error) {
-      showErrorToast(error.message || 'Failed to open browser');
-    }
-  };
-
   return (
     <>
       <div>
+        <div className={style.setupCallout}>
+          <div>
+            <p className='primary-text-color body-md-bold'>
+              Don&apos;t have VPX installed or prefer a guided setup?
+            </p>
+            <p className='secondary-text-color body-sm-regular'>
+              Use the setup guide to install VPX and configure required folders,
+              then come back here any time to edit paths manually.
+            </p>
+          </div>
+          <div className={style.setupCalloutButtonWrapper}>
+            <Button
+              label='Begin Setup'
+              type={ButtonType.secondary}
+              onClick={() => setIsSetupModalOpen(true)}
+              icon='cog'
+            />
+          </div>
+        </div>
         <div className={style.inputWrapper}>
           <Input
             label='VPX App Path'
@@ -122,6 +140,13 @@ const MacOsFilePathsSection: FunctionComponent = () => {
           />
         </div>
       </div>
+      {isSetupModalOpen && (
+        <VpxSetupGuideModal
+          onClose={() => {
+            setIsSetupModalOpen(false);
+          }}
+        />
+      )}
     </>
   );
 };

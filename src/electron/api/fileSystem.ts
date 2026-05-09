@@ -148,6 +148,14 @@ export async function openFilePicker(
         const stat = fs.statSync(selectedPath);
 
         if (stat.isDirectory()) {
+          if (isAcceptedFilePath(selectedPath, extensionSet)) {
+            results.push({
+              path: selectedPath,
+              name: path.basename(selectedPath),
+            });
+            continue;
+          }
+
           if (!acceptFolders) {
             continue;
           }

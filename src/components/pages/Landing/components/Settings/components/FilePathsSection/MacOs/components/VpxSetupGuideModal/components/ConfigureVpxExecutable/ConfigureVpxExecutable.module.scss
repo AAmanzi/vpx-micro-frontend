@@ -1,0 +1,39 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: 0 24px 24px;
+}
+
+.content {
+  flex: 1;
+}
+
+.titleSection {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: linear-gradient(
+    135deg,
+    rgba(var(--green-rgb), 0.08) 0%,
+    rgba(var(--green-rgb), 0.04) 100%
+  );
+  border: 1px solid rgba(var(--green-rgb), 0.2);
+  border-radius: 8px;
+}
+
+.title {
+  margin: 0 0 8px;
+}
+
+.inputGroup {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.footer {
+  margin-top: 24px;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}

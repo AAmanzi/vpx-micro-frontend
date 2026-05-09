@@ -1,3 +1,18 @@
+.setupCallout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: rgba(var(--gray-rgb), 0.2);
+}
+
+.setupCalloutButtonWrapper {
+  flex-shrink: 0;
+}
+
 .inputWrapper {
   display: flex;
   align-items: flex-end;

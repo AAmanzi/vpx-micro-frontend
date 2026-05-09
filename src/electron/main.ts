@@ -244,6 +244,9 @@ app.whenReady().then(async () => {
   ipcMain.handle('api:updateTablesDirectoryPath', async (_, path: string) =>
     api.updateTablesDirectoryPath(path),
   );
+  ipcMain.handle('api:setupDefaultLibraryFolders', async (_, path: string) =>
+    api.setupDefaultLibraryFolders(path),
+  );
   ipcMain.handle('api:updateVpxExecutablePath', async (_, path: string) =>
     api.updateVpxExecutablePath(path),
   );
