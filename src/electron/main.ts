@@ -13,7 +13,7 @@ import * as api from './api';
 import { runAppMigrations } from './database/migrations';
 import * as db from './database/tables';
 
-const logFile = path.join(process.cwd(), 'backend.log');
+const logFile = path.join(app.getPath('userData'), 'backend.log');
 const logStream = fs.createWriteStream(logFile, {
   flags: 'a',
   encoding: 'utf8',
