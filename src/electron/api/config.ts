@@ -53,9 +53,16 @@ export function updateRomsDirectoryPath(path: string): ApiResult<null> {
   }
 }
 
-export function updateTablesDirectoryPath(path: string): ApiResult<null> {
+export function updateTablesDirectoryPath(tablesDirectoryPath: string): ApiResult<null> {
   try {
-    configDb.updateTablesDirectoryPath(path);
+    configDb.updateTablesDirectoryPath(tablesDirectoryPath);
+
+    // On macOS, keep vpxRootPath aligned with the selected Tables parent folder.
+    if (process.platform === 'darwin' && tablesDirectoryPath.trim()) {
+      const parentFolder = normalizePath(path.dirname(tablesDirectoryPath));
+      configDb.updateVpxRootPath(parentFolder);
+    }
+
     return apiSuccess(null);
   } catch (error) {
     return apiFailure(error);
@@ -84,6 +91,11 @@ export function setupDefaultLibraryFolders(
 
     configDb.updateTablesDirectoryPath(tablesDirectory);
     configDb.updateRomsDirectoryPath(romsDirectory);
+
+    // On macOS, also treat the chosen library folder as the VPX root path.
+    if (process.platform === 'darwin') {
+      configDb.updateVpxRootPath(normalizePath(libraryFolder));
+    }
 
     return apiSuccess(null);
   } catch (error) {
