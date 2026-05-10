@@ -7,6 +7,7 @@ import path from 'path';
 import type { ApiResult } from 'src/types/api';
 import type { FileSystemItem } from 'src/types/file';
 
+import { resolveUserPath } from '../utils/path';
 import { getExpectedRomNameFromVpxFile } from '../utils/vpxParsing';
 
 const isAcceptedFilePath = (
@@ -192,11 +193,24 @@ export async function openFilePicker(
 
 export async function openPath(filePath: string): Promise<ApiResult<null>> {
   try {
-    if (!filePath) {
+    if (!filePath || !filePath.trim()) {
       return apiFailure(new Error('Path is required'));
     }
 
-    const shellError = await shell.openPath(filePath);
+    const resolvedPath = resolveUserPath(filePath);
+
+    if (!fs.existsSync(resolvedPath)) {
+      return apiFailure(new Error(`Path does not exist: ${resolvedPath}`));
+    }
+
+    const pathStats = fs.statSync(resolvedPath);
+
+    if (pathStats.isFile()) {
+      shell.showItemInFolder(resolvedPath);
+      return apiSuccess(null);
+    }
+
+    const shellError = await shell.openPath(resolvedPath);
 
     if (shellError) {
       return apiFailure(new Error(shellError));

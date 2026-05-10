@@ -232,6 +232,7 @@ const ExportTablesModal: FunctionComponent<Props> = ({ close }) => {
                 disabled={isExporting}
                 label={`Export ${numberOfTables} Table${numberOfTables !== 1 ? 's' : ''}`}
                 isSubmit
+                loading={isExporting}
               />
             </>
           )}
