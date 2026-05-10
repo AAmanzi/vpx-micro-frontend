@@ -26,3 +26,5 @@ export enum ViewType {
   grid = 'grid',
   list = 'list',
 }
+
+export type Platform = 'win32' | 'darwin' | 'linux';

@@ -13,7 +13,7 @@ import * as api from './api';
 import { runAppMigrations } from './database/migrations';
 import * as db from './database/tables';
 
-const logFile = path.join(process.cwd(), 'backend.log');
+const logFile = path.join(app.getPath('userData'), 'backend.log');
 const logStream = fs.createWriteStream(logFile, {
   flags: 'a',
   encoding: 'utf8',
@@ -233,6 +233,7 @@ app.whenReady().then(async () => {
     async (_, directoryPath: string, acceptedExtensions: string[]) =>
       api.getDirectoryTree(directoryPath, acceptedExtensions),
   );
+  ipcMain.handle('api:getPlatform', async () => api.getPlatform());
   ipcMain.handle('api:getConfig', async () => api.getConfig());
   ipcMain.handle('api:updateVpxRootPath', async (_, path: string) =>
     api.updateVpxRootPath(path),
@@ -242,6 +243,9 @@ app.whenReady().then(async () => {
   );
   ipcMain.handle('api:updateTablesDirectoryPath', async (_, path: string) =>
     api.updateTablesDirectoryPath(path),
+  );
+  ipcMain.handle('api:setupDefaultLibraryFolders', async (_, path: string) =>
+    api.setupDefaultLibraryFolders(path),
   );
   ipcMain.handle('api:updateVpxExecutablePath', async (_, path: string) =>
     api.updateVpxExecutablePath(path),

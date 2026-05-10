@@ -4,6 +4,17 @@ This guide explains how to use the app day-to-day to manage your Visual Pinball 
 
 ![VPX Micro Frontend dashboard](public/readme/hero-dashboard.png)
 
+## Table of Contents
+
+- [What you can do](#what-you-can-do)
+- [Install](#install)
+- [First-time setup - Windows](#first-time-setup---windows)
+- [First-time setup - macOS](#first-time-setup---macos)
+- [Add tables to your library](#add-tables-to-your-library)
+- [Work with tables](#work-with-tables)
+- [Settings reference](#settings-reference)
+- [Minimal run notes (dev)](#minimal-run-notes-dev)
+
 ## What you can do
 
 - Import `.vpx` tables and `.zip` ROM files
@@ -19,11 +30,13 @@ This guide explains how to use the app day-to-day to manage your Visual Pinball 
 
 ## Install
 
-Download the latest Windows build from GitHub Releases:
+Download the latest build from GitHub Releases for your platform:
 
 - [VPX Micro Frontend Releases](https://github.com/AAmanzi/vpx-micro-frontend/releases)
 
-### Download options
+### Windows
+
+**Download options:**
 
 - **Installer (recommended)**
   - Standard Windows installation flow
@@ -35,7 +48,7 @@ Download the latest Windows build from GitHub Releases:
   - Run directly from any folder or USB drive
   - Good for testing or restricted environments
 
-### Smart App Control (Windows 11)
+**Smart App Control (Windows 11):**
 
 Some systems have Smart App Control enabled, which can block unsigned apps completely.
 
@@ -43,16 +56,51 @@ If the app does not start at all (no **Run anyway** option), you may need to dis
 
 `Windows Security → App & browser control → Smart App Control → Off`
 
+### macOS
+
+**Download and install:**
+
+1. Download the `.dmg` file from releases
+2. Open the `.dmg` file
+3. Drag the VPX Micro Frontend app into the **Applications** folder
+4. Open Applications and launch **VPX Micro Frontend**
+
 After installation, open the app and continue with first-time setup below.
 
-## First-time setup
+## First-time setup - Windows
 
-![Settings file paths](public/readme/settings-file-paths.png)
+![Settings file paths - Windows](public/readme/settings-file-paths.png)
 
 1. Open **Settings** from the left navigation.
 2. In **File Paths**, set **VPX Root Directory** (the folder containing `VPinballX.exe`).
 3. Confirm **ROMs Directory** and **Tables Directory**.
    - These auto-sync with the root path by default, but you can override if needed.
+
+## First-time setup - macOS
+
+The app includes a guided setup wizard to help you configure VPX on macOS.
+
+![Settings file paths - macOS](public/readme/settings-file-paths-mac.png)
+
+**Guided Setup (Recommended):**
+
+Click **Begin Setup** in the Settings → File Paths section to start a step-by-step guide that covers:
+1. Installing/locating VPX
+2. Configuring the VPX executable path
+3. Setting up Tables and ROMs folders
+4. Configuring ROM support (PinMAME)
+
+![Setup guide - Install VPX macOS build](public/mac-setup/install-macos-build.png)
+
+**Manual Setup:**
+
+This expects that you already have VPX and PinMAME installed and configured on your Mac.
+
+1. Open **Settings** from the left navigation.
+2. In **File Paths**, set the paths to your VPX installation:
+   - **VPX App Path**: path to `VPinballX_BGFX.app` bundle
+   - **Tables Directory**: where your `.vpx` files are stored
+   - **ROMs Directory**: where your ROM files (`.zip`) are stored
 
 ## Add tables to your library
 
@@ -119,7 +167,7 @@ Table images are automatically fetched from the [Virtual Pinball Spreadsheet dat
 
 1. Open the table **Kebab menu** and click **Table Image**.
 2. Browse alternate image results for that table.
-3. Select the image you prefer.
+3. Select the image you prefer, or manually enter a custom image URL.
 
 ![Image Select Modal](public/readme/image-select-modal.png)
 
@@ -231,9 +279,9 @@ The app will default the table and ROM paths to:
 - `/mockVpxFolder/Tables`
 - `/mockVpxFolder/VPinMAME/roms`
 
-## Build Windows binaries (EXE)
+## Build and package for distribution
 
-This project now supports production packaging via Electron Builder.
+This project supports production packaging via Electron Builder for Windows and macOS.
 
 ### 1. Install dependencies
 
@@ -263,19 +311,29 @@ Artifacts are written to `dist/`:
 - NSIS installer `.exe`
 - Portable `.exe`
 
-### 4. Create unpacked app only (quick local validation)
+### 4. Create macOS distributable
+
+```bash
+yarn dist:mac
+```
+
+Artifacts are written to `dist/`:
+
+- `.dmg` file (drag-and-drop installer)
+
+### 5. Create unpacked app only (quick local validation)
 
 ```bash
 yarn dist:dir
 ```
 
-This outputs `dist/win-unpacked/`.
+This outputs `dist/win-unpacked/` (or platform-specific equivalent).
 
 ### Notes
 
-- Packaging is Windows-first in the current setup.
-- If Defender/permissions interfere with packaging, run the terminal as Administrator and retry.
-- Optional polish for release: set `author`, `description`, and app icon in `package.json`.
+- Builds are platform-specific; run on Windows to build `.exe` and on macOS to build `.dmg`.
+- If Defender/permissions interfere with Windows packaging, run the terminal as Administrator and retry.
+- macOS builds require Xcode command-line tools: `xcode-select --install`
 
 ## Troubleshooting
 

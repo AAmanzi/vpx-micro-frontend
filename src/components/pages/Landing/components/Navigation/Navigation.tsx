@@ -24,7 +24,7 @@ const Navigation: FunctionComponent<Props> = ({
   archivedTablesCount,
 }) => {
   const { fetchTables } = useTablesContext();
-  const { config } = useConfigContext();
+  const { config, platform } = useConfigContext();
   const fullVpxPath = config?.vpxRootPath || '';
   const androidFeaturesEnabled = Boolean(config?.androidFeaturesEnabled);
 
@@ -148,36 +148,40 @@ const Navigation: FunctionComponent<Props> = ({
           </div>
         </div>
         <div className={style.meta}>
-          <div className={style.metaLabel}>
-            <Icon
-              icon='folder'
-              width={14}
-              height={14}
-              className='secondary-text-color'
-            />
-            <span className='body-xs-semibold secondary-text-color'>
-              VPX PATH
-            </span>
-          </div>
-          <div className={style.metaPathWrapper}>
-            <span
-              className={classNames(
-                'body-xs-regular',
-                'secondary-text-color',
-                style.metaPath,
-              )}>
-              {fullVpxPath}
-            </span>
-            {fullVpxPath && (
-              <span
-                className={classNames(
-                  'body-xs-regular',
-                  style.metaPathTooltip,
-                )}>
-                {fullVpxPath}
-              </span>
-            )}
-          </div>
+          {platform !== 'darwin' && (
+            <>
+              <div className={style.metaLabel}>
+                <Icon
+                  icon='folder'
+                  width={14}
+                  height={14}
+                  className='secondary-text-color'
+                />
+                <span className='body-xs-semibold secondary-text-color'>
+                  VPX PATH
+                </span>
+              </div>
+              <div className={style.metaPathWrapper}>
+                <span
+                  className={classNames(
+                    'body-xs-regular',
+                    'secondary-text-color',
+                    style.metaPath,
+                  )}>
+                  {fullVpxPath}
+                </span>
+                {fullVpxPath && (
+                  <span
+                    className={classNames(
+                      'body-xs-regular',
+                      style.metaPathTooltip,
+                    )}>
+                    {fullVpxPath}
+                  </span>
+                )}
+              </div>
+            </>
+          )}
           <div className={style.metaStat}>
             <span className='body-xs-semibold secondary-text-color'>
               LIBRARY SIZE
