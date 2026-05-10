@@ -90,6 +90,8 @@ Click **Begin Setup** in the Settings → File Paths section to start a step-by-
 3. Setting up Tables and ROMs folders
 4. Configuring ROM support (PinMAME)
 
+![Setup guide - Install VPX macOS build](public/mac-setup/install-macos-build.png)
+
 **Manual Setup:**
 
 This expects that you already have VPX and PinMAME installed and configured on your Mac.
