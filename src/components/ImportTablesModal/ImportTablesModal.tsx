@@ -35,12 +35,19 @@ const ImportTablesModal: FunctionComponent<Props> = ({
     [],
   );
   const assignedRoms = useAssignedRoms();
-  const romOptions = mergeRoms(
-    assignedRoms,
+  const manuallyImportedRoms = mergeRoms(
     unassignedRoms,
     tablesToImport
       .map((table) => table.rom)
-      .filter((rom): rom is FileSystemItem => Boolean(rom)),
+      .filter(
+        (rom): rom is FileSystemItem =>
+          rom !== undefined &&
+          !assignedRoms.some(
+            (assignedRom) =>
+              normalizePathForComparison(assignedRom.path) ===
+              normalizePathForComparison(rom.path),
+          ),
+      ),
   );
   const assignedRomPaths = new Set(
     assignedRoms.map((rom) => normalizePathForComparison(rom.path)),
@@ -88,6 +95,7 @@ const ImportTablesModal: FunctionComponent<Props> = ({
         currentTables: tablesToImport,
         currentUnassignedRoms: unassignedRoms,
         incomingFiles: filteredFiles,
+        libraryRoms: assignedRoms,
       });
 
       setTablesToImport(result.tablesToImport);
@@ -192,7 +200,7 @@ const ImportTablesModal: FunctionComponent<Props> = ({
     if (importTablesWarning) {
       showWarningToast(
         importTablesWarning.message ||
-        'Some tables failed to import because source files were missing',
+          'Some tables failed to import because source files were missing',
       );
     }
 
@@ -202,7 +210,7 @@ const ImportTablesModal: FunctionComponent<Props> = ({
     if (updateDeleteAfterImportError) {
       showErrorToast(
         updateDeleteAfterImportError.message ||
-        'Failed to update import setting',
+          'Failed to update import setting',
       );
 
       return;
@@ -247,7 +255,8 @@ const ImportTablesModal: FunctionComponent<Props> = ({
                   <TableEntry
                     key={table.filePath}
                     table={table}
-                    romOptions={romOptions}
+                    manuallyImportedRoms={manuallyImportedRoms}
+                    libraryRoms={assignedRoms}
                     onAssignRom={handleAssignRom}
                     onRemoveTable={handleRemoveTableFile}
                     onRemoveRom={handleRemoveRomFromTable}

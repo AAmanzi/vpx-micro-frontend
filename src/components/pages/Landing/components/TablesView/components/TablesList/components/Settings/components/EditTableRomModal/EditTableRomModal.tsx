@@ -12,7 +12,7 @@ import RomPicker from 'src/components/RomPicker';
 import api from 'src/consts';
 import { useToastContext } from 'src/providers/toast';
 import { FileSystemItem } from 'src/types/file';
-import { mergeRoms, normalizePathForComparison } from 'src/utils';
+import { normalizePathForComparison } from 'src/utils';
 import useAssignedRoms from 'src/utils/useAssignedRoms';
 
 import style from './EditTableRomModal.module.scss';
@@ -92,14 +92,14 @@ const EditTableRomModal: FunctionComponent<Props> = ({
     };
   }, []);
 
-  const options = useMemo(() => {
+  const libraryRoms = useMemo(() => {
     const currentRomOption =
       currentRomName && currentRomPath
         ? [{ name: currentRomName, path: currentRomPath }]
         : [];
 
-    return mergeRoms(currentRomOption, assignedRoms, uploadedRoms);
-  }, [currentRomName, currentRomPath, assignedRoms, uploadedRoms]);
+    return [...currentRomOption, ...assignedRoms];
+  }, [currentRomName, currentRomPath, assignedRoms]);
 
   const handleFilesSelected = (files: Array<FileSystemItem>) => {
     const zipFiles = files.filter((item) => isZipFile(item.name));
@@ -184,7 +184,9 @@ const EditTableRomModal: FunctionComponent<Props> = ({
             </div>
             <RomPicker
               selectedRom={selectedRom}
-              options={options}
+              manuallyImportedRoms={uploadedRoms}
+              scannedRoms={[]}
+              libraryRoms={libraryRoms}
               expectedRomName={expectedRomName}
               onRemoveRom={() => setSelectedRom(null)}
               onSelect={handleRomSelect}

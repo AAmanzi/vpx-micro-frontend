@@ -12,7 +12,9 @@ import style from './NewTablesSection.module.scss';
 
 interface Props {
   tables: Array<TableFile>;
-  romOptions: Array<FileSystemItem>;
+  manuallyImportedRoms: Array<FileSystemItem>;
+  scannedRoms: Array<FileSystemItem>;
+  libraryRoms: Array<FileSystemItem>;
   includedByPath: Record<string, boolean>;
   onToggleInclude: (filePath: string) => void;
   onSelectAll: () => void;
@@ -23,7 +25,9 @@ interface Props {
 
 const NewTablesSection: FunctionComponent<Props> = ({
   tables,
-  romOptions,
+  manuallyImportedRoms,
+  scannedRoms,
+  libraryRoms,
   includedByPath,
   onToggleInclude,
   onSelectAll,
@@ -76,7 +80,9 @@ const NewTablesSection: FunctionComponent<Props> = ({
                   <div onClick={(event) => event.stopPropagation()}>
                     <RomPicker
                       selectedRom={table.rom || null}
-                      options={romOptions}
+                      manuallyImportedRoms={manuallyImportedRoms}
+                      scannedRoms={scannedRoms}
+                      libraryRoms={libraryRoms}
                       expectedRomName={table.expectedRomName || null}
                       onRemoveRom={() => onRomChange(table.filePath, '')}
                       onSelect={handleRomSelect(table)}

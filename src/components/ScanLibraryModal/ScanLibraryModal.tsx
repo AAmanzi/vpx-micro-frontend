@@ -74,6 +74,14 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
       .map((table) => table.rom)
       .filter((rom): rom is NonNullable<typeof rom> => Boolean(rom)),
   );
+  const scannedRoms = mergeRoms(
+    unmatchedRoms,
+    newTables
+      .map((table) => table.rom)
+      .filter((rom): rom is NonNullable<typeof rom> => Boolean(rom)),
+  ).filter(
+    (rom) => !assignedRomPaths.has(normalizePathForComparison(rom.path)),
+  );
 
   const modalTitle = isLoading ? 'Scanning VPX Library' : 'Scan Results';
   const modalDescription = isLoading
@@ -416,7 +424,9 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
                   onToggle={() => setIsNewTablesOpen((prev) => !prev)}>
                   <NewTablesSection
                     tables={newTables}
-                    romOptions={romOptions}
+                    manuallyImportedRoms={[]}
+                    scannedRoms={scannedRoms}
+                    libraryRoms={assignedRoms}
                     includedByPath={includedNewTablesByPath}
                     onToggleInclude={toggleNewTableInclude}
                     onSelectAll={selectAllNewTables}

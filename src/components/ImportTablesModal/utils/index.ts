@@ -3,6 +3,7 @@ import path from 'path';
 import { api } from 'src/consts';
 import { FileSystemItem, TableFile } from 'src/types/file';
 import { Table } from 'src/types/table';
+import { normalizePathForComparison } from 'src/utils';
 
 import { ImportSelectionResult } from '../types';
 import { applyExpectedRoms } from './rules';
@@ -45,10 +46,12 @@ export const buildImportSelectionResult = async ({
   currentTables,
   currentUnassignedRoms,
   incomingFiles,
+  libraryRoms,
 }: {
   currentTables: Array<TableFile>;
   currentUnassignedRoms: Array<FileSystemItem>;
   incomingFiles: Array<FileSystemItem>;
+  libraryRoms: Array<FileSystemItem>;
 }): Promise<ImportSelectionResult> => {
   const knownTablePaths = new Set(currentTables.map((table) => table.filePath));
   const knownRomPaths = new Set([
@@ -60,15 +63,16 @@ export const buildImportSelectionResult = async ({
     .filter(isVpxFile)
     .filter((file) => !knownTablePaths.has(file.path));
 
-  const vpxCountByDirectoryPath = incomingVpxFiles.reduce<
-    Map<string, number>
-  >((acc, file) => {
-    const directoryPath = path.dirname(file.path);
+  const vpxCountByDirectoryPath = incomingVpxFiles.reduce<Map<string, number>>(
+    (acc, file) => {
+      const directoryPath = path.dirname(file.path);
 
-    acc.set(directoryPath, (acc.get(directoryPath) || 0) + 1);
+      acc.set(directoryPath, (acc.get(directoryPath) || 0) + 1);
 
-    return acc;
-  }, new Map<string, number>());
+      return acc;
+    },
+    new Map<string, number>(),
+  );
 
   const newTables = await Promise.all(
     incomingVpxFiles.map((file) =>
@@ -88,10 +92,21 @@ export const buildImportSelectionResult = async ({
         .map((table) => table.rom)
         .filter((rom): rom is FileSystemItem => Boolean(rom)),
       ...newRoms,
+      ...libraryRoms,
     ].map((rom) => [rom.path, rom]),
   );
 
-  return applyExpectedRoms(nextTables, Array.from(romsByPath.values()));
+  const result = applyExpectedRoms(nextTables, Array.from(romsByPath.values()));
+  const libraryRomPaths = new Set(
+    libraryRoms.map((rom) => normalizePathForComparison(rom.path)),
+  );
+
+  return {
+    ...result,
+    unassignedRoms: result.unassignedRoms.filter(
+      (rom) => !libraryRomPaths.has(normalizePathForComparison(rom.path)),
+    ),
+  };
 };
 
 export const filterExistingFiles = ({
