@@ -10,10 +10,10 @@ import Form from 'src/components/Form';
 import Modal, { Size as ModalSize } from 'src/components/Modal';
 import RomPicker from 'src/components/RomPicker';
 import api from 'src/consts';
-import { useTablesContext } from 'src/providers/tables';
 import { useToastContext } from 'src/providers/toast';
 import { FileSystemItem } from 'src/types/file';
-import { normalizePathForComparison } from 'src/utils';
+import { mergeRoms, normalizePathForComparison } from 'src/utils';
+import useAssignedRoms from 'src/utils/useAssignedRoms';
 
 import style from './EditTableRomModal.module.scss';
 
@@ -35,13 +35,13 @@ const EditTableRomModal: FunctionComponent<Props> = ({
   currentRomPath,
   close,
 }) => {
-  const { tables } = useTablesContext();
   const { showErrorToast, showSuccessToast, showWarningToast } =
     useToastContext();
+  const assignedRoms = useAssignedRoms();
 
   const [isSaving, setIsSaving] = useState(false);
-  const [isLoadingData, setIsLoadingData] = useState(false);
-  const [unmatchedRoms, setUnmatchedRoms] = useState<Array<FileSystemItem>>([]);
+  const [isLoadingExpectedRom, setIsLoadingExpectedRom] = useState(false);
+  const isLoadingData = isLoadingExpectedRom;
   const [uploadedRoms, setUploadedRoms] = useState<Array<FileSystemItem>>([]);
   const [expectedRomName, setExpectedRomName] = useState<string | null>(null);
   const [selectedRom, setSelectedRom] = useState<FileSystemItem | null>(
@@ -53,63 +53,17 @@ const EditTableRomModal: FunctionComponent<Props> = ({
       : null,
   );
 
-  const getFileName = (value?: string): string => {
-    if (!value) {
-      return '';
-    }
-
-    const segments = value.split(/[/\\]/);
-    return segments[segments.length - 1] || '';
-  };
-
-  const isRomAlreadyAssigned = (rom: FileSystemItem): boolean => {
-    const normalizedSelectedPath = normalizePathForComparison(rom.path);
-    const normalizedSelectedName = normalizePathForComparison(
-      getFileName(rom.name),
-    );
-
-    return tables.some((table) => {
-      const normalizedTableRomPath = normalizePathForComparison(
-        table.romFilePath,
-      );
-      const normalizedTableRomName = normalizePathForComparison(
-        getFileName(table.romFile),
-      );
-      const normalizedTableRomPathName = normalizePathForComparison(
-        getFileName(table.romFilePath),
-      );
-
-      return (
-        normalizedTableRomPath === normalizedSelectedPath ||
-        normalizedTableRomName === normalizedSelectedName ||
-        normalizedTableRomPathName === normalizedSelectedName
-      );
-    });
-  };
-
   useEffect(() => {
     let isMounted = true;
 
     const loadData = async () => {
       try {
-        setIsLoadingData(true);
+        setIsLoadingExpectedRom(true);
 
-        const [unmatchedResult, expectedResult] = await Promise.all([
-          api.getUnmatchedRoms(),
-          api.getExpectedRomName(vpxFilePath),
-        ]);
+        const expectedResult = await api.getExpectedRomName(vpxFilePath);
 
         if (!isMounted) {
           return;
-        }
-
-        if (!unmatchedResult.success) {
-          showErrorToast(
-            unmatchedResult.error.message ||
-              'Failed to load unmatched ROM files',
-          );
-        } else {
-          setUnmatchedRoms(unmatchedResult.data || []);
         }
 
         if (!expectedResult.success) {
@@ -126,7 +80,7 @@ const EditTableRomModal: FunctionComponent<Props> = ({
         }
       } finally {
         if (isMounted) {
-          setIsLoadingData(false);
+          setIsLoadingExpectedRom(false);
         }
       }
     };
@@ -143,18 +97,9 @@ const EditTableRomModal: FunctionComponent<Props> = ({
       currentRomName && currentRomPath
         ? [{ name: currentRomName, path: currentRomPath }]
         : [];
-    const merged = [...currentRomOption, ...unmatchedRoms, ...uploadedRoms];
 
-    return merged.filter((item, index, allItems) => {
-      return (
-        allItems.findIndex(
-          (candidate) =>
-            normalizePathForComparison(candidate.path) ===
-            normalizePathForComparison(item.path),
-        ) === index
-      );
-    });
-  }, [currentRomName, currentRomPath, unmatchedRoms, uploadedRoms]);
+    return mergeRoms(currentRomOption, assignedRoms, uploadedRoms);
+  }, [currentRomName, currentRomPath, assignedRoms, uploadedRoms]);
 
   const handleFilesSelected = (files: Array<FileSystemItem>) => {
     const zipFiles = files.filter((item) => isZipFile(item.name));
@@ -166,12 +111,6 @@ const EditTableRomModal: FunctionComponent<Props> = ({
     }
 
     const nextRom = zipFiles[0];
-
-    if (isRomAlreadyAssigned(nextRom)) {
-      showErrorToast('This ROM is already assigned to another table');
-
-      return;
-    }
 
     if (zipFiles.length > 1) {
       showWarningToast('Multiple ROM files detected. Using the first one.');
@@ -218,7 +157,7 @@ const EditTableRomModal: FunctionComponent<Props> = ({
   return (
     <Modal
       title='Edit Table ROM'
-      description='Attach a ROM by uploading a .zip file or selecting an unmatched ROM from your library.'
+      description='Attach a ROM by uploading a .zip file or selecting a ROM from your library.'
       modalClassName={style.modal}
       onExitClick={close}
       size={ModalSize.medium}

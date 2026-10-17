@@ -29,8 +29,6 @@ const frontendApi: Api = {
     invoke<ApiResult<null>>('api:deleteTable', id),
   renameTable: (id: string, newName: string): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:renameTable', id, newName),
-  getUnmatchedRoms: (): Promise<ApiResult<Array<FileSystemItem>>> =>
-    invoke<ApiResult<Array<FileSystemItem>>>('api:getUnmatchedRoms'),
   updateTableRom: (
     tableId: string,
     rom: FileSystemItem | null,

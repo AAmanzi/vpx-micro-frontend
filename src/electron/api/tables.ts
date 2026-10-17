@@ -150,7 +150,16 @@ export function deleteTable(id: string): ApiResult<null> {
 
     deleteFile(table.vpxFilePath);
 
-    if (table.romFilePath) {
+    const isRomStillAssigned =
+      table.romFilePath &&
+      tablesDb.getAll().some(
+        (item) =>
+          item.romFilePath &&
+          normalizePathForComparison(item.romFilePath) ===
+            normalizePathForComparison(table.romFilePath),
+      );
+
+    if (table.romFilePath && !isRomStillAssigned) {
       deleteFile(table.romFilePath);
     }
 
@@ -175,22 +184,6 @@ export function renameTable(id: string, newName: string): ApiResult<null> {
     }
 
     return apiSuccess(null);
-  } catch (error) {
-    return apiFailure(error);
-  }
-}
-
-export function getUnmatchedRoms(): ApiResult<Array<FileSystemItem>> {
-  try {
-    const tables = tablesDb.getAll();
-    const romsDirectoryPath = configDb.getRomsDirectoryPath();
-    const assignedRomPaths = tables
-      .map((table) => table.romFilePath)
-      .filter(Boolean) as Array<string>;
-
-    const unmatchedRoms = scanNewRoms(romsDirectoryPath, assignedRomPaths);
-
-    return apiSuccess(unmatchedRoms);
   } catch (error) {
     return apiFailure(error);
   }
@@ -242,27 +235,6 @@ export function updateTableRom(
       normalizePathForComparison(nextRomPath);
 
     if (hasRomChanged && nextRomPath) {
-      const isAssignedToAnotherTable = tablesDb.getAll().some((item) => {
-        if (item.id === tableId || !item.romFilePath) {
-          return false;
-        }
-
-        return (
-          normalizePathForComparison(item.romFilePath) ===
-          normalizePathForComparison(nextRomPath)
-        );
-      });
-
-      if (isAssignedToAnotherTable) {
-        return {
-          success: false,
-          error: {
-            code: 'ROM_ALREADY_ASSIGNED',
-            message: 'This ROM is already assigned to another table',
-          },
-        };
-      }
-
       if (rom) {
         const normalizedSourceRomPath = normalizePathForComparison(rom.path);
 
@@ -466,9 +438,24 @@ export async function importTables(
           tablesDirectoryPath,
           tableFile.fileName,
         );
-        const romDestinationFilePath = tableFile.rom
+        let romDestinationFilePath = tableFile.rom
           ? path.join(romsDirectoryPath, tableFile.rom.name)
           : undefined;
+
+        // a rom already in the library is referenced as is, never transferred
+        const libraryRomPath = romSourceFilePath
+          ? tablesDb
+              .getAll()
+              .find(
+                (table) =>
+                  normalizePathForComparison(table.romFilePath) ===
+                  normalizePathForComparison(romSourceFilePath),
+              )?.romFilePath
+          : undefined;
+
+        if (libraryRomPath) {
+          romDestinationFilePath = libraryRomPath;
+        }
 
         const normalizedDestinationPath = normalizePathForComparison(
           vpxDestinationFilePath,
@@ -486,8 +473,15 @@ export async function importTables(
           }
         }
 
-        if (romSourceFilePath && romDestinationFilePath) {
-          if (romSourceFilePath !== romDestinationFilePath) {
+        if (romSourceFilePath && romDestinationFilePath && !libraryRomPath) {
+          const romWasAlreadyMoved =
+            deleteAfterImport && movedSourceFilePaths.has(romSourceFilePath);
+
+          if (
+            normalizePathForComparison(romSourceFilePath) !==
+              normalizePathForComparison(romDestinationFilePath) &&
+            !romWasAlreadyMoved
+          ) {
             transferFile(romSourceFilePath, romDestinationFilePath);
 
             if (deleteAfterImport) {
@@ -657,13 +651,31 @@ export function scanVpxLibrary(): ApiResult<ScanResult> {
 
   // save rom paths of each table that has a missing vpx file, but existing rom file
   //    remove those rompaths from existing rom files set
+  const tableIdsWithMissingVpx = new Set(
+    tablesWithMissingFiles
+      .filter((item) => item.missingVpxFile)
+      .map((item) => item.table.id),
+  );
+  const romPathsUsedByRemainingTables = new Set(
+    tables
+      .filter((table) => !tableIdsWithMissingVpx.has(table.id))
+      .map((table) => normalizePathForComparison(table.romFilePath))
+      .filter(Boolean),
+  );
+  // a rom shared with a table that is staying must not become an unmatched rom
   const unmatchedRomsInDatabase = tablesWithMissingFiles
     .filter(
       (item) =>
         item.table.romFile && item.missingVpxFile && !item.missingRomFile,
     )
     .map((item) => item.table.romFilePath)
-    .filter(Boolean) as Array<string>;
+    .filter(
+      (romPath): romPath is string =>
+        Boolean(romPath) &&
+        !romPathsUsedByRemainingTables.has(
+          normalizePathForComparison(romPath),
+        ),
+    );
   const existingRomFilesWithTables = existingRomFiles.filter(
     (romFile) => !unmatchedRomsInDatabase.includes(romFile),
   );
@@ -673,13 +685,32 @@ export function scanVpxLibrary(): ApiResult<ScanResult> {
     romsDirectoryPath,
     existingRomFilesWithTables,
   );
+  const missingRomTableIds = new Set(
+    tablesWithMissingFiles
+      .filter((item) => item.missingRomFile || item.missingVpxFile)
+      .map((item) => item.table.id),
+  );
+  const existingRomCandidates = tables
+    .filter(
+      (table) =>
+        table.romFile &&
+        table.romFilePath &&
+        !missingRomTableIds.has(table.id),
+    )
+    .map((table) => ({
+      path: table.romFilePath!,
+      name: table.romFile!,
+    }));
+  const romCandidatesByPath = new Map(
+    [...existingRomCandidates, ...scannedRoms].map((rom) => [rom.path, rom]),
+  );
 
   // scan vpx tables directory for vpx files
   //    these are newTables
   const scannedTables = scanNewTables(
     tablesDirectoryPath,
     existingVpxFiles,
-    scannedRoms,
+    Array.from(romCandidatesByPath.values()),
   );
 
   // from scanned vpx tables filter out ones that have been added to newly scanned tables

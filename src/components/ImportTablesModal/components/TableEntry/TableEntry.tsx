@@ -11,7 +11,7 @@ import style from './TableEntry.module.scss';
 
 interface Props {
   table: TableFile;
-  unassignedRoms: Array<FileSystemItem>;
+  romOptions: Array<FileSystemItem>;
   onAssignRom: (table: TableFile, rom: FileSystemItem) => void;
   onRemoveTable: (table: TableFile) => void;
   onRemoveRom: (table: TableFile) => void;
@@ -20,7 +20,7 @@ interface Props {
 
 const TableEntry: FunctionComponent<Props> = ({
   table,
-  unassignedRoms,
+  romOptions,
   onAssignRom,
   onRemoveTable,
   onRemoveRom,
@@ -54,7 +54,7 @@ const TableEntry: FunctionComponent<Props> = ({
         <Tag icon='file-code' label={table.fileName} />
         <RomPicker
           selectedRom={table.rom || null}
-          options={unassignedRoms}
+          options={romOptions}
           expectedRomName={table.expectedRomName || null}
           onRemoveRom={() => onRemoveRom(table)}
           onSelect={handleRomSelect}

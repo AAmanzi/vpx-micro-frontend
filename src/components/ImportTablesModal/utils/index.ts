@@ -81,9 +81,17 @@ export const buildImportSelectionResult = async ({
     .filter((file) => !knownRomPaths.has(file.path));
 
   const nextTables = [...currentTables, ...newTables];
-  const nextUnassignedRoms = [...currentUnassignedRoms, ...newRoms];
+  const romsByPath = new Map(
+    [
+      ...currentUnassignedRoms,
+      ...currentTables
+        .map((table) => table.rom)
+        .filter((rom): rom is FileSystemItem => Boolean(rom)),
+      ...newRoms,
+    ].map((rom) => [rom.path, rom]),
+  );
 
-  return applyExpectedRoms(nextTables, nextUnassignedRoms);
+  return applyExpectedRoms(nextTables, Array.from(romsByPath.values()));
 };
 
 export const filterExistingFiles = ({

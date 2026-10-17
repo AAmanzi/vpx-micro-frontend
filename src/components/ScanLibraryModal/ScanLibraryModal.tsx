@@ -12,6 +12,11 @@ import { api } from 'src/consts';
 import { useTablesContext } from 'src/providers/tables';
 import { useToastContext } from 'src/providers/toast';
 import { ScanResult } from 'src/types/table';
+import {
+  getAssignedRoms,
+  mergeRoms,
+  normalizePathForComparison,
+} from 'src/utils';
 
 import Form from '../Form';
 import style from './ScanLibraryModal.module.scss';
@@ -25,7 +30,7 @@ interface Props {
 }
 
 const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
-  const { fetchTables } = useTablesContext();
+  const { fetchTables, tables } = useTablesContext();
   const { showErrorToast, showSuccessToast } = useToastContext();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -52,6 +57,23 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
     useState<Record<string, boolean>>({});
   const [includedMissingFilesByTableId, setIncludedMissingFilesByTableId] =
     useState<Record<string, boolean>>({});
+
+  const tableIdsWithMissingFiles = new Set(
+    tablesWithMissingFiles.map((item) => item.table.id),
+  );
+  const assignedRoms = getAssignedRoms(
+    tables.filter((table) => !tableIdsWithMissingFiles.has(table.id)),
+  );
+  const assignedRomPaths = new Set(
+    assignedRoms.map((rom) => normalizePathForComparison(rom.path)),
+  );
+  const romOptions = mergeRoms(
+    assignedRoms,
+    unmatchedRoms,
+    newTables
+      .map((table) => table.rom)
+      .filter((rom): rom is NonNullable<typeof rom> => Boolean(rom)),
+  );
 
   const modalTitle = isLoading ? 'Scanning VPX Library' : 'Scan Results';
   const modalDescription = isLoading
@@ -253,9 +275,16 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
   };
 
   const handleTableRomChange = (filePath: string, romPath: string) => {
-    const selectedRom = unmatchedRoms.find((rom) => rom.path === romPath);
+    const selectedRom = romPath
+      ? romOptions.find((rom) => rom.path === romPath)
+      : undefined;
     const previouslyAssignedRom =
       newTables.find((table) => table.filePath === filePath)?.rom ?? undefined;
+    const isPreviousRomUsedElsewhere = newTables.some(
+      (table) =>
+        table.filePath !== filePath &&
+        table.rom?.path === previouslyAssignedRom?.path,
+    );
 
     setNewTables((prev) =>
       prev.map((table) =>
@@ -275,9 +304,14 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
         nextRoms = nextRoms.filter((rom) => rom.path !== selectedRom.path);
       }
 
+      // Library ROMs belong to existing tables and must never become deletable
       if (
         previouslyAssignedRom &&
         previouslyAssignedRom.path !== selectedRom?.path &&
+        !isPreviousRomUsedElsewhere &&
+        !assignedRomPaths.has(
+          normalizePathForComparison(previouslyAssignedRom.path),
+        ) &&
         !nextRoms.some((rom) => rom.path === previouslyAssignedRom.path)
       ) {
         nextRoms = [...nextRoms, previouslyAssignedRom];
@@ -382,7 +416,7 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
                   onToggle={() => setIsNewTablesOpen((prev) => !prev)}>
                   <NewTablesSection
                     tables={newTables}
-                    availableRoms={unmatchedRoms}
+                    romOptions={romOptions}
                     includedByPath={includedNewTablesByPath}
                     onToggleInclude={toggleNewTableInclude}
                     onSelectAll={selectAllNewTables}
