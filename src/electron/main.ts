@@ -1,5 +1,6 @@
 import { spawn } from 'child_process';
 import { BrowserWindow, Menu, app, ipcMain } from 'electron';
+import './devPaths';
 import fs from 'fs';
 import http from 'http';
 import path from 'path';

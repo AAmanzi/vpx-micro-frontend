@@ -6,7 +6,11 @@ const { name: packageName } = require('../package.json');
 async function resetDb() {
   await app.whenReady();
 
-  const storeDirectory = path.join(app.getPath('appData'), packageName);
+  const suffix = process.argv.includes('--prod') ? '' : '-dev';
+  const storeDirectory = path.join(
+    app.getPath('appData'),
+    `${packageName}${suffix}`,
+  );
 
   const configStore = new Store({
     name: 'app-config',
