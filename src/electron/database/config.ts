@@ -135,6 +135,19 @@ export function updateViewType(viewType: Config['viewType']): void {
   });
 }
 
+export function getSkippedScanTablePaths(): Array<string> {
+  return getStoredConfig().skippedScanTablePaths ?? [];
+}
+
+export function updateSkippedScanTablePaths(
+  skippedScanTablePaths: Array<string>,
+): void {
+  store.set('config', {
+    ...getStoredConfig(),
+    skippedScanTablePaths,
+  });
+}
+
 export function updateAndroidFeaturesEnabled(
   androidFeaturesEnabled: boolean,
 ): void {

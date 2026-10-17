@@ -720,8 +720,18 @@ export function scanVpxLibrary(): ApiResult<ScanResult> {
       !scannedTables.some((table) => table.rom?.path === scannedRom.path),
   );
 
+  const storedSkippedPaths = new Set(
+    configDb.getSkippedScanTablePaths().map(normalizePathForComparison),
+  );
+  const skippedTablePaths = scannedTables
+    .map((table) => table.filePath)
+    .filter((filePath) =>
+      storedSkippedPaths.has(normalizePathForComparison(filePath)),
+    );
+
   return apiSuccess({
     newTables: scannedTables,
+    skippedTablePaths,
     unmatchedRoms,
     tablesWithMissingFiles,
   });
@@ -734,6 +744,25 @@ export async function applyScanResult(
     await registerTableFiles(scanResult.newTables);
     deleteUnusedRoms(scanResult.unmatchedRoms);
     cleanTablesWithMissingFiles(scanResult.tablesWithMissingFiles);
+
+    const importedPaths = new Set(
+      scanResult.newTables.map((table) =>
+        normalizePathForComparison(table.filePath),
+      ),
+    );
+    const skippedPaths = new Map<string, string>();
+
+    [
+      ...configDb.getSkippedScanTablePaths(),
+      ...scanResult.skippedTablePaths,
+    ].forEach((filePath) => {
+      const normalized = normalizePathForComparison(filePath);
+
+      if (!importedPaths.has(normalized)) {
+        skippedPaths.set(normalized, filePath);
+      }
+    });
+    configDb.updateSkippedScanTablePaths(Array.from(skippedPaths.values()));
 
     return apiSuccess(null);
   } catch (error) {

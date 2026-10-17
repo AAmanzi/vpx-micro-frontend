@@ -24,6 +24,8 @@ export interface Table {
 
 export interface ScanResult {
   newTables: Array<TableFile>;
+  // On scan: new tables the user skipped before. On apply: new tables deselected now.
+  skippedTablePaths: Array<string>;
   unmatchedRoms: Array<FileSystemItem>;
   tablesWithMissingFiles: Array<{
     table: Table;

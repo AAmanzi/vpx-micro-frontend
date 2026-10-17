@@ -11,6 +11,7 @@ export interface Config {
   androidWebServerUrl?: string;
   androidTablesDirectory?: string;
   androidRomsDirectory?: string;
+  skippedScanTablePaths?: Array<string>;
 }
 
 export enum Order {

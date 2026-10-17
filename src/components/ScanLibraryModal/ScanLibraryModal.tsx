@@ -39,6 +39,7 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
   const [scanErrorMessage, setScanErrorMessage] = useState<string | null>(null);
 
   const [isNewTablesOpen, setIsNewTablesOpen] = useState(false);
+  const [isSkippedTablesOpen, setIsSkippedTablesOpen] = useState(false);
   const [isUnmatchedRomsOpen, setIsUnmatchedRomsOpen] = useState(false);
   const [isMissingFilesOpen, setIsMissingFilesOpen] = useState(false);
 
@@ -83,6 +84,14 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
     (rom) => !assignedRomPaths.has(normalizePathForComparison(rom.path)),
   );
 
+  const skippedPathSet = new Set(scanResult?.skippedTablePaths ?? []);
+  const freshTables = newTables.filter(
+    (table) => !skippedPathSet.has(table.filePath),
+  );
+  const skippedTables = newTables.filter((table) =>
+    skippedPathSet.has(table.filePath),
+  );
+
   const modalTitle = isLoading ? 'Scanning VPX Library' : 'Scan Results';
   const modalDescription = isLoading
     ? 'Comparing database with disk files...'
@@ -120,6 +129,7 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
     setScanResult(null);
 
     setIsNewTablesOpen(false);
+    setIsSkippedTablesOpen(false);
     setIsUnmatchedRomsOpen(false);
     setIsMissingFilesOpen(false);
 
@@ -143,7 +153,9 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
           result.data.newTables.reduce<Record<string, boolean>>(
             (acc, table) => ({
               ...acc,
-              [table.filePath]: true,
+              [table.filePath]: !result.data.skippedTablePaths.includes(
+                table.filePath,
+              ),
             }),
             {},
           ),
@@ -202,29 +214,23 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
     }));
   };
 
-  const selectAllNewTables = () => {
-    setIncludedNewTablesByPath(
-      newTables.reduce<Record<string, boolean>>(
-        (acc, table) => ({
-          ...acc,
-          [table.filePath]: true,
-        }),
-        {},
+  const setNewTablesIncluded = (
+    tablesToUpdate: ScanResult['newTables'],
+    included: boolean,
+  ) => {
+    setIncludedNewTablesByPath((prev) => ({
+      ...prev,
+      ...Object.fromEntries(
+        tablesToUpdate.map((table) => [table.filePath, included]),
       ),
-    );
+    }));
   };
 
-  const deselectAllNewTables = () => {
-    setIncludedNewTablesByPath(
-      newTables.reduce<Record<string, boolean>>(
-        (acc, table) => ({
-          ...acc,
-          [table.filePath]: false,
-        }),
-        {},
-      ),
-    );
-  };
+  const selectAllNewTables = () => setNewTablesIncluded(freshTables, true);
+  const deselectAllNewTables = () => setNewTablesIncluded(freshTables, false);
+  const selectAllSkippedTables = () => setNewTablesIncluded(skippedTables, true);
+  const deselectAllSkippedTables = () =>
+    setNewTablesIncluded(skippedTables, false);
 
   const selectAllUnmatchedRoms = () => {
     setIncludedUnmatchedRomsByPath(
@@ -355,6 +361,9 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
       newTables: newTables.filter(
         (table) => includedNewTablesByPath[table.filePath] ?? true,
       ),
+      skippedTablePaths: newTables
+        .filter((table) => !(includedNewTablesByPath[table.filePath] ?? true))
+        .map((table) => table.filePath),
       unmatchedRoms: unmatchedRoms.filter(
         (rom) => includedUnmatchedRomsByPath[rom.path] ?? false,
       ),
@@ -413,17 +422,17 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
                 </div>
               )}
 
-              {newTables.length > 0 && (
+              {freshTables.length > 0 && (
                 <Collapsible
                   title='New Tables Found'
                   description='These Tables will be added to your library when you apply changes.'
                   icon='plus'
                   color='blue'
-                  count={newTables.length}
+                  count={freshTables.length}
                   isOpen={isNewTablesOpen}
                   onToggle={() => setIsNewTablesOpen((prev) => !prev)}>
                   <NewTablesSection
-                    tables={newTables}
+                    tables={freshTables}
                     manuallyImportedRoms={[]}
                     scannedRoms={scannedRoms}
                     libraryRoms={assignedRoms}
@@ -471,6 +480,31 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
                     onToggleInclude={toggleMissingFileInclude}
                     onSelectAll={selectAllMissingFiles}
                     onDeselectAll={deselectAllMissingFiles}
+                  />
+                </Collapsible>
+              )}
+
+              {skippedTables.length > 0 && (
+                <Collapsible
+                  title='Previously Skipped Tables'
+                  description='You skipped these in an earlier scan. Select any you want to add to your library.'
+                  icon='clock-recent'
+                  color='gray'
+                  count={skippedTables.length}
+                  isOpen={isSkippedTablesOpen}
+                  onToggle={() => setIsSkippedTablesOpen((prev) => !prev)}>
+                  <NewTablesSection
+                    color='gray'
+                    tables={skippedTables}
+                    manuallyImportedRoms={[]}
+                    scannedRoms={scannedRoms}
+                    libraryRoms={assignedRoms}
+                    includedByPath={includedNewTablesByPath}
+                    onToggleInclude={toggleNewTableInclude}
+                    onSelectAll={selectAllSkippedTables}
+                    onDeselectAll={deselectAllSkippedTables}
+                    onNameChange={handleTableNameChange}
+                    onRomChange={handleTableRomChange}
                   />
                 </Collapsible>
               )}

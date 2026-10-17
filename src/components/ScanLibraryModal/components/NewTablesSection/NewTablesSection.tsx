@@ -21,6 +21,7 @@ interface Props {
   onDeselectAll: () => void;
   onNameChange: (filePath: string, value: string) => void;
   onRomChange: (filePath: string, romPath: string) => void;
+  color?: 'blue' | 'gray';
 }
 
 const NewTablesSection: FunctionComponent<Props> = ({
@@ -34,6 +35,7 @@ const NewTablesSection: FunctionComponent<Props> = ({
   onDeselectAll,
   onNameChange,
   onRomChange,
+  color = 'blue',
 }) => {
   const handleRomSelect = (table: TableFile) => (rom: FileSystemItem) => {
     onRomChange(table.filePath, rom.path);
@@ -42,8 +44,8 @@ const NewTablesSection: FunctionComponent<Props> = ({
   return (
     <div>
       <SectionHeader
-        color='blue'
-        title={`${Object.values(includedByPath).filter(Boolean).length} of ${tables.length} selected for import`}
+        color={color}
+        title={`${tables.filter((table) => includedByPath[table.filePath] ?? true).length} of ${tables.length} selected for import`}
         onSelectAll={onSelectAll}
         onDeselectAll={onDeselectAll}
       />
