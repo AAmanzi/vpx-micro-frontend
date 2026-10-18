@@ -103,6 +103,13 @@ export interface Api {
     vpxFilePath: string,
   ) => Promise<ApiResult<string | null>>;
 
+  // Window
+  isFullScreen: () => Promise<ApiResult<boolean>>;
+  setFullScreen: (fullScreen: boolean) => Promise<ApiResult<null>>;
+  onFullScreenChanged: (
+    callback: (isFullScreen: boolean) => void,
+  ) => () => void;
+
   // Config
   getPlatform: () => Promise<ApiResult<Platform>>;
   getConfig: () => Promise<ApiResult<Config>>;

@@ -13,6 +13,11 @@ import type { GroupType, ScanResult, Table } from 'src/types/table';
 import * as api from './api';
 import { runAppMigrations } from './database/migrations';
 import * as db from './database/tables';
+import {
+  loadWindowState,
+  setupFullScreenControls,
+  trackWindowState,
+} from './utils/windowState';
 
 const logFile = path.join(app.getPath('userData'), 'backend.log');
 const logStream = fs.createWriteStream(logFile, {
@@ -105,9 +110,13 @@ function waitForServer(port: number, timeout = 30000, interval = 300) {
 const createWindow = () => {
   const isProduction = app.isPackaged;
 
+  const windowState = loadWindowState();
+
   const win = new BrowserWindow({
-    width: 900,
-    height: 600,
+    width: windowState.width,
+    height: windowState.height,
+    x: windowState.x,
+    y: windowState.y,
     icon: getWindowIconPath(),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -116,6 +125,17 @@ const createWindow = () => {
       devTools: !isProduction,
     },
   });
+
+  if (windowState.isMaximized) {
+    win.maximize();
+  }
+
+  if (windowState.isFullScreen) {
+    win.setFullScreen(true);
+  }
+
+  trackWindowState(win);
+  setupFullScreenControls(win);
 
   if (isProduction) {
     win.webContents.on('devtools-opened', () => {
@@ -241,6 +261,16 @@ app.whenReady().then(async () => {
     async (_, directoryPath: string, acceptedExtensions: string[]) =>
       api.getDirectoryTree(directoryPath, acceptedExtensions),
   );
+  ipcMain.handle('api:isFullScreen', async (event) =>
+    api.apiSuccess(
+      BrowserWindow.fromWebContents(event.sender)?.isFullScreen() ?? false,
+    ),
+  );
+  ipcMain.handle('api:setFullScreen', async (event, fullScreen: boolean) => {
+    BrowserWindow.fromWebContents(event.sender)?.setFullScreen(fullScreen);
+
+    return api.apiSuccess(null);
+  });
   ipcMain.handle('api:getPlatform', async () => api.getPlatform());
   ipcMain.handle('api:getConfig', async () => api.getConfig());
   ipcMain.handle('api:updateVpxRootPath', async (_, path: string) =>
