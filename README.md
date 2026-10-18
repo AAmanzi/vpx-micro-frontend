@@ -1,12 +1,13 @@
-# VPX Micro Frontend — Usage Guide
+# VPX Micro Frontend
 
-This guide explains how to use the app day-to-day to manage your Visual Pinball X tables and ROMs.
+A desktop application for managing and launching Visual Pinball X tables and ROMs, built with Electron, Next.js, React, and TypeScript. Available for Windows and macOS.
 
 ![VPX Micro Frontend dashboard](public/readme/hero-dashboard.png)
 
 ## Table of Contents
 
 - [What you can do](#what-you-can-do)
+- [Tech Stack](#tech-stack)
 - [Install](#install)
 - [First-time setup - Windows](#first-time-setup---windows)
 - [First-time setup - macOS](#first-time-setup---macos)
@@ -27,6 +28,15 @@ This guide explains how to use the app day-to-day to manage your Visual Pinball 
 - View recently played tables
 - Export tables (all, favorites, or archived)
 - Connect Android mobile devices to sync selected tables and ROMs (experimental)
+
+## Tech Stack
+
+- Electron
+- Next.js
+- React
+- TypeScript
+
+The Next.js frontend runs in an Electron desktop application, which provides access to local files and launching external applications.
 
 ## Install
 
@@ -50,11 +60,7 @@ Download the latest build from GitHub Releases for your platform:
 
 **Smart App Control (Windows 11):**
 
-Some systems have Smart App Control enabled, which can block unsigned apps completely.
-
-If the app does not start at all (no **Run anyway** option), you may need to disable Smart App Control:
-
-`Windows Security → App & browser control → Smart App Control → Off`
+This app is currently unsigned, so Smart App Control may block it. If the app does not start and Windows does not show a **Run anyway** option, confirm that you downloaded it from the [official releases page](https://github.com/AAmanzi/vpx-micro-frontend/releases). Smart App Control may need to be turned off to run the app; this reduces protection for other apps on your device, so only do so if you trust the source and are comfortable with that security tradeoff.
 
 ### macOS
 
