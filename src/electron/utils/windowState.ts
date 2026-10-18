@@ -97,14 +97,14 @@ export const setupFullScreenControls = (win: BrowserWindow): void => {
     }
   });
 
-  const notify = () => {
+  const notify = (isFullScreen: boolean) => {
     if (!win.isDestroyed()) {
-      win.webContents.send(FULL_SCREEN_CHANGED_EVENT, win.isFullScreen());
+      win.webContents.send(FULL_SCREEN_CHANGED_EVENT, isFullScreen);
     }
   };
 
-  win.on('enter-full-screen', notify);
-  win.on('leave-full-screen', notify);
+  win.on('enter-full-screen', () => notify(true));
+  win.on('leave-full-screen', () => notify(false));
 };
 
 export const trackWindowState = (win: BrowserWindow): void => {

@@ -37,7 +37,10 @@ const MaintenanceSection: FunctionComponent = () => {
 
     if (!result.success) {
       showErrorToast(result.error.message || 'Failed to change fullscreen');
+      return;
     }
+
+    setIsFullScreen(!isFullScreen);
   };
 
   const openConfirmation = () => {
