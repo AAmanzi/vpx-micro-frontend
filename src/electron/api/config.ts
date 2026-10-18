@@ -4,7 +4,7 @@ import path from 'path';
 
 import { VPX_DEFAULT_ROM_PATH, VPX_DEFAULT_TABLES_PATH } from 'src/consts/vpx';
 import type { ApiResult } from 'src/types/api';
-import type { Config, Platform } from 'src/types/config';
+import type { Config, LaunchFlags, Platform } from 'src/types/config';
 import { normalizePath } from 'src/utils';
 
 import * as configDb from '../database/config';
@@ -168,6 +168,18 @@ export function updateAndroidTablesDirectoryPath(
 ): ApiResult<null> {
   try {
     configDb.updateAndroidTablesDirectoryPath(path);
+    return apiSuccess(null);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}
+
+export function updateLaunchFlags(launchFlags: LaunchFlags): ApiResult<null> {
+  try {
+    configDb.updateLaunchFlags({
+      lessCpuThreads: Boolean(launchFlags.lessCpuThreads),
+      extMinimized: Boolean(launchFlags.extMinimized),
+    });
     return apiSuccess(null);
   } catch (error) {
     return apiFailure(error);

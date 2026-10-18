@@ -6,7 +6,7 @@ import type {
   AndroidSyncProgressEvent,
 } from 'src/types/android';
 import type { Api, ApiResult } from 'src/types/api';
-import type { Config, Platform } from 'src/types/config';
+import type { Config, LaunchFlags, Platform } from 'src/types/config';
 import type { FileSystemItem } from 'src/types/file';
 import type { GroupType, ScanResult, Table } from 'src/types/table';
 
@@ -29,8 +29,6 @@ const frontendApi: Api = {
     invoke<ApiResult<null>>('api:deleteTable', id),
   renameTable: (id: string, newName: string): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:renameTable', id, newName),
-  getUnmatchedRoms: (): Promise<ApiResult<Array<FileSystemItem>>> =>
-    invoke<ApiResult<Array<FileSystemItem>>>('api:getUnmatchedRoms'),
   updateTableRom: (
     tableId: string,
     rom: FileSystemItem | null,
@@ -49,6 +47,13 @@ const frontendApi: Api = {
     tableId: string,
   ): Promise<ApiResult<Array<string>>> =>
     invoke<ApiResult<Array<string>>>('api:getTableImageCandidates', tableId),
+  updateTableLaunchFlags: (
+    tableId: string,
+    launchFlags: Partial<LaunchFlags> | null,
+  ): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:updateTableLaunchFlags', tableId, launchFlags),
+  updateLaunchFlags: (launchFlags: LaunchFlags): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:updateLaunchFlags', launchFlags),
   updateTableImage: (
     tableId: string,
     imgUrl: string,
@@ -133,6 +138,16 @@ const frontendApi: Api = {
     exportGroup: GroupType,
   ): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:exportTables', destinationPath, exportGroup),
+  isFullScreen: (): Promise<ApiResult<boolean>> =>
+    invoke<ApiResult<boolean>>('api:isFullScreen'),
+  setFullScreen: (fullScreen: boolean): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:setFullScreen', fullScreen),
+  onFullScreenChanged: (callback: (isFullScreen: boolean) => void) => {
+    const handler = (_: Electron.IpcRendererEvent, value: boolean) =>
+      callback(value);
+    ipcRenderer.on('event:fullScreenChanged', handler);
+    return () => ipcRenderer.removeListener('event:fullScreenChanged', handler);
+  },
   getPlatform: (): Promise<ApiResult<Platform>> =>
     invoke<ApiResult<Platform>>('api:getPlatform'),
   getConfig: (): Promise<ApiResult<Config>> =>

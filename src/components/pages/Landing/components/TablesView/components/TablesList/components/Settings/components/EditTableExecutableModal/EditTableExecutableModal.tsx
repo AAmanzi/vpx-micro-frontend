@@ -9,30 +9,79 @@ import FilePicker, { Size as FilePickerSize } from 'src/components/FilePicker';
 import Form from 'src/components/Form';
 import Input from 'src/components/Input';
 import Modal, { Size as ModalSize } from 'src/components/Modal';
+import Select from 'src/components/Select';
 import api from 'src/consts';
-import { VPX_DEFAULT_EXECUTABLE } from 'src/consts/vpx';
+import {
+  VPX_DEFAULT_EXECUTABLE,
+  VPX_DEFAULT_LAUNCH_FLAGS,
+} from 'src/consts/vpx';
 import { useConfigContext } from 'src/providers/config';
 import { useToastContext } from 'src/providers/toast';
+import { LaunchFlags } from 'src/types/config';
 
 import style from './EditTableExecutableModal.module.scss';
 
 interface Props {
   id: string;
   currentExecutablePath?: string;
+  currentLaunchFlags?: Partial<LaunchFlags>;
   close: () => void;
 }
 
 const EditTableExecutableModal: FunctionComponent<Props> = ({
   id,
   currentExecutablePath,
+  currentLaunchFlags,
   close,
 }) => {
-  const { config } = useConfigContext();
+  const { config, platform } = useConfigContext();
   const { showErrorToast, showSuccessToast } = useToastContext();
   const [executablePath, setExecutablePath] = useState(
     currentExecutablePath || '',
   );
   const [isSaving, setIsSaving] = useState(false);
+  const [launchFlags, setLaunchFlags] = useState<Partial<LaunchFlags>>(
+    currentLaunchFlags || {},
+  );
+  const [isAdvancedOpen, setIsAdvancedOpen] = useState(
+    Boolean(currentLaunchFlags && Object.keys(currentLaunchFlags).length),
+  );
+
+  const globalFlags: LaunchFlags = {
+    ...VPX_DEFAULT_LAUNCH_FLAGS,
+    ...config?.launchFlags,
+  };
+
+  const flagOptions: Array<{
+    key: keyof LaunchFlags;
+    label: string;
+    hint: string;
+  }> = [
+    {
+      key: 'lessCpuThreads',
+      label: 'Limit CPU threads (-LessCPUthreads)',
+      hint: '',
+    },
+    {
+      key: 'extMinimized',
+      label: 'Legacy pause menu (-ExtMinimized)',
+      hint: 'Needed for VPX 10.8.0 and earlier. Causes a launch error on 10.8.1+.',
+    },
+  ];
+
+  const setFlag = (key: keyof LaunchFlags, value: string) => {
+    setLaunchFlags((current) => {
+      const next = { ...current };
+
+      if (value === 'default') {
+        delete next[key];
+      } else {
+        next[key] = value === 'on';
+      }
+
+      return next;
+    });
+  };
 
   const getExecutableName = (pathValue: string): string =>
     pathValue.split(/[/\\]/).pop() || pathValue;
@@ -57,22 +106,26 @@ const EditTableExecutableModal: FunctionComponent<Props> = ({
       executablePath.trim() || null,
     );
 
+    const flagsResult = result.success
+      ? await api.updateTableLaunchFlags(id, launchFlags)
+      : result;
+
     setIsSaving(false);
 
-    if (!result.success) {
+    if (!flagsResult.success) {
       showErrorToast(
-        result.error.message || 'Failed to update table executable',
+        flagsResult.error.message || 'Failed to update table launch settings',
       );
       return;
     }
 
-    showSuccessToast('Table executable updated successfully');
+    showSuccessToast('Table launch settings updated successfully');
     close();
   };
 
   return (
     <Modal
-      title='Edit VPX Executable'
+      title='Edit Launch Settings'
       description='Set a custom VPX executable path for this table. Leave empty to use the default executable.'
       modalClassName={style.modal}
       onExitClick={close}
@@ -109,6 +162,63 @@ const EditTableExecutableModal: FunctionComponent<Props> = ({
               label='Browse'
             />
           </div>
+          {platform === 'win32' && (
+            <div className={style.advanced}>
+              <button
+                type='button'
+                className={style.advancedToggle}
+                aria-expanded={isAdvancedOpen}
+                onClick={() => setIsAdvancedOpen((open) => !open)}>
+                <span className='primary-text-color body-sm-semibold'>
+                  Launch flags (advanced)
+                </span>
+                <span className='secondary-text-color body-xs-regular'>
+                  {isAdvancedOpen ? 'Hide' : 'Show'}
+                </span>
+              </button>
+              {isAdvancedOpen && (
+                <div className={style.advancedContent}>
+                  <p className='secondary-text-color body-xs-regular'>
+                    Advanced: leave on "Use default" unless this table needs
+                    different behavior.
+                  </p>
+                  {flagOptions.map(({ key, label, hint }) => (
+                    <div key={key} className={style.flagRow}>
+                      <div>
+                        <p className='primary-text-color body-sm-semibold'>
+                          {label}
+                        </p>
+                        {hint && (
+                          <p className='secondary-text-color body-xs-regular'>
+                            {hint}
+                          </p>
+                        )}
+                      </div>
+                      <Select
+                        ariaLabel={label}
+                        value={
+                          launchFlags[key] === undefined
+                            ? 'default'
+                            : launchFlags[key]
+                              ? 'on'
+                              : 'off'
+                        }
+                        onChange={(value) => setFlag(key, value)}
+                        options={[
+                          {
+                            value: 'default',
+                            label: `Use default (${globalFlags[key] ? 'on' : 'off'})`,
+                          },
+                          { value: 'on', label: 'On' },
+                          { value: 'off', label: 'Off' },
+                        ]}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
         <div className={style.footer}>
           <Button

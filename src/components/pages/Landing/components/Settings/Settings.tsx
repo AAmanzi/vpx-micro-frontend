@@ -14,13 +14,14 @@ import { useToastContext } from 'src/providers/toast';
 import { getDefaultVpxExecutablePath } from 'src/utils';
 
 import style from './Settings.module.scss';
+import AdvancedSection from './components/AdvancedSection';
 import AndroidSection from './components/AndroidSection';
 import DataSection from './components/DataSection';
 import FilePathsSection from './components/FilePathsSection';
 import MaintenanceSection from './components/MaintenanceSection';
 
 const Settings: FunctionComponent = () => {
-  const { config } = useConfigContext();
+  const { config, platform } = useConfigContext();
   const { showErrorToast } = useToastContext();
 
   const vpxRootPath = config?.vpxRootPath || '';
@@ -120,6 +121,22 @@ const Settings: FunctionComponent = () => {
               </div>
               <div>
                 <AndroidSection />
+              </div>
+            </div>
+          )}
+          {platform === 'win32' && (
+            <div className={classNames(style.section, style.dataSection)}>
+              <div className={style.sectionHeader}>
+                <Icon
+                  className={style.sectionIcon}
+                  icon='cog'
+                  width={20}
+                  height={20}
+                />
+                <h2 className='primary-text-color heading-4-bold'>Advanced</h2>
+              </div>
+              <div>
+                <AdvancedSection />
               </div>
             </div>
           )}

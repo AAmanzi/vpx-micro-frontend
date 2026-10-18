@@ -56,6 +56,7 @@ const TableCard: FunctionComponent<Props> = ({
   vpxFile,
   vpxFilePath,
   vpxExecutablePath,
+  launchFlags,
   imgUrl,
   imagePreference,
   dateAddedTimestamp,
@@ -207,6 +208,7 @@ const TableCard: FunctionComponent<Props> = ({
               isArchived={isArchived}
               vpxFilePath={vpxFilePath}
               vpxExecutablePath={vpxExecutablePath}
+              launchFlags={launchFlags}
               vpxFile={vpxFile}
               romFilePath={romFilePath}
               romFile={romFile}

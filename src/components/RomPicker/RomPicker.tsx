@@ -10,7 +10,9 @@ import RomSelect from './components/RomSelect';
 
 interface Props {
   selectedRom: FileSystemItem | null;
-  options: Array<FileSystemItem>;
+  manuallyImportedRoms: Array<FileSystemItem>;
+  scannedRoms: Array<FileSystemItem>;
+  libraryRoms: Array<FileSystemItem>;
   expectedRomName: string | null;
   onRemoveRom: () => void;
   onSelect: (rom: FileSystemItem) => void;
@@ -18,14 +20,19 @@ interface Props {
 
 const RomPicker: FunctionComponent<Props> = ({
   selectedRom,
-  options,
+  manuallyImportedRoms,
+  scannedRoms,
+  libraryRoms,
   expectedRomName,
   onRemoveRom,
   onSelect,
 }) => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
 
-  const hasOptions = options.length > 0;
+  const hasOptions =
+    manuallyImportedRoms.length > 0 ||
+    scannedRoms.length > 0 ||
+    libraryRoms.length > 0;
 
   const handleToggleIsSelectOpen = () => {
     if (hasOptions) {
@@ -86,7 +93,10 @@ const RomPicker: FunctionComponent<Props> = ({
       </button>
       {isSelectOpen && (
         <RomSelect
-          options={options}
+          manuallyImportedRoms={manuallyImportedRoms}
+          scannedRoms={scannedRoms}
+          libraryRoms={libraryRoms}
+          expectedRomName={expectedRomName}
           onSelect={onSelect}
           onClose={() => setIsSelectOpen(false)}
         />

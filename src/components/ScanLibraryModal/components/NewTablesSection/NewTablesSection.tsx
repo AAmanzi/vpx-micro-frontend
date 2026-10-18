@@ -12,24 +12,30 @@ import style from './NewTablesSection.module.scss';
 
 interface Props {
   tables: Array<TableFile>;
-  availableRoms: Array<FileSystemItem>;
+  manuallyImportedRoms: Array<FileSystemItem>;
+  scannedRoms: Array<FileSystemItem>;
+  libraryRoms: Array<FileSystemItem>;
   includedByPath: Record<string, boolean>;
   onToggleInclude: (filePath: string) => void;
   onSelectAll: () => void;
   onDeselectAll: () => void;
   onNameChange: (filePath: string, value: string) => void;
   onRomChange: (filePath: string, romPath: string) => void;
+  color?: 'blue' | 'gray';
 }
 
 const NewTablesSection: FunctionComponent<Props> = ({
   tables,
-  availableRoms,
+  manuallyImportedRoms,
+  scannedRoms,
+  libraryRoms,
   includedByPath,
   onToggleInclude,
   onSelectAll,
   onDeselectAll,
   onNameChange,
   onRomChange,
+  color = 'blue',
 }) => {
   const handleRomSelect = (table: TableFile) => (rom: FileSystemItem) => {
     onRomChange(table.filePath, rom.path);
@@ -38,8 +44,8 @@ const NewTablesSection: FunctionComponent<Props> = ({
   return (
     <div>
       <SectionHeader
-        color='blue'
-        title={`${Object.values(includedByPath).filter(Boolean).length} of ${tables.length} selected for import`}
+        color={color}
+        title={`${tables.filter((table) => includedByPath[table.filePath] ?? true).length} of ${tables.length} selected for import`}
         onSelectAll={onSelectAll}
         onDeselectAll={onDeselectAll}
       />
@@ -76,7 +82,9 @@ const NewTablesSection: FunctionComponent<Props> = ({
                   <div onClick={(event) => event.stopPropagation()}>
                     <RomPicker
                       selectedRom={table.rom || null}
-                      options={availableRoms}
+                      manuallyImportedRoms={manuallyImportedRoms}
+                      scannedRoms={scannedRoms}
+                      libraryRoms={libraryRoms}
                       expectedRomName={table.expectedRomName || null}
                       onRemoveRom={() => onRomChange(table.filePath, '')}
                       onSelect={handleRomSelect(table)}

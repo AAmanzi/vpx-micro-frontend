@@ -20,6 +20,7 @@ interface Props {
   imgUrl?: string;
   imagePreference?: Table['imagePreference'];
   vpxExecutablePath?: string;
+  launchFlags?: Table['launchFlags'];
   isArchived?: boolean;
   vpxFile: string;
   vpxFilePath: string;
@@ -37,6 +38,7 @@ const SettingsPopover: FunctionComponent<Props> = ({
   imgUrl,
   imagePreference,
   vpxExecutablePath,
+  launchFlags,
   isArchived,
   vpxFile,
   vpxFilePath,
@@ -148,6 +150,7 @@ const SettingsPopover: FunctionComponent<Props> = ({
             imgUrl={imgUrl}
             imagePreference={imagePreference}
             vpxExecutablePath={vpxExecutablePath}
+            launchFlags={launchFlags}
             isArchived={isArchived}
             vpxFile={vpxFile}
             vpxFilePath={vpxFilePath}

@@ -10,7 +10,7 @@ interface Props {
   title: string;
   description: string;
   icon: IconType;
-  color: 'yellow' | 'blue' | 'red';
+  color: 'yellow' | 'blue' | 'red' | 'gray';
   count: number;
   isOpen: boolean;
   onToggle: () => void;

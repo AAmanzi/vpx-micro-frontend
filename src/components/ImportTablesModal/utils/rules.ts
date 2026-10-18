@@ -13,23 +13,19 @@ export const applyExpectedRoms = (
   tables: Array<TableFile>,
   roms: Array<FileSystemItem>,
 ): ImportSelectionResult => {
-  const availableRoms = [...roms];
-
   const tablesToImport = tables.map((table) => {
     if (table.rom || !table.expectedRomName) {
       return table;
     }
 
     const expectedRomName = normalizeRomName(table.expectedRomName);
-    const romIndex = availableRoms.findIndex(
+    const matchedRom = roms.find(
       (rom) => normalizeRomName(rom.name) === expectedRomName,
     );
 
-    if (romIndex === -1) {
+    if (!matchedRom) {
       return table;
     }
-
-    const [matchedRom] = availableRoms.splice(romIndex, 1);
 
     return {
       ...table,
@@ -37,8 +33,14 @@ export const applyExpectedRoms = (
     };
   });
 
+  const assignedRomPaths = new Set(
+    tablesToImport
+      .map((table) => table.rom?.path)
+      .filter((romPath): romPath is string => Boolean(romPath)),
+  );
+
   return {
     tablesToImport,
-    unassignedRoms: availableRoms,
+    unassignedRoms: roms.filter((rom) => !assignedRomPaths.has(rom.path)),
   };
 };

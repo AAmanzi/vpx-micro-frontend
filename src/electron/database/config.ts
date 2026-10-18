@@ -3,9 +3,10 @@ import Store from 'electron-store';
 import {
   VPX_DEFAULT_ANDROID_ROMS_PATH,
   VPX_DEFAULT_ANDROID_TABLES_PATH,
+  VPX_DEFAULT_LAUNCH_FLAGS,
   VPX_DEFAULT_ROOT_PATH,
 } from 'src/consts/vpx';
-import { Config, Order, ViewType } from 'src/types/config';
+import { Config, LaunchFlags, Order, ViewType } from 'src/types/config';
 import {
   getDefaultRomsDirectory,
   getDefaultTablesDirectory,
@@ -31,6 +32,7 @@ const defaultConfig: Config = {
   androidWebServerUrl: '',
   androidTablesDirectory: VPX_DEFAULT_ANDROID_TABLES_PATH,
   androidRomsDirectory: VPX_DEFAULT_ANDROID_ROMS_PATH,
+  launchFlags: VPX_DEFAULT_LAUNCH_FLAGS,
 };
 
 const store = new Store<ConfigStoreSchema>({
@@ -40,13 +42,32 @@ const store = new Store<ConfigStoreSchema>({
   },
 });
 
-const getStoredConfig = (): Config => ({
-  ...defaultConfig,
-  ...store.get('config'),
-});
+const getStoredConfig = (): Config => {
+  const stored = store.get('config');
+
+  return {
+    ...defaultConfig,
+    ...stored,
+    launchFlags: {
+      ...VPX_DEFAULT_LAUNCH_FLAGS,
+      ...stored?.launchFlags,
+    },
+  };
+};
 
 export function getConfig(): Config {
   return getStoredConfig();
+}
+
+export function getLaunchFlags(): LaunchFlags {
+  return getStoredConfig().launchFlags as LaunchFlags;
+}
+
+export function updateLaunchFlags(launchFlags: LaunchFlags): void {
+  store.set('config', {
+    ...getStoredConfig(),
+    launchFlags,
+  });
 }
 
 export function getRomsDirectoryPath(): string {
@@ -132,6 +153,19 @@ export function updateViewType(viewType: Config['viewType']): void {
   store.set('config', {
     ...getStoredConfig(),
     viewType,
+  });
+}
+
+export function getSkippedScanTablePaths(): Array<string> {
+  return getStoredConfig().skippedScanTablePaths ?? [];
+}
+
+export function updateSkippedScanTablePaths(
+  skippedScanTablePaths: Array<string>,
+): void {
+  store.set('config', {
+    ...getStoredConfig(),
+    skippedScanTablePaths,
   });
 }
 

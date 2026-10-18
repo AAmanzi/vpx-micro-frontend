@@ -12,6 +12,11 @@ import { api } from 'src/consts';
 import { useTablesContext } from 'src/providers/tables';
 import { useToastContext } from 'src/providers/toast';
 import { ScanResult } from 'src/types/table';
+import {
+  getAssignedRoms,
+  mergeRoms,
+  normalizePathForComparison,
+} from 'src/utils';
 
 import Form from '../Form';
 import style from './ScanLibraryModal.module.scss';
@@ -25,7 +30,7 @@ interface Props {
 }
 
 const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
-  const { fetchTables } = useTablesContext();
+  const { fetchTables, tables } = useTablesContext();
   const { showErrorToast, showSuccessToast } = useToastContext();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -34,6 +39,7 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
   const [scanErrorMessage, setScanErrorMessage] = useState<string | null>(null);
 
   const [isNewTablesOpen, setIsNewTablesOpen] = useState(false);
+  const [isSkippedTablesOpen, setIsSkippedTablesOpen] = useState(false);
   const [isUnmatchedRomsOpen, setIsUnmatchedRomsOpen] = useState(false);
   const [isMissingFilesOpen, setIsMissingFilesOpen] = useState(false);
 
@@ -52,6 +58,39 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
     useState<Record<string, boolean>>({});
   const [includedMissingFilesByTableId, setIncludedMissingFilesByTableId] =
     useState<Record<string, boolean>>({});
+
+  const tableIdsWithMissingFiles = new Set(
+    tablesWithMissingFiles.map((item) => item.table.id),
+  );
+  const assignedRoms = getAssignedRoms(
+    tables.filter((table) => !tableIdsWithMissingFiles.has(table.id)),
+  );
+  const assignedRomPaths = new Set(
+    assignedRoms.map((rom) => normalizePathForComparison(rom.path)),
+  );
+  const romOptions = mergeRoms(
+    assignedRoms,
+    unmatchedRoms,
+    newTables
+      .map((table) => table.rom)
+      .filter((rom): rom is NonNullable<typeof rom> => Boolean(rom)),
+  );
+  const scannedRoms = mergeRoms(
+    unmatchedRoms,
+    newTables
+      .map((table) => table.rom)
+      .filter((rom): rom is NonNullable<typeof rom> => Boolean(rom)),
+  ).filter(
+    (rom) => !assignedRomPaths.has(normalizePathForComparison(rom.path)),
+  );
+
+  const skippedPathSet = new Set(scanResult?.skippedTablePaths ?? []);
+  const freshTables = newTables.filter(
+    (table) => !skippedPathSet.has(table.filePath),
+  );
+  const skippedTables = newTables.filter((table) =>
+    skippedPathSet.has(table.filePath),
+  );
 
   const modalTitle = isLoading ? 'Scanning VPX Library' : 'Scan Results';
   const modalDescription = isLoading
@@ -90,6 +129,7 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
     setScanResult(null);
 
     setIsNewTablesOpen(false);
+    setIsSkippedTablesOpen(false);
     setIsUnmatchedRomsOpen(false);
     setIsMissingFilesOpen(false);
 
@@ -113,7 +153,9 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
           result.data.newTables.reduce<Record<string, boolean>>(
             (acc, table) => ({
               ...acc,
-              [table.filePath]: true,
+              [table.filePath]: !result.data.skippedTablePaths.includes(
+                table.filePath,
+              ),
             }),
             {},
           ),
@@ -172,29 +214,23 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
     }));
   };
 
-  const selectAllNewTables = () => {
-    setIncludedNewTablesByPath(
-      newTables.reduce<Record<string, boolean>>(
-        (acc, table) => ({
-          ...acc,
-          [table.filePath]: true,
-        }),
-        {},
+  const setNewTablesIncluded = (
+    tablesToUpdate: ScanResult['newTables'],
+    included: boolean,
+  ) => {
+    setIncludedNewTablesByPath((prev) => ({
+      ...prev,
+      ...Object.fromEntries(
+        tablesToUpdate.map((table) => [table.filePath, included]),
       ),
-    );
+    }));
   };
 
-  const deselectAllNewTables = () => {
-    setIncludedNewTablesByPath(
-      newTables.reduce<Record<string, boolean>>(
-        (acc, table) => ({
-          ...acc,
-          [table.filePath]: false,
-        }),
-        {},
-      ),
-    );
-  };
+  const selectAllNewTables = () => setNewTablesIncluded(freshTables, true);
+  const deselectAllNewTables = () => setNewTablesIncluded(freshTables, false);
+  const selectAllSkippedTables = () => setNewTablesIncluded(skippedTables, true);
+  const deselectAllSkippedTables = () =>
+    setNewTablesIncluded(skippedTables, false);
 
   const selectAllUnmatchedRoms = () => {
     setIncludedUnmatchedRomsByPath(
@@ -253,9 +289,16 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
   };
 
   const handleTableRomChange = (filePath: string, romPath: string) => {
-    const selectedRom = unmatchedRoms.find((rom) => rom.path === romPath);
+    const selectedRom = romPath
+      ? romOptions.find((rom) => rom.path === romPath)
+      : undefined;
     const previouslyAssignedRom =
       newTables.find((table) => table.filePath === filePath)?.rom ?? undefined;
+    const isPreviousRomUsedElsewhere = newTables.some(
+      (table) =>
+        table.filePath !== filePath &&
+        table.rom?.path === previouslyAssignedRom?.path,
+    );
 
     setNewTables((prev) =>
       prev.map((table) =>
@@ -275,9 +318,14 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
         nextRoms = nextRoms.filter((rom) => rom.path !== selectedRom.path);
       }
 
+      // Library ROMs belong to existing tables and must never become deletable
       if (
         previouslyAssignedRom &&
         previouslyAssignedRom.path !== selectedRom?.path &&
+        !isPreviousRomUsedElsewhere &&
+        !assignedRomPaths.has(
+          normalizePathForComparison(previouslyAssignedRom.path),
+        ) &&
         !nextRoms.some((rom) => rom.path === previouslyAssignedRom.path)
       ) {
         nextRoms = [...nextRoms, previouslyAssignedRom];
@@ -313,6 +361,9 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
       newTables: newTables.filter(
         (table) => includedNewTablesByPath[table.filePath] ?? true,
       ),
+      skippedTablePaths: newTables
+        .filter((table) => !(includedNewTablesByPath[table.filePath] ?? true))
+        .map((table) => table.filePath),
       unmatchedRoms: unmatchedRoms.filter(
         (rom) => includedUnmatchedRomsByPath[rom.path] ?? false,
       ),
@@ -371,18 +422,20 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
                 </div>
               )}
 
-              {newTables.length > 0 && (
+              {freshTables.length > 0 && (
                 <Collapsible
                   title='New Tables Found'
                   description='These Tables will be added to your library when you apply changes.'
                   icon='plus'
                   color='blue'
-                  count={newTables.length}
+                  count={freshTables.length}
                   isOpen={isNewTablesOpen}
                   onToggle={() => setIsNewTablesOpen((prev) => !prev)}>
                   <NewTablesSection
-                    tables={newTables}
-                    availableRoms={unmatchedRoms}
+                    tables={freshTables}
+                    manuallyImportedRoms={[]}
+                    scannedRoms={scannedRoms}
+                    libraryRoms={assignedRoms}
                     includedByPath={includedNewTablesByPath}
                     onToggleInclude={toggleNewTableInclude}
                     onSelectAll={selectAllNewTables}
@@ -427,6 +480,31 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
                     onToggleInclude={toggleMissingFileInclude}
                     onSelectAll={selectAllMissingFiles}
                     onDeselectAll={deselectAllMissingFiles}
+                  />
+                </Collapsible>
+              )}
+
+              {skippedTables.length > 0 && (
+                <Collapsible
+                  title='Previously Skipped Tables'
+                  description='You skipped these in an earlier scan. Select any you want to add to your library.'
+                  icon='clock-recent'
+                  color='gray'
+                  count={skippedTables.length}
+                  isOpen={isSkippedTablesOpen}
+                  onToggle={() => setIsSkippedTablesOpen((prev) => !prev)}>
+                  <NewTablesSection
+                    color='gray'
+                    tables={skippedTables}
+                    manuallyImportedRoms={[]}
+                    scannedRoms={scannedRoms}
+                    libraryRoms={assignedRoms}
+                    includedByPath={includedNewTablesByPath}
+                    onToggleInclude={toggleNewTableInclude}
+                    onSelectAll={selectAllSkippedTables}
+                    onDeselectAll={deselectAllSkippedTables}
+                    onNameChange={handleTableNameChange}
+                    onRomChange={handleTableRomChange}
                   />
                 </Collapsible>
               )}

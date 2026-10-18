@@ -2,6 +2,8 @@ import { spawn } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
+import type { LaunchFlags } from 'src/types/config';
+
 const escapePowerShellSingleQuotedString = (value: string): string =>
   value.replace(/'/g, "''");
 
@@ -93,9 +95,20 @@ const startVpxOnMac = async (
   });
 };
 
+export const buildWindowsLaunchArgs = (
+  tablePath: string,
+  launchFlags: LaunchFlags,
+): string[] => [
+  ...(launchFlags.lessCpuThreads ? ['-LessCPUthreads'] : []),
+  ...(launchFlags.extMinimized ? ['-ExtMinimized'] : []),
+  '-play',
+  tablePath,
+];
+
 export const startVpxTable = async (
   tablePath: string,
   vpxExecutablePath: string,
+  launchFlags: LaunchFlags,
 ): Promise<void> => {
   if (!fs.existsSync(tablePath)) {
     throw new Error(`Table file not found: ${tablePath}`);
@@ -118,7 +131,7 @@ export const startVpxTable = async (
   }
 
   const vpxDir = path.dirname(vpxExecutablePath);
-  const launchArgs = ['-LessCPUthreads', '-ExtMinimized', '-play', tablePath];
+  const launchArgs = buildWindowsLaunchArgs(tablePath, launchFlags);
 
   await new Promise<void>((resolve, reject) => {
     const child = spawn(vpxExecutablePath, launchArgs, {

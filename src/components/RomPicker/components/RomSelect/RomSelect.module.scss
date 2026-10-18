@@ -10,26 +10,126 @@
   padding-bottom: 8px;
   border-radius: 14px;
   width: 254px;
+  max-height: min(70vh, 420px);
+  overflow-y: auto;
 }
 
-.title {
-  margin-left: 12px;
-  margin-right: 12px;
+.search {
+  padding: 0 8px 6px;
   margin-bottom: 8px;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    bottom: 0;
+    border-bottom: thin solid rgba(var(--gray-rgb), 0.45);
+  }
+
+  input {
+    padding-right: 22px;
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: normal;
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+    margin-right: 6px;
+  }
+}
+
+.clearButton {
+  position: absolute;
+  right: 16px;
+  top: 0;
+  width: 20px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-500);
+  transition: color 150ms ease-out;
+
+  &:hover {
+    color: var(--primary-text-color);
+  }
+
+  svg {
+    width: 10px;
+    height: 10px;
+    margin: 0;
+  }
+}
+
+.group {
+  & + & {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: thin solid rgba(var(--gray-rgb), 0.45);
+  }
+}
+
+.groupTitle {
+  display: table;
+  margin: 0 8px 4px;
+  padding: 3px 7px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.correctMatch {
+  color: var(--yellow);
+  background-color: rgba(var(--yellow-rgb), 0.1);
+}
+
+.manualImport {
+  color: var(--purple);
+  background-color: rgba(var(--purple-rgb), 0.1);
+}
+
+.scanned {
+  color: var(--blue);
+  background-color: rgba(var(--blue-rgb), 0.1);
+}
+
+.library {
+  color: var(--green);
+  background-color: rgba(var(--green-rgb), 0.1);
 }
 
 .option {
-  padding-left: 12px;
-  padding-right: 12px;
+  padding: 5px 12px;
   width: 100%;
   transition: background-color 200ms ease-in;
   display: flex;
+  justify-content: space-between;
   gap: 8px;
   align-items: center;
+  min-height: 30px;
 
   &:hover {
     background-color: rgba(var(--gray-500-rgb), 0.1);
   }
+}
+
+.importedIndicator {
+  color: var(--purple);
+  white-space: nowrap;
+}
+
+.scannedIndicator {
+  color: var(--gray-500);
+  white-space: nowrap;
+}
+
+.emptyState {
+  padding: 8px 12px;
 }
 
 @keyframes fadeInRomSelect {
