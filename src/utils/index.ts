@@ -5,10 +5,40 @@ import {
   VPX_DEFAULT_ROM_PATH,
   VPX_DEFAULT_TABLES_PATH,
 } from 'src/consts/vpx';
+import { FileSystemItem } from 'src/types/file';
 import { Table } from 'src/types/table';
 
 export const normalizePathForComparison = (value?: string): string =>
   (value || '').trim().toLowerCase().replace(/\\/g, '/');
+
+export const mergeRoms = (
+  ...romLists: Array<Array<FileSystemItem>>
+): Array<FileSystemItem> => {
+  const seenPaths = new Set<string>();
+
+  return romLists.flat().filter((rom) => {
+    const normalizedPath = normalizePathForComparison(rom.path);
+
+    if (seenPaths.has(normalizedPath)) {
+      return false;
+    }
+
+    seenPaths.add(normalizedPath);
+
+    return true;
+  });
+};
+
+export const getAssignedRoms = (
+  tables: Array<Table>,
+): Array<FileSystemItem> =>
+  mergeRoms(
+    tables.flatMap((table) =>
+      table.romFile && table.romFilePath
+        ? [{ name: table.romFile, path: table.romFilePath }]
+        : [],
+    ),
+  );
 
 const RESTRICTED_VPX_ROOT_PATH_PATTERNS = [
   /^[a-z]:\/program files(?: \(x86\))?(?:\/|$)/,

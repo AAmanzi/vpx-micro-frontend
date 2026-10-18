@@ -15,6 +15,18 @@
   }
 }
 
+.gray {
+  .iconWrapper,
+  .count {
+    background: rgba(var(--gray-500-rgb), 0.15);
+  }
+
+  .icon,
+  .count {
+    color: var(--gray-300);
+  }
+}
+
 .yellow {
   .iconWrapper,
   .count {

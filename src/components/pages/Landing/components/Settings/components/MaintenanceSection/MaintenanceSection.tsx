@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useEffect, useState } from 'react';
 
 import Button, {
   Size as ButtonSize,
@@ -17,9 +17,31 @@ import style from './MaintenanceSection.module.scss';
 const MaintenanceSection: FunctionComponent = () => {
   const { showErrorToast, showSuccessToast } = useToastContext();
   const { fetchTables } = useTablesContext();
-  const { config, fetchConfig } = useConfigContext();
+  const { config, fetchConfig, platform } = useConfigContext();
 
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
+  const [isFullScreen, setIsFullScreen] = useState(false);
+
+  useEffect(() => {
+    api.isFullScreen().then((result) => {
+      if (result.success) {
+        setIsFullScreen(result.data);
+      }
+    });
+
+    return api.onFullScreenChanged(setIsFullScreen);
+  }, []);
+
+  const handleToggleFullScreen = async () => {
+    const result = await api.setFullScreen(!isFullScreen);
+
+    if (!result.success) {
+      showErrorToast(result.error.message || 'Failed to change fullscreen');
+      return;
+    }
+
+    setIsFullScreen(!isFullScreen);
+  };
 
   const openConfirmation = () => {
     setIsConfirmationOpen(true);
@@ -49,7 +71,9 @@ const MaintenanceSection: FunctionComponent = () => {
     );
 
     if (!result.success) {
-      showErrorToast(result.error.message || 'Failed to update Android features');
+      showErrorToast(
+        result.error.message || 'Failed to update Android features',
+      );
       return;
     }
 
@@ -60,7 +84,24 @@ const MaintenanceSection: FunctionComponent = () => {
     <>
       <div className={style.settingsRow}>
         <div>
-          <p className='primary-text-color body-md-semibold'>Android Features</p>
+          <p className='primary-text-color body-md-semibold'>Fullscreen</p>
+          <p className='secondary-text-color body-xs-regular'>
+            Hide the window frame and fill the screen. Press{' '}
+            {platform === 'darwin' ? 'Ctrl+Cmd+F' : 'F11'} to toggle at any
+            time. The window state is remembered between launches.
+          </p>
+        </div>
+        <CheckboxSwitch
+          checked={isFullScreen}
+          onChange={handleToggleFullScreen}
+          color='green'
+        />
+      </div>
+      <div className={style.settingsRow}>
+        <div>
+          <p className='primary-text-color body-md-semibold'>
+            Android Features
+          </p>
           <p className='secondary-text-color body-xs-regular'>
             Enable Android-focused features and settings in the app.
           </p>

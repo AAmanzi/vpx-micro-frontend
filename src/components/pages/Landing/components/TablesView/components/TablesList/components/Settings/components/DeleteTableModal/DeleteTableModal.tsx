@@ -6,7 +6,9 @@ import Button, {
 } from 'src/components/Button';
 import Modal, { Size as ModalSize } from 'src/components/Modal';
 import api from 'src/consts';
+import { useTablesContext } from 'src/providers/tables';
 import { useToastContext } from 'src/providers/toast';
+import { normalizePathForComparison } from 'src/utils';
 
 import style from './DeleteTableModal.module.scss';
 
@@ -24,6 +26,19 @@ const DeleteTableModal: FunctionComponent<Props> = ({
   close,
 }) => {
   const { showErrorToast } = useToastContext();
+  const { tables } = useTablesContext();
+
+  const romFilePath = tables.find((table) => table.id === id)?.romFilePath;
+  const isRomSharedWithOtherTables =
+    !!romFilePath &&
+    tables.some(
+      (table) =>
+        table.id !== id &&
+        table.romFilePath &&
+        normalizePathForComparison(table.romFilePath) ===
+          normalizePathForComparison(romFilePath),
+    );
+  const willDeleteRom = !!romFile && !isRomSharedWithOtherTables;
 
   const handleDelete = async () => {
     const { error } = await api.deleteTable(id);
@@ -49,7 +64,7 @@ const DeleteTableModal: FunctionComponent<Props> = ({
         <p className={style.text}>These files will be deleted:</p>
         <ul className={style.filesList}>
           <li className={style.fileItem}>{vpxFile}</li>
-          {romFile && <li className={style.fileItem}>{romFile}</li>}
+          {willDeleteRom && <li className={style.fileItem}>{romFile}</li>}
         </ul>
       </div>
       <div className={style.footer}>

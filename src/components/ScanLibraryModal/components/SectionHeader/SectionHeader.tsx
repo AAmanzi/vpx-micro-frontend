@@ -10,7 +10,7 @@ interface Props {
   title: string;
   onSelectAll: () => void;
   onDeselectAll: () => void;
-  color: 'yellow' | 'blue' | 'red';
+  color: 'yellow' | 'blue' | 'red' | 'gray';
   warningIcon?: IconType;
   warningText?: string;
 }
@@ -29,6 +29,7 @@ const SectionHeader: FunctionComponent<Props> = ({
         [style.yellow]: color === 'yellow',
         [style.blue]: color === 'blue',
         [style.red]: color === 'red',
+        [style.gray]: color === 'gray',
       })}>
       {warningText && (
         <div className={style.warning}>

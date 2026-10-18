@@ -163,7 +163,7 @@ If you already have an existing VPX setup, start with Scan Library first.
   - Rename table
   - Edit ROM — set the ROM file associated with this table
   - Table Image (if available from VPS DB) — click to view or edit image selection from alternate results.
-  - VPX Executable — set a different VPX exe file per table (overrides the global one)
+  - VPX Executable — open launch settings to set a different VPX executable for this table and, on Windows, optional per-table launch-flag overrides. Unset flags use the global defaults.
   - Delete Table — removes the DB entry and deletes the table's files from VPX folders
   - Archive / Unarchive table — archive the table to hide it from your active library.
 
@@ -247,9 +247,20 @@ On your Android device:
 
 ### Maintenance
 
+- **Fullscreen** toggles fullscreen mode. Press **F11** on Windows or **Ctrl+Cmd+F** on macOS to toggle it from anywhere in the app. Window size, position, maximized state, and fullscreen state are restored on the next launch.
 - **Clear Library Data** resets app metadata/list only.
 - It does **not** delete your actual VPX/ROM files.
 - **Database Migrations** run automatically on app update to keep existing data compatible.
+
+### Advanced launch settings (Windows)
+
+In **Settings → Advanced → VPX launch flags**, configure the global defaults:
+
+- **Limit CPU threads** passes `-LessCPUthreads` to VPX.
+- **Legacy pause menu** passes `-ExtMinimized` and is enabled by default. It is required for VPX 10.8.0 and earlier; turn it off for VPX 10.8.1 and newer, where it causes a launch error. The newer version's pause menu opens with **F12** by default.
+- Use **Reset to defaults** to restore the built-in settings.
+
+To override either flag for one table, open its **Kebab menu → VPX Executable → Launch flags (advanced)**. Choose **Use default**, **On**, or **Off** for each flag. macOS launches do not use these Windows command-line flags.
 
 ### VPX utilities
 
@@ -264,6 +275,8 @@ If you are running this locally from source:
 yarn install
 yarn dev
 ```
+
+Development runs use a separate `-dev` data store so development data stays separate from the installed app. `yarn db:reset` clears the development store by default; pass `--prod` only when you intentionally want to clear the production store.
 
 ### Data mocking notes
 

@@ -8,6 +8,8 @@ import { useConfigContext } from 'src/providers/config';
 import { useTablesContext } from 'src/providers/tables';
 import { useToastContext } from 'src/providers/toast';
 import { FileSystemItem, TableFile } from 'src/types/file';
+import { mergeRoms, normalizePathForComparison } from 'src/utils';
+import useAssignedRoms from 'src/utils/useAssignedRoms';
 
 import Button, { Size as ButtonSize, Type as ButtonType } from '../Button';
 import CheckboxSwitch from '../CheckboxSwitch';
@@ -32,6 +34,41 @@ const ImportTablesModal: FunctionComponent<Props> = ({
   const [unassignedRoms, setUnassignedRoms] = useState<Array<FileSystemItem>>(
     [],
   );
+  const assignedRoms = useAssignedRoms();
+  const manuallyImportedRoms = mergeRoms(
+    unassignedRoms,
+    tablesToImport
+      .map((table) => table.rom)
+      .filter(
+        (rom): rom is FileSystemItem =>
+          rom !== undefined &&
+          !assignedRoms.some(
+            (assignedRom) =>
+              normalizePathForComparison(assignedRom.path) ===
+              normalizePathForComparison(rom.path),
+          ),
+      ),
+  );
+  const assignedRomPaths = new Set(
+    assignedRoms.map((rom) => normalizePathForComparison(rom.path)),
+  );
+
+  const releaseRom = (
+    rom: FileSystemItem | undefined,
+    otherTables: Array<TableFile>,
+  ) => {
+    if (
+      !rom ||
+      assignedRomPaths.has(normalizePathForComparison(rom.path)) ||
+      otherTables.some((item) => item.rom?.path === rom.path)
+    ) {
+      return;
+    }
+
+    setUnassignedRoms((prev) =>
+      prev.some((item) => item.path === rom.path) ? prev : [...prev, rom],
+    );
+  };
   const [deleteAfterImport, setDeleteAfterImport] = useState(false);
   const initialFilesHandledRef = useRef(false);
 
@@ -58,6 +95,7 @@ const ImportTablesModal: FunctionComponent<Props> = ({
         currentTables: tablesToImport,
         currentUnassignedRoms: unassignedRoms,
         incomingFiles: filteredFiles,
+        libraryRoms: assignedRoms,
       });
 
       setTablesToImport(result.tablesToImport);
@@ -85,24 +123,35 @@ const ImportTablesModal: FunctionComponent<Props> = ({
   };
 
   const handleRemoveTableFile = (table: TableFile) => {
-    if (table.rom) {
-      setUnassignedRoms((prev) => [...prev, table.rom!]);
-    }
-
-    setTablesToImport((prev) =>
-      prev.filter((t) => t.filePath !== table.filePath),
+    const remainingTables = tablesToImport.filter(
+      (item) => item.filePath !== table.filePath,
     );
+
+    releaseRom(table.rom, remainingTables);
+    setTablesToImport(remainingTables);
   };
 
   const handleAssignRom = (table: TableFile, rom: FileSystemItem) => {
+    const otherTables = tablesToImport.filter(
+      (item) => item.filePath !== table.filePath,
+    );
+
     setTablesToImport((prev) =>
       prev.map((t) => (t.filePath === table.filePath ? { ...t, rom: rom } : t)),
     );
-    setUnassignedRoms((prev) => prev.filter((r) => r.path !== rom.path));
+    setUnassignedRoms((prev) => prev.filter((item) => item.path !== rom.path));
+
+    if (table.rom?.path !== rom.path) {
+      releaseRom(table.rom, otherTables);
+    }
   };
 
   const handleRemoveRomFromTable = (table: TableFile) => {
-    setUnassignedRoms((prev) => [...prev, table.rom!]);
+    releaseRom(
+      table.rom,
+      tablesToImport.filter((item) => item.filePath !== table.filePath),
+    );
+
     setTablesToImport((prev) =>
       prev.map((t) =>
         t.filePath === table.filePath ? { ...t, rom: undefined } : t,
@@ -151,7 +200,7 @@ const ImportTablesModal: FunctionComponent<Props> = ({
     if (importTablesWarning) {
       showWarningToast(
         importTablesWarning.message ||
-        'Some tables failed to import because source files were missing',
+          'Some tables failed to import because source files were missing',
       );
     }
 
@@ -161,7 +210,7 @@ const ImportTablesModal: FunctionComponent<Props> = ({
     if (updateDeleteAfterImportError) {
       showErrorToast(
         updateDeleteAfterImportError.message ||
-        'Failed to update import setting',
+          'Failed to update import setting',
       );
 
       return;
@@ -206,7 +255,8 @@ const ImportTablesModal: FunctionComponent<Props> = ({
                   <TableEntry
                     key={table.filePath}
                     table={table}
-                    unassignedRoms={unassignedRoms}
+                    manuallyImportedRoms={manuallyImportedRoms}
+                    libraryRoms={assignedRoms}
                     onAssignRom={handleAssignRom}
                     onRemoveTable={handleRemoveTableFile}
                     onRemoveRom={handleRemoveRomFromTable}

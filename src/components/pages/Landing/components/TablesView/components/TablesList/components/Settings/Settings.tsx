@@ -24,6 +24,7 @@ interface Props {
   imgUrl?: string;
   imagePreference?: Table['imagePreference'];
   vpxExecutablePath?: string;
+  launchFlags?: Table['launchFlags'];
   isArchived?: boolean;
   vpxFile: string;
   vpxFilePath: string;
@@ -38,6 +39,7 @@ const Settings: FunctionComponent<Props> = ({
   imgUrl,
   imagePreference,
   vpxExecutablePath,
+  launchFlags,
   isArchived,
   vpxFile,
   vpxFilePath,
@@ -190,6 +192,7 @@ const Settings: FunctionComponent<Props> = ({
         <EditTableExecutableModal
           id={id}
           currentExecutablePath={vpxExecutablePath}
+          currentLaunchFlags={launchFlags}
           close={closeEditExecutableModal}
         />
       )}

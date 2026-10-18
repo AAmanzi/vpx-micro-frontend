@@ -2,6 +2,16 @@
   padding: 16px;
 }
 
+.gray {
+  background-color: rgba(var(--gray-500-rgb), 0.15);
+
+  .icon,
+  .warningText,
+  .selectAllButton {
+    color: var(--gray-300);
+  }
+}
+
 .yellow {
   background-color: rgba(var(--yellow-rgb), 0.1);
 

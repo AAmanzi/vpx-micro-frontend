@@ -1,3 +1,10 @@
+export interface LaunchFlags {
+  // -LessCPUthreads
+  lessCpuThreads: boolean;
+  // -ExtMinimized: pause menu on VPX <= 10.8.0, a launch error on 10.8.1+
+  extMinimized: boolean;
+}
+
 export interface Config {
   vpxRootPath: string;
   deleteFilesAfterImport: boolean;
@@ -11,6 +18,8 @@ export interface Config {
   androidWebServerUrl?: string;
   androidTablesDirectory?: string;
   androidRomsDirectory?: string;
+  skippedScanTablePaths?: Array<string>;
+  launchFlags?: LaunchFlags;
 }
 
 export enum Order {
