@@ -6,7 +6,7 @@ import http from 'http';
 import path from 'path';
 
 import type { AndroidSyncApplyPayload } from 'src/types/android';
-import type { Config } from 'src/types/config';
+import type { Config, LaunchFlags } from 'src/types/config';
 import type { TableFile } from 'src/types/file';
 import type { GroupType, ScanResult, Table } from 'src/types/table';
 
@@ -196,6 +196,14 @@ app.whenReady().then(async () => {
     'api:updateTableVpxExecutablePath',
     async (_, tableId: string, executablePath: string | null) =>
       api.updateTableVpxExecutablePath(tableId, executablePath),
+  );
+  ipcMain.handle(
+    'api:updateTableLaunchFlags',
+    async (_, tableId: string, launchFlags: Partial<LaunchFlags> | null) =>
+      api.updateTableLaunchFlags(tableId, launchFlags),
+  );
+  ipcMain.handle('api:updateLaunchFlags', async (_, launchFlags: LaunchFlags) =>
+    api.updateLaunchFlags(launchFlags),
   );
   ipcMain.handle('api:getTableImageCandidates', async (_, tableId: string) =>
     api.getTableImageCandidates(tableId),

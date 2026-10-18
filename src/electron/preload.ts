@@ -6,7 +6,7 @@ import type {
   AndroidSyncProgressEvent,
 } from 'src/types/android';
 import type { Api, ApiResult } from 'src/types/api';
-import type { Config, Platform } from 'src/types/config';
+import type { Config, LaunchFlags, Platform } from 'src/types/config';
 import type { FileSystemItem } from 'src/types/file';
 import type { GroupType, ScanResult, Table } from 'src/types/table';
 
@@ -47,6 +47,13 @@ const frontendApi: Api = {
     tableId: string,
   ): Promise<ApiResult<Array<string>>> =>
     invoke<ApiResult<Array<string>>>('api:getTableImageCandidates', tableId),
+  updateTableLaunchFlags: (
+    tableId: string,
+    launchFlags: Partial<LaunchFlags> | null,
+  ): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:updateTableLaunchFlags', tableId, launchFlags),
+  updateLaunchFlags: (launchFlags: LaunchFlags): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:updateLaunchFlags', launchFlags),
   updateTableImage: (
     tableId: string,
     imgUrl: string,

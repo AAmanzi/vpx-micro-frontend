@@ -3,7 +3,7 @@ import {
   AndroidSyncApplyPayload,
   AndroidSyncProgressEvent,
 } from './android';
-import { Config, Platform } from './config';
+import { Config, LaunchFlags, Platform } from './config';
 import { FileSystemItem, TableFile } from './file';
 import { GroupType, ScanResult, Table } from './table';
 
@@ -53,6 +53,11 @@ export interface Api {
   getTableImageCandidates: (
     tableId: string,
   ) => Promise<ApiResult<Array<string>>>;
+  updateTableLaunchFlags: (
+    tableId: string,
+    launchFlags: Partial<LaunchFlags> | null,
+  ) => Promise<ApiResult<null>>;
+  updateLaunchFlags: (launchFlags: LaunchFlags) => Promise<ApiResult<null>>;
   updateTableImage: (
     tableId: string,
     imgUrl: string,

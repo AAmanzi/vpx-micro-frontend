@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { TABLE_STARTUP_LOCK_MS } from 'src/consts/platform';
 import type { ApiResult } from 'src/types/api';
+import type { LaunchFlags } from 'src/types/config';
 import type { FileSystemItem, TableFile } from 'src/types/file';
 import { GroupType, ScanResult, Table } from 'src/types/table';
 
@@ -35,6 +36,11 @@ import {
 
 const isZipFile = (name: string): boolean =>
   path.extname(name).toLowerCase() === '.zip';
+
+const resolveLaunchFlags = (table: Table): LaunchFlags => ({
+  ...configDb.getLaunchFlags(),
+  ...table.launchFlags,
+});
 
 const tableStartLockById = new Map<string, number>();
 
@@ -304,6 +310,42 @@ export function updateTableVpxExecutablePath(
     const normalizedPath = executablePath?.trim();
     const updatedTable = tablesDb.update(tableId, {
       vpxExecutablePath: normalizedPath || undefined,
+    });
+
+    if (!updatedTable) {
+      return {
+        success: false,
+        error: {
+          code: 'TABLE_NOT_FOUND',
+          message: `Table not found: ${tableId}`,
+        },
+      };
+    }
+
+    return apiSuccess(null);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}
+
+export function updateTableLaunchFlags(
+  tableId: string,
+  launchFlags: Partial<LaunchFlags> | null,
+): ApiResult<null> {
+  try {
+    // Absent keys are cleared via an explicit undefined, which JSON storage drops
+    const overrides: Partial<LaunchFlags> = {};
+
+    if (typeof launchFlags?.lessCpuThreads === 'boolean') {
+      overrides.lessCpuThreads = launchFlags.lessCpuThreads;
+    }
+
+    if (typeof launchFlags?.extMinimized === 'boolean') {
+      overrides.extMinimized = launchFlags.extMinimized;
+    }
+
+    const updatedTable = tablesDb.update(tableId, {
+      launchFlags: Object.keys(overrides).length > 0 ? overrides : undefined,
     });
 
     if (!updatedTable) {
@@ -602,6 +644,7 @@ export async function startTable(tableId: string): Promise<ApiResult<null>> {
       await startVpxTable(
         table.vpxFilePath,
         table.vpxExecutablePath || configVpxExecutablePath,
+        resolveLaunchFlags(table),
       );
     } catch (error) {
       tableStartLockById.delete(tableId);
@@ -864,6 +907,7 @@ export async function startRandomTable(
     await startVpxTable(
       table.vpxFilePath,
       table.vpxExecutablePath || configVpxExecutablePath,
+      resolveLaunchFlags(table),
     );
 
     tablesDb.update(table.id, {

@@ -1,3 +1,4 @@
+import { LaunchFlags } from './config';
 import { FileSystemItem, TableFile } from './file';
 
 export type TableImagePreference = 'manual' | 'none';
@@ -18,6 +19,8 @@ export interface Table {
   dateAddedTimestamp: number;
 
   vpxExecutablePath?: string;
+  // Per-table overrides of the global launch flags; unset flags inherit the global value
+  launchFlags?: Partial<LaunchFlags>;
   imgUrl?: string;
   imagePreference?: TableImagePreference;
 }
