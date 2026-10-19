@@ -32,12 +32,12 @@ jobs:
 
     steps:
       - name: Check out source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: 22
+          node-version: 24
           cache: yarn
 
       - name: Activate Yarn
@@ -55,7 +55,7 @@ jobs:
         run: yarn package:${{ matrix.platform }} --${{ matrix.arch }}
 
       - name: Upload distributables
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: VPX-Micro-Frontend-${{ matrix.artifact }}
           path: dist/*.${{ matrix.extension }}
