@@ -52,7 +52,7 @@ jobs:
         run: yarn build:prod
 
       - name: Package application
-        run: yarn package:${{ matrix.platform }} --${{ matrix.arch }}
+        run: yarn package:${{ matrix.platform }} --${{ matrix.arch }} --publish never
 
       - name: Upload distributables
         uses: actions/upload-artifact@v5
