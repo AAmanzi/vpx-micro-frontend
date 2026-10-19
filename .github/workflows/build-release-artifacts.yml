@@ -10,8 +10,6 @@ jobs:
   build:
     name: ${{ matrix.platform }} ${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
-    outputs:
-      version: ${{ steps.package.outputs.version }}
     strategy:
       fail-fast: false
       matrix:
@@ -67,7 +65,7 @@ jobs:
       - name: Upload distributables
         uses: actions/upload-artifact@v5
         with:
-          name: VPX-Micro-Frontend-${{ steps.package.outputs.version }}-${{ matrix.artifact }}${{ matrix.platform == 'win' && '-portable' || '' }}
+          name: VPX-Micro-Frontend-${{ steps.package.outputs.version }}-${{ matrix.artifact }}
           path: dist/VPX-Micro-Frontend-${{ steps.package.outputs.version }}-${{ matrix.artifact }}.${{ matrix.extension }}
           if-no-files-found: error
           retention-days: 14
@@ -76,21 +74,7 @@ jobs:
         if: matrix.platform == 'win'
         uses: actions/upload-artifact@v5
         with:
-          name: VPX-Micro-Frontend-${{ steps.package.outputs.version }}-${{ matrix.artifact }}-installer
+          name: VPX-Micro-Frontend-Setup-${{ steps.package.outputs.version }}-${{ matrix.artifact }}
           path: dist/VPX-Micro-Frontend-Setup-${{ steps.package.outputs.version }}-${{ matrix.artifact }}.exe
           if-no-files-found: error
-          retention-days: 14
-
-  combine:
-    name: Combine release artifacts
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Combine distributables into one artifact
-        uses: actions/upload-artifact/merge@v5
-        with:
-          name: VPX-Micro-Frontend-${{ needs.build.outputs.version }}-all-platforms
-          pattern: VPX-Micro-Frontend-${{ needs.build.outputs.version }}-*
-          separate-directories: false
-          delete-merged: true
           retention-days: 14

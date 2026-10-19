@@ -365,14 +365,14 @@ This outputs `dist/win-unpacked/` (or platform-specific equivalent).
 Release artifacts can be built using **GitHub Actions** without a local build environment.
 
 1. Go to **Actions → Build release artifacts → Run workflow**.
-2. Once all builds and the **Combine release artifacts** job complete, download `VPX-Micro-Frontend-<version>-all-platforms.zip` from the workflow run. It contains:
-   - **Windows x64 installer:** `VPX-Micro-Frontend-Setup-<version>-windows-x64.exe`
-   - **Windows x64 portable:** `VPX-Micro-Frontend-<version>-windows-x64.exe`
-   - **macOS x64 (Intel):** `VPX-Micro-Frontend-<version>-macos-x64.dmg`
-   - **macOS arm64 (Apple Silicon):** `VPX-Micro-Frontend-<version>-macos-arm64.dmg`
+2. Once completed, download the separate artifacts from the workflow run:
+   - **Windows x64 installer:** `VPX-Micro-Frontend-Setup-<version>-windows-x64.zip` contains the matching `.exe`
+   - **Windows x64 portable:** `VPX-Micro-Frontend-<version>-windows-x64.zip` contains the matching `.exe`
+   - **macOS x64 (Intel):** `VPX-Micro-Frontend-<version>-macos-x64.zip` contains the matching `.dmg`
+   - **macOS arm64 (Apple Silicon):** `VPX-Micro-Frontend-<version>-macos-arm64.zip` contains the matching `.dmg`
 3. Test the artifacts and manually publish them through **GitHub Releases**.
 
-The version is read from `package.json`. All four files are combined into one ZIP without nested archives or platform folders. The temporary per-platform artifacts are deleted after merging. If any build or required file is missing, the workflow fails instead of producing an incomplete combined artifact. The combined artifact is retained for 14 days.
+The version is read from `package.json`. Each ZIP contains one file with the same base name; extract it to access the installer, portable executable, or disk image. The workflow fails if a required file is missing. Artifacts are retained for 14 days.
 
 > **Note:** Builds are unsigned. macOS may display security warnings. The workflow does not create drafts or modify releases, even if a release for the same version already exists.
 
