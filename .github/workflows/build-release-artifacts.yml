@@ -45,6 +45,11 @@ jobs:
           corepack enable
           corepack prepare yarn@1.22.22 --activate
 
+      - name: Read package version
+        id: package
+        shell: bash
+        run: node -p "'version=' + require('./package.json').version" >> "$GITHUB_OUTPUT"
+
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
@@ -52,12 +57,24 @@ jobs:
         run: yarn build:prod
 
       - name: Package application
-        run: yarn package:${{ matrix.platform }} --${{ matrix.arch }} --publish never
+        run: >-
+          yarn package:${{ matrix.platform }} --${{ matrix.arch }} --publish never
+          --config.artifactName="VPX-Micro-Frontend-${{ steps.package.outputs.version }}-${{ matrix.artifact }}.${{ matrix.extension }}"
+          --config.nsis.artifactName="VPX-Micro-Frontend-Setup-${{ steps.package.outputs.version }}-${{ matrix.artifact }}.exe"
 
       - name: Upload distributables
         uses: actions/upload-artifact@v5
         with:
-          name: VPX-Micro-Frontend-${{ matrix.artifact }}
-          path: dist/*.${{ matrix.extension }}
+          name: VPX-Micro-Frontend-${{ steps.package.outputs.version }}-${{ matrix.artifact }}${{ matrix.platform == 'win' && '-portable' || '' }}
+          path: dist/VPX-Micro-Frontend-${{ steps.package.outputs.version }}-${{ matrix.artifact }}.${{ matrix.extension }}
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload Windows installer
+        if: matrix.platform == 'win'
+        uses: actions/upload-artifact@v5
+        with:
+          name: VPX-Micro-Frontend-${{ steps.package.outputs.version }}-${{ matrix.artifact }}-installer
+          path: dist/VPX-Micro-Frontend-Setup-${{ steps.package.outputs.version }}-${{ matrix.artifact }}.exe
           if-no-files-found: error
           retention-days: 14

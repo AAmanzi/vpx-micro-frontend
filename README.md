@@ -49,11 +49,13 @@ Download the latest build from GitHub Releases for your platform:
 **Download options:**
 
 - **Installer (recommended)**
+  - Download `VPX-Micro-Frontend-Setup-<version>-windows-x64.exe`
   - Standard Windows installation flow
   - Creates Start Menu/Desktop shortcuts
   - Best for most users
 
 - **Portable (`.exe`)**
+  - Download `VPX-Micro-Frontend-<version>-windows-x64.exe`
   - No installation required
   - Run directly from any folder or USB drive
   - Good for testing or restricted environments
@@ -67,8 +69,8 @@ This app is currently unsigned, so Smart App Control may block it. If the app do
 **Download and install:**
 
 1. Download the `.dmg` file from releases that matches your Mac:
-   - **Apple Silicon** (M1 or newer): the file ending in `-arm64.dmg`
-   - **Intel**: the file without an architecture suffix (for example `VPX Micro Frontend-1.3.0.dmg`)
+   - **Apple Silicon** (M1 or newer): `VPX-Micro-Frontend-<version>-macos-arm64.dmg`
+   - **Intel**: `VPX-Micro-Frontend-<version>-macos-x64.dmg`
 
    Not sure which you have? Open **Apple menu → About This Mac** and check **Chip** (Apple M-series) or **Processor** (Intel).
 2. Open the `.dmg` file
@@ -364,10 +366,13 @@ Release artifacts can be built using **GitHub Actions** without a local build en
 
 1. Go to **Actions → Build release artifacts → Run workflow**.
 2. Once completed, download the artifacts from the workflow run:
-   - **Windows x64:** Installer and portable `.exe`
-   - **macOS x64 (Intel):** `VPX Micro Frontend-<version>.dmg`
-   - **macOS arm64 (Apple Silicon):** `VPX Micro Frontend-<version>-arm64.dmg`
+   - **Windows x64 installer:** `VPX-Micro-Frontend-<version>-windows-x64-installer` contains `VPX-Micro-Frontend-Setup-<version>-windows-x64.exe`
+   - **Windows x64 portable:** `VPX-Micro-Frontend-<version>-windows-x64-portable` contains `VPX-Micro-Frontend-<version>-windows-x64.exe`
+   - **macOS x64 (Intel):** `VPX-Micro-Frontend-<version>-macos-x64` contains `VPX-Micro-Frontend-<version>-macos-x64.dmg`
+   - **macOS arm64 (Apple Silicon):** `VPX-Micro-Frontend-<version>-macos-arm64` contains `VPX-Micro-Frontend-<version>-macos-arm64.dmg`
 3. Test the artifacts and manually publish them through **GitHub Releases**.
+
+The version is read from `package.json`. Each artifact downloads as a ZIP; extract it to access the installer, portable executable, or disk image. The Windows installer and portable app are uploaded separately, and the workflow fails if either file is missing.
 
 > **Note:** Builds are unsigned. macOS may display security warnings. The workflow does not automatically publish releases.
 
