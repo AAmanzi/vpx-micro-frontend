@@ -66,7 +66,11 @@ This app is currently unsigned, so Smart App Control may block it. If the app do
 
 **Download and install:**
 
-1. Download the `.dmg` file from releases
+1. Download the `.dmg` file from releases that matches your Mac:
+   - **Apple Silicon** (M1 or newer): the file ending in `-arm64.dmg`
+   - **Intel**: the file without an architecture suffix (for example `VPX Micro Frontend-1.3.0.dmg`)
+
+   Not sure which you have? Open **Apple menu → About This Mac** and check **Chip** (Apple M-series) or **Processor** (Intel).
 2. Open the `.dmg` file
 3. Drag the VPX Micro Frontend app into the **Applications** folder
 4. Open Applications and launch **VPX Micro Frontend**
@@ -353,6 +357,19 @@ This outputs `dist/win-unpacked/` (or platform-specific equivalent).
 - Builds are platform-specific; run on Windows to build `.exe` and on macOS to build `.dmg`.
 - If Defender/permissions interfere with Windows packaging, run the terminal as Administrator and retry.
 - macOS builds require Xcode command-line tools: `xcode-select --install`
+
+## Building release artifacts
+
+Release artifacts can be built using **GitHub Actions** without a local build environment.
+
+1. Go to **Actions → Build release artifacts → Run workflow**.
+2. Once completed, download the artifacts from the workflow run:
+   - **Windows x64:** Installer and portable `.exe`
+   - **macOS x64 (Intel):** `VPX Micro Frontend-<version>.dmg`
+   - **macOS arm64 (Apple Silicon):** `VPX Micro Frontend-<version>-arm64.dmg`
+3. Test the artifacts and manually publish them through **GitHub Releases**.
+
+> **Note:** Builds are unsigned. macOS may display security warnings. The workflow does not automatically publish releases.
 
 ## Troubleshooting
 

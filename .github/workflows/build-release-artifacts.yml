@@ -1,0 +1,63 @@
+name: Build release artifacts
+
+'on':
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.platform }} ${{ matrix.arch }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform: win
+            arch: x64
+            artifact: windows-x64
+            extension: exe
+          - os: macos-latest
+            platform: mac
+            arch: x64
+            artifact: macos-x64
+            extension: dmg
+          - os: macos-latest
+            platform: mac
+            arch: arm64
+            artifact: macos-arm64
+            extension: dmg
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Activate Yarn
+        run: |
+          corepack enable
+          corepack prepare yarn@1.22.22 --activate
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build production assets
+        run: yarn build:prod
+
+      - name: Package application
+        run: yarn package:${{ matrix.platform }} --${{ matrix.arch }}
+
+      - name: Upload distributables
+        uses: actions/upload-artifact@v4
+        with:
+          name: VPX-Micro-Frontend-${{ matrix.artifact }}
+          path: dist/*.${{ matrix.extension }}
+          if-no-files-found: error
+          retention-days: 14
