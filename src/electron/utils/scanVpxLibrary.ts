@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { FileSystemItem, TableFile } from 'src/types/file';
-import { ResolvedTable } from 'src/types/table';
+import { ResolvedTable, ScanResult } from 'src/types/table';
 
 import { normalizePathForComparison, resolveUserPath } from './path';
 import { getExpectedRomNameFromVpxFile } from './vpxParsing';
@@ -263,11 +263,7 @@ export const scanFilesByExtension = (
 
 export const findTablesWithMissingFiles = (
   tables: Array<ResolvedTable>,
-): Array<{
-  table: ResolvedTable;
-  missingVpxFile: boolean;
-  missingRomFile: boolean;
-}> => {
+): ScanResult['tablesWithMissingFiles'] => {
   const resolveFilePath = (filePath?: string): string | null => {
     if (!filePath) {
       return null;
@@ -296,19 +292,18 @@ export const findTablesWithMissingFiles = (
     }
   };
 
-  const tablesWithMissingFiles: Array<{
-    table: ResolvedTable;
-    missingVpxFile: boolean;
-    missingRomFile: boolean;
-  }> = [];
+  const tablesWithMissingFiles: ScanResult['tablesWithMissingFiles'] = [];
 
   tables.forEach((table) => {
     const missingVpxFile = !fileExists(table.vpxFilePath);
     const missingRomFile =
       Boolean(resolveFilePath(table.romFilePath)) &&
       !fileExists(table.romFilePath);
+    const missingBackglassFile =
+      Boolean(resolveFilePath(table.backglassFilePath)) &&
+      !fileExists(table.backglassFilePath);
 
-    if (!missingVpxFile && !missingRomFile) {
+    if (!missingVpxFile && !missingRomFile && !missingBackglassFile) {
       return;
     }
 
@@ -316,6 +311,7 @@ export const findTablesWithMissingFiles = (
       table,
       missingVpxFile,
       missingRomFile,
+      missingBackglassFile,
     });
   });
 

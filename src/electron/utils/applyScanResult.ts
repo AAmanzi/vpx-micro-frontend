@@ -64,12 +64,18 @@ export function cleanTablesWithMissingFiles(
   data: ScanResult['tablesWithMissingFiles'],
 ): void {
   data.forEach((item) => {
-    const { table, missingVpxFile, missingRomFile } = item;
+    const { table, missingVpxFile, missingRomFile, missingBackglassFile } =
+      item;
 
     if (missingVpxFile) {
       tablesDb.remove(table.id);
-    } else if (missingRomFile) {
-      tablesDb.updateFileReference(table.id, 'romFileId', 'rom');
+    } else {
+      if (missingRomFile) {
+        tablesDb.updateFileReference(table.id, 'romFileId', 'rom');
+      }
+      if (missingBackglassFile) {
+        tablesDb.updateFileReference(table.id, 'backglassFileId', 'directb2s');
+      }
     }
   });
 }

@@ -147,7 +147,13 @@ Safety:
 Definition:
 
 * DB entry exists
-* `.vpx` or `rom` file not found
+* `.vpx`, associated ROM, or associated DirectB2S file not found
+
+Missing backglasses appear in Tables With Missing Files, including combined
+VPX/ROM/backglass failures. Selecting a row clears its missing ROM and backglass
+associations on Apply Changes; a missing VPX removes the table instead. Deselecting
+a row preserves those references. Tables without an assigned backglass are not
+reported as missing a backglass.
 
 Additionally detect:
 

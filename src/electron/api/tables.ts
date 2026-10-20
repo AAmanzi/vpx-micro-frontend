@@ -1096,14 +1096,6 @@ export async function applyScanResult(
 ): Promise<ApiResult<null>> {
   try {
     await registerTableFiles(scanResult.newTables);
-    scanResult.backglassUpdates.forEach(({ tableId, backglass }) => {
-      tablesDb.updateFileReference(
-        tableId,
-        'backglassFileId',
-        'directb2s',
-        backglass?.path,
-      );
-    });
     const tablesByPath = new Map(
       tablesDb
         .getAllResolved()
@@ -1133,6 +1125,16 @@ export async function applyScanResult(
     }
     deleteUnusedRoms(scanResult.unmatchedRoms);
     cleanTablesWithMissingFiles(scanResult.tablesWithMissingFiles);
+    scanResult.backglassUpdates.forEach(({ tableId, backglass }) => {
+      if (backglass) {
+        tablesDb.updateFileReference(
+          tableId,
+          'backglassFileId',
+          'directb2s',
+          backglass.path,
+        );
+      }
+    });
 
     const importedPaths = new Set(
       scanResult.newTables.map((table) =>

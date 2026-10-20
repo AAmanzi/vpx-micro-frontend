@@ -65,6 +65,7 @@ export interface ScanResult {
     table: ResolvedTable;
     missingVpxFile: boolean;
     missingRomFile: boolean;
+    missingBackglassFile: boolean;
   }>;
 }
 
