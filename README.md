@@ -73,6 +73,7 @@ This app is currently unsigned, so Smart App Control may block it. If the app do
    - **Intel**: `VPX-Micro-Frontend-<version>-macos-x64.dmg`
 
    Not sure which you have? Open **Apple menu → About This Mac** and check **Chip** (Apple M-series) or **Processor** (Intel).
+
 2. Open the `.dmg` file
 3. Drag the VPX Micro Frontend app into the **Applications** folder
 4. Open Applications and launch **VPX Micro Frontend**
@@ -97,6 +98,7 @@ The app includes a guided setup wizard to help you configure VPX on macOS.
 **Guided Setup (Recommended):**
 
 Click **Begin Setup** in the Settings → File Paths section to start a step-by-step guide that covers:
+
 1. Installing/locating VPX
 2. Configuring the VPX executable path
 3. Setting up Tables and ROMs folders
@@ -169,13 +171,11 @@ may require additional setup outside this app.
 ![Table card actions](public/readme/table-card-actions.png)
 
 - **Play** button launches the table.
-- **Kebab menu** lets you:
-  - Rename table
-  - Edit ROM — set the ROM file associated with this table
-  - Table Image (if available from VPS DB) — click to view or edit image selection from alternate results.
-  - VPX Executable — open launch settings to set a different VPX executable for this table and, on Windows, optional per-table launch-flag overrides. Unset flags use the global defaults.
-  - Delete Table — removes the DB entry and deletes the table's files from VPX folders
-  - Archive / Unarchive table — archive the table to hide it from your active library.
+- **Kebab menu** groups table actions:
+  - Rename Table and Table Image
+  - **Files:** Edit ROM, Edit Backglass, and VPX Executable. The executable action opens launch settings for a different VPX executable and, on Windows, optional per-table launch-flag overrides. Unset flags use the global defaults.
+  - **Library:** Archive Table / Unarchive Table to hide or restore the table in your active library.
+  - **Delete Table:** removes the DB entry and deletes the table's files from VPX folders.
 
 ### Table Images
 
@@ -222,7 +222,6 @@ There's also a snapshot of VPS DB as backup at [VPS Backup snapshot](https://aam
 - Mark tables as "Android" and preview them in the Android tab
 - From the **Android tab**, select **Sync Android**
 - Preview Changes and sync your libraries
-
 
 ![Enable android features](public/readme/android-features-enabled.png)
 ![Mark table for android](public/readme/mark-for-android.png)
