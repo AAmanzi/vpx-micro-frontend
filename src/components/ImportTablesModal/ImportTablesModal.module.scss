@@ -27,6 +27,27 @@
   gap: 12px;
 }
 
+.unmatchedBackglass {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 16px;
+  border: thin solid var(--gray);
+}
+
+.backglassMatchDetails {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.removeBackglassMatch {
+  display: flex;
+  flex-shrink: 0;
+}
+
 .footer {
   padding: 24px 24px 0;
   border-top: thin solid var(--gray);

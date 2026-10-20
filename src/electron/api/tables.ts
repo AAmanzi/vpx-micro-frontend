@@ -5,7 +5,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { TABLE_STARTUP_LOCK_MS } from 'src/consts/platform';
 import type { ApiResult } from 'src/types/api';
 import type { LaunchFlags } from 'src/types/config';
-import type { FileSystemItem, TableFile } from 'src/types/file';
+import type {
+  BackglassImportAssignment,
+  FileSystemItem,
+  TableFile,
+} from 'src/types/file';
 import { GroupType, ResolvedTable, ScanResult, Table } from 'src/types/table';
 
 import * as configDb from '../database/config';
@@ -17,8 +21,10 @@ import {
 } from '../utils/applyScanResult';
 import {
   copyFile,
+  copyFileExclusive,
   createDirectoryIfNotExists,
   deleteFile,
+  ensureSourceFile,
   moveFile,
   removeEmptyParentDirectories,
 } from '../utils/fileManagement';
@@ -468,14 +474,109 @@ export function clearTableImage(tableId: string): ApiResult<null> {
 export async function importTables(
   tableFiles: Array<TableFile>,
   deleteAfterImport: boolean,
+  existingTableBackglasses: Array<BackglassImportAssignment> = [],
 ): Promise<ApiResult<null>> {
   try {
+    if (tableFiles.length === 0) {
+      return {
+        success: false,
+        error: {
+          code: 'NO_TABLES_TO_IMPORT',
+          message:
+            'Import at least one VPX table to import or assign backglasses',
+        },
+      };
+    }
+
     const transferFile = deleteAfterImport ? moveFile : copyFile;
     const movedSourceFilePaths = new Set<string>();
     let missingSourceFailures = 0;
     let permissionFailures = 0;
+    let backglassFailures = 0;
+    let sourceCleanupFailures = 0;
+    let hasImportedFiles = false;
     const tablesDirectoryPath = configDb.getTablesDirectoryPath();
     const romsDirectoryPath = configDb.getRomsDirectoryPath();
+    const existingLibraryBackglassPaths = new Set(
+      tablesDb
+        .getFilesByType('directb2s')
+        .map((file) => normalizePathForComparison(file.path)),
+    );
+    const expectedBackglassCopies = new Map<
+      string,
+      { sourcePath: string; expected: number; completed: number }
+    >();
+    const protectedBackglassPaths = new Set<string>();
+    const getBackglassDestinationPath = (vpxFilePath: string) =>
+      path.join(
+        path.dirname(vpxFilePath),
+        `${path.basename(vpxFilePath, path.extname(vpxFilePath))}.directb2s`,
+      );
+
+    const expectBackglassCopy = (sourcePath: string, targetPath: string) => {
+      const sourceKey = normalizePathForComparison(sourcePath);
+      const copy = expectedBackglassCopies.get(sourceKey) ?? {
+        sourcePath,
+        expected: 0,
+        completed: 0,
+      };
+      copy.expected += 1;
+      expectedBackglassCopies.set(sourceKey, copy);
+      protectedBackglassPaths.add(normalizePathForComparison(targetPath));
+    };
+    tableFiles.forEach((tableFile) => {
+      if (tableFile.backglass) {
+        const targetPath = getBackglassDestinationPath(
+          path.join(tablesDirectoryPath, tableFile.fileName),
+        );
+        expectBackglassCopy(tableFile.backglass.path, targetPath);
+      }
+    });
+    existingTableBackglasses.forEach(({ tableId, backglass }) => {
+      const table = tablesDb.getResolved(tableId);
+      if (table) {
+        const targetPath = getBackglassDestinationPath(table.vpxFilePath);
+        expectBackglassCopy(backglass.path, targetPath);
+      }
+    });
+
+    const importBackglass = (
+      tableId: string,
+      sourcePath: string,
+      targetPath: string,
+    ) => {
+      const sourceKey = normalizePathForComparison(sourcePath);
+      const normalizedTargetPath = normalizePathForComparison(targetPath);
+
+      if (sourceKey !== normalizedTargetPath) {
+        copyFileExclusive(sourcePath, targetPath);
+      } else {
+        ensureSourceFile(sourcePath);
+      }
+
+      try {
+        const updatedTable = tablesDb.updateFileReference(
+          tableId,
+          'backglassFileId',
+          'directb2s',
+          targetPath,
+        );
+        if (!updatedTable) {
+          throw new Error(`Table not found: ${tableId}`);
+        }
+      } catch (error) {
+        if (sourceKey !== normalizedTargetPath) {
+          deleteFile(targetPath);
+        }
+        throw error;
+      }
+
+      const copy = expectedBackglassCopies.get(sourceKey);
+      if (copy) {
+        copy.completed += 1;
+      }
+      hasImportedFiles = true;
+    };
 
     const existingVpxPaths = new Set(
       tablesDb
@@ -516,6 +617,9 @@ export async function importTables(
         );
 
         if (existingVpxPaths.has(normalizedDestinationPath)) {
+          if (tableFile.backglass) {
+            backglassFailures += 1;
+          }
           continue;
         }
 
@@ -568,7 +672,27 @@ export async function importTables(
           vpxDestinationFilePath,
           romDestinationFilePath,
         );
+        hasImportedFiles = true;
         existingVpxPaths.add(normalizedDestinationPath);
+
+        if (tableFile.backglass) {
+          const backglassDestinationPath = getBackglassDestinationPath(
+            vpxDestinationFilePath,
+          );
+          try {
+            importBackglass(
+              nextTable.id,
+              tableFile.backglass.path,
+              backglassDestinationPath,
+            );
+          } catch (error) {
+            backglassFailures += 1;
+            console.warn(
+              `Failed to import backglass for ${tableFile.fileName}:`,
+              error,
+            );
+          }
+        }
       } catch (error) {
         if (
           error &&
@@ -595,29 +719,103 @@ export async function importTables(
       }
     }
 
+    existingTableBackglasses.forEach(({ tableId, backglass }) => {
+      try {
+        const table = tablesDb.getResolved(tableId);
+        if (!table || table.backglassFilePath) {
+          backglassFailures += 1;
+          return;
+        }
+
+        const backglassDestinationPath = getBackglassDestinationPath(
+          table.vpxFilePath,
+        );
+        importBackglass(tableId, backglass.path, backglassDestinationPath);
+      } catch (error) {
+        backglassFailures += 1;
+        console.warn(
+          `Failed to import backglass for library table ${tableId}:`,
+          error,
+        );
+      }
+    });
+
     if (deleteAfterImport) {
+      expectedBackglassCopies.forEach((copy) => {
+        if (
+          copy.expected === copy.completed &&
+          copy.expected > 0 &&
+          !existingLibraryBackglassPaths.has(
+            normalizePathForComparison(copy.sourcePath),
+          ) &&
+          !protectedBackglassPaths.has(
+            normalizePathForComparison(copy.sourcePath),
+          )
+        ) {
+          try {
+            deleteFile(copy.sourcePath);
+            movedSourceFilePaths.add(copy.sourcePath);
+          } catch (error) {
+            sourceCleanupFailures += 1;
+            console.warn(
+              `Backglass imported, but failed to delete source ${copy.sourcePath}:`,
+              error,
+            );
+          }
+        }
+      });
       Array.from(movedSourceFilePaths).forEach((sourceFilePath) => {
-        removeEmptyParentDirectories(sourceFilePath);
+        try {
+          removeEmptyParentDirectories(sourceFilePath);
+        } catch (error) {
+          sourceCleanupFailures += 1;
+          console.warn(
+            `Files imported, but failed to clean up source folders for ${sourceFilePath}:`,
+            error,
+          );
+        }
       });
     }
 
-    if (missingSourceFailures > 0) {
-      return {
-        success: true,
-        data: null,
-        warning: {
-          code: 'IMPORT_MISSING_SOURCE_FILES',
-          message: `${missingSourceFailures} table(s) failed to import because source files were missing`,
-        },
-      };
-    }
+    const failureMessage = [
+      missingSourceFailures > 0
+        ? `${missingSourceFailures} table(s) failed to import because source files were missing`
+        : '',
+      permissionFailures > 0
+        ? `${permissionFailures} table(s) failed to import because access was denied. The destination folder (e.g. Program Files) may require administrator access. Move your VPX library to C:\\Visual Pinball and update the library path in Settings, then try again`
+        : '',
+      backglassFailures > 0
+        ? `${backglassFailures} backglass file(s) could not be assigned because the destination already exists or the copy failed; existing files were preserved`
+        : '',
+      sourceCleanupFailures > 0
+        ? `${sourceCleanupFailures} source file/folder cleanup operation(s) failed after import; imported files were kept, but some originals or source folders may remain`
+        : '',
+    ]
+      .filter(Boolean)
+      .join('. ');
 
-    if (permissionFailures > 0) {
+    if (permissionFailures > 0 && !hasImportedFiles) {
       return {
         success: false,
         error: {
           code: 'IMPORT_PERMISSION_DENIED',
-          message: `Permission denied. The destination folder (e.g. Program Files) requires administrator access. Move your VPX library to C:\\Visual Pinball and update the library path in Settings, then try again.`,
+          message: failureMessage,
+        },
+      };
+    }
+
+    if (failureMessage) {
+      return {
+        success: true,
+        data: null,
+        warning: {
+          code:
+            backglassFailures > 0 ||
+            permissionFailures > 0 ||
+            sourceCleanupFailures > 0
+              ? 'IMPORT_PARTIAL_FAILURE'
+              : 'IMPORT_MISSING_SOURCE_FILES',
+          message: failureMessage,
         },
       };
     }

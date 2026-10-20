@@ -1,7 +1,8 @@
 import classNames from 'classnames';
-import { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useCallback, useRef, useState } from 'react';
 
 import { FileSystemItem } from 'src/types/file';
+import useClickOutside from 'src/utils/useClickOutside';
 
 import Icon from '../Icon';
 import Tag, { Type as TagType } from '../Tag';
@@ -28,6 +29,11 @@ const RomPicker: FunctionComponent<Props> = ({
   onSelect,
 }) => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
+  const pickerRef = useRef<HTMLDivElement | null>(null);
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const closeSelect = useCallback(() => setIsSelectOpen(false), []);
+  useClickOutside(pickerRef, closeSelect, { ignoreRef: menuRef });
 
   const hasOptions =
     manuallyImportedRoms.length > 0 ||
@@ -42,26 +48,29 @@ const RomPicker: FunctionComponent<Props> = ({
 
   if (selectedRom) {
     return (
-      <div className={style.romInfo}>
-        <Tag icon='package' label={selectedRom.name} type={TagType.success} />
-        <button
-          type='button'
-          className={classNames(style.removeButton, style.small)}
-          onClick={onRemoveRom}>
-          <Icon
-            className={classNames('secondary-text-color', style.removeIcon)}
-            icon='cross'
-            width={14}
-            height={14}
-          />
-        </button>
+      <div className={style.assignRom} ref={pickerRef}>
+        <div className={style.romInfo}>
+          <Tag icon='package' label={selectedRom.name} type={TagType.success} />
+          <button
+            type='button'
+            className={classNames(style.removeButton, style.small)}
+            onClick={onRemoveRom}>
+            <Icon
+              className={classNames('secondary-text-color', style.removeIcon)}
+              icon='cross'
+              width={14}
+              height={14}
+            />
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className={style.assignRom}>
+    <div className={style.assignRom} ref={pickerRef}>
       <button
+        ref={buttonRef}
         type='button'
         className={classNames(style.assignButton, {
           [style.noRomExpected]: !expectedRomName,
@@ -93,12 +102,14 @@ const RomPicker: FunctionComponent<Props> = ({
       </button>
       {isSelectOpen && (
         <RomSelect
+          buttonRef={buttonRef}
+          menuRef={menuRef}
           manuallyImportedRoms={manuallyImportedRoms}
           scannedRoms={scannedRoms}
           libraryRoms={libraryRoms}
           expectedRomName={expectedRomName}
           onSelect={onSelect}
-          onClose={() => setIsSelectOpen(false)}
+          onClose={closeSelect}
         />
       )}
     </div>

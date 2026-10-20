@@ -4,7 +4,7 @@ import {
   AndroidSyncProgressEvent,
 } from './android';
 import { Config, LaunchFlags, Platform } from './config';
-import { FileSystemItem, TableFile } from './file';
+import { BackglassImportAssignment, FileSystemItem, TableFile } from './file';
 import { GroupType, ResolvedTable, ScanResult } from './table';
 
 export interface ApiError {
@@ -66,6 +66,7 @@ export interface Api {
   importTables: (
     tables: Array<TableFile>,
     deleteAfterImport: boolean,
+    existingTableBackglasses?: Array<BackglassImportAssignment>,
   ) => Promise<ApiResult<null>>;
   startTable: (tableId: string) => Promise<ApiResult<null>>;
   clearTables: () => Promise<ApiResult<null>>;

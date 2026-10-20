@@ -99,6 +99,7 @@ const Modal: FunctionComponent<Props> = ({
           [style.allowOverflow]: allowOverflow,
         })}>
         <div
+          data-modal-container
           className={classNames(
             style.modal,
             modalClassName,

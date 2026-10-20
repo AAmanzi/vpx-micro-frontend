@@ -5,7 +5,7 @@ import { FileSystemItem, TableFile } from 'src/types/file';
 import { ResolvedTable } from 'src/types/table';
 import { normalizePathForComparison } from 'src/utils';
 
-import { ImportSelectionResult } from '../types';
+import { ExistingTableBackglass, ImportSelectionResult } from '../types';
 import { applyExpectedRoms } from './rules';
 
 const isVpxFile = (file: FileSystemItem): boolean =>
@@ -13,6 +13,12 @@ const isVpxFile = (file: FileSystemItem): boolean =>
 
 const isRomFile = (file: FileSystemItem): boolean =>
   file.name.toLowerCase().endsWith('.zip');
+
+const isBackglassFile = (file: FileSystemItem): boolean =>
+  file.name.toLowerCase().endsWith('.directb2s');
+
+const getFileStem = (fileName: string): string =>
+  path.basename(fileName, path.extname(fileName)).trim().toLowerCase();
 
 const createTableFile = async (
   file: FileSystemItem,
@@ -45,13 +51,19 @@ const createTableFile = async (
 export const buildImportSelectionResult = async ({
   currentTables,
   currentUnassignedRoms,
+  currentUnassignedBackglasses,
+  currentExistingTableBackglasses,
   incomingFiles,
   libraryRoms,
+  existingTables,
 }: {
   currentTables: Array<TableFile>;
   currentUnassignedRoms: Array<FileSystemItem>;
+  currentUnassignedBackglasses: Array<FileSystemItem>;
+  currentExistingTableBackglasses: Array<ExistingTableBackglass>;
   incomingFiles: Array<FileSystemItem>;
   libraryRoms: Array<FileSystemItem>;
+  existingTables: Array<ResolvedTable>;
 }): Promise<ImportSelectionResult> => {
   const knownTablePaths = new Set(currentTables.map((table) => table.filePath));
   const knownRomPaths = new Set([
@@ -84,7 +96,78 @@ export const buildImportSelectionResult = async ({
     .filter(isRomFile)
     .filter((file) => !knownRomPaths.has(file.path));
 
-  const nextTables = [...currentTables, ...newTables];
+  const knownBackglassPaths = new Set(
+    [
+      ...currentUnassignedBackglasses,
+      ...currentTables
+        .map((table) => table.backglass)
+        .filter((backglass): backglass is FileSystemItem => Boolean(backglass)),
+      ...currentExistingTableBackglasses.map((item) => item.backglass),
+    ].map((backglass) => normalizePathForComparison(backglass.path)),
+  );
+  const newBackglasses = incomingFiles
+    .filter(isBackglassFile)
+    .filter(
+      (backglass) =>
+        !knownBackglassPaths.has(normalizePathForComparison(backglass.path)),
+    );
+  const backglassesByStem = new Map<string, Array<FileSystemItem>>();
+  [...currentUnassignedBackglasses, ...newBackglasses].forEach((backglass) => {
+    const stem = getFileStem(backglass.name);
+    const candidates = backglassesByStem.get(stem) ?? [];
+    candidates.push(backglass);
+    backglassesByStem.set(stem, candidates);
+  });
+
+  const nextTables = [...currentTables, ...newTables].map((table) => {
+    if (table.backglass) {
+      return table;
+    }
+
+    const matches = backglassesByStem.get(getFileStem(table.fileName));
+    return matches?.length === 1 ? { ...table, backglass: matches[0] } : table;
+  });
+
+  const assignedBackglassPaths = new Set(
+    nextTables
+      .map((table) => table.backglass?.path)
+      .filter((filePath): filePath is string => Boolean(filePath))
+      .map(normalizePathForComparison),
+  );
+  const existingAssignments = [...currentExistingTableBackglasses];
+  existingTables.forEach((table) => {
+    if (
+      table.backglassFilePath ||
+      existingAssignments.some((item) => item.tableId === table.id)
+    ) {
+      return;
+    }
+
+    const matches = backglassesByStem.get(getFileStem(table.vpxFile));
+    if (matches?.length === 1) {
+      const backglass = matches[0];
+      const normalizedPath = normalizePathForComparison(backglass.path);
+      if (!assignedBackglassPaths.has(normalizedPath)) {
+        existingAssignments.push({
+          tableId: table.id,
+          tableName: table.name,
+          vpxFileName: table.vpxFile,
+          backglass,
+        });
+        assignedBackglassPaths.add(normalizedPath);
+      }
+    }
+  });
+
+  const backglassFiles = new Map<string, FileSystemItem>();
+  [...currentUnassignedBackglasses, ...newBackglasses].forEach((backglass) => {
+    backglassFiles.set(normalizePathForComparison(backglass.path), backglass);
+  });
+  const assignedExistingBackglassPaths = new Set(
+    existingAssignments.map((item) =>
+      normalizePathForComparison(item.backglass.path),
+    ),
+  );
   const romsByPath = new Map(
     [
       ...currentUnassignedRoms,
@@ -103,6 +186,17 @@ export const buildImportSelectionResult = async ({
 
   return {
     ...result,
+    tablesToImport: result.tablesToImport,
+    unassignedBackglasses: Array.from(backglassFiles.values()).filter(
+      (backglass) => {
+        const normalizedPath = normalizePathForComparison(backglass.path);
+        return (
+          !assignedBackglassPaths.has(normalizedPath) &&
+          !assignedExistingBackglassPaths.has(normalizedPath)
+        );
+      },
+    ),
+    existingTableBackglasses: existingAssignments,
     unassignedRoms: result.unassignedRoms.filter(
       (rom) => !libraryRomPaths.has(normalizePathForComparison(rom.path)),
     ),
@@ -131,6 +225,18 @@ export const filterExistingFiles = ({
       .filter((romFile): romFile is string => Boolean(romFile))
       .map(normalizeName),
   );
+  const existingBackglassPaths = new Set(
+    tables
+      .map((table) => table.backglassFilePath)
+      .filter((filePath): filePath is string => Boolean(filePath))
+      .map(normalizePathForComparison),
+  );
+  const existingBackglassFiles = new Set(
+    tables
+      .map((table) => table.backglassFile)
+      .filter((fileName): fileName is string => Boolean(fileName))
+      .map(normalizeName),
+  );
 
   return files.filter((file) => {
     const incomingName = normalizeName(file.name);
@@ -141,6 +247,14 @@ export const filterExistingFiles = ({
 
     if (isRomFile(file)) {
       return !existingRomFiles.has(incomingName);
+    }
+
+    if (
+      isBackglassFile(file) &&
+      (existingBackglassFiles.has(incomingName) ||
+        existingBackglassPaths.has(normalizePathForComparison(file.path)))
+    ) {
+      return false;
     }
 
     return true;
