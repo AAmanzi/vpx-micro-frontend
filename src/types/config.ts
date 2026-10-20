@@ -20,6 +20,7 @@ export interface Config {
   androidRomsDirectory?: string;
   skippedScanTablePaths?: Array<string>;
   launchFlags?: LaunchFlags;
+  updateNoticeDismissedAt?: number;
 }
 
 export enum Order {

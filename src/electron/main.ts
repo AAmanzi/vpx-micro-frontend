@@ -14,8 +14,10 @@ import type { BackglassImportAssignment, TableFile } from 'src/types/file';
 import type { GroupType, ResolvedTable, ScanResult } from 'src/types/table';
 
 import * as api from './api';
+import { dismissUpdateNotice, getConfig } from './database/config';
 import { runAppMigrations } from './database/migrations';
 import * as db from './database/tables';
+import { createUpdateChecker } from './utils/updates';
 import {
   loadWindowState,
   setupFullScreenControls,
@@ -371,6 +373,31 @@ app.whenReady().then(async () => {
   ipcMain.handle('api:startRandomTable', async (_, tables: ResolvedTable[]) =>
     api.startRandomTable(tables),
   );
+
+  const updateChecker = createUpdateChecker({
+    installedVersion: app.getVersion(),
+    getDismissedAt: () => getConfig().updateNoticeDismissedAt,
+    saveDismissedAt: dismissUpdateNotice,
+    fetchRelease: fetch,
+  });
+  let availableUpdate = updateChecker
+    .check()
+    .then(api.apiSuccess)
+    .catch((error: unknown) => {
+      console.warn('Startup update check failed:', error);
+      return api.apiFailure(error);
+    });
+  ipcMain.handle('api:getAvailableUpdate', async () => availableUpdate);
+  ipcMain.handle('api:dismissUpdateNotice', () => {
+    try {
+      updateChecker.dismiss();
+      availableUpdate = Promise.resolve(api.apiSuccess(null));
+      return api.apiSuccess(null);
+    } catch (error) {
+      console.error('Failed to save update notice dismissal:', error);
+      return api.apiFailure(error);
+    }
+  });
 
   startupComplete = true;
   createWindow();
