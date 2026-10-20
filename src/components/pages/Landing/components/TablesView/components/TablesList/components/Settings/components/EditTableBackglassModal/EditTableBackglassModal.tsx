@@ -7,6 +7,7 @@ import Button, {
   Type as ButtonType,
 } from 'src/components/Button';
 import FileUpload from 'src/components/FileUpload';
+import MacBackglassNotice from 'src/components/MacBackglassNotice';
 import Modal, { Size as ModalSize } from 'src/components/Modal';
 import api from 'src/consts';
 import { useTablesContext } from 'src/providers/tables';
@@ -152,6 +153,7 @@ const EditTableBackglassModal: FunctionComponent<Props> = ({
       onExitClick={close}
       size={ModalSize.medium}
       color={isConfirmingRemove ? 'red' : 'blue'}>
+      <MacBackglassNotice className={style.notice} />
       {isConfirmingRemove ? (
         <div className={style.footer}>
           <Button
