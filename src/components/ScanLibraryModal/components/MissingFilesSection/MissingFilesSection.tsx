@@ -29,23 +29,21 @@ const MissingFilesSection: FunctionComponent<Props> = ({
     <div>
       <SectionHeader
         color='red'
-        title={`${Object.values(includedByTableId).filter(Boolean).length} of ${items.length} selected for removal`}
+        title={`${items.filter((item) => includedByTableId[item.table.id] ?? true).length} of ${items.length} selected for cleanup`}
         onSelectAll={onSelectAll}
         onDeselectAll={onDeselectAll}
         warningIcon='circle-alert'
-        warningText='These tables are in your library but their files are missing. Select to remove from library.'
+        warningText='These tables have missing files. Select to remove tables with missing VPX files or clear missing ROM and backglass associations.'
       />
       <div className={style.list}>
         {items.map((item) => {
           const isIncluded = includedByTableId[item.table.id] ?? true;
-          const tagText =
-            item.missingVpxFile && item.missingRomFile
-              ? 'Missing VPX and ROM'
-              : item.missingRomFile
-                ? 'Missing ROM'
-                : item.missingVpxFile
-                  ? 'Missing VPX'
-                  : '';
+          const missingFiles = [
+            ...(item.missingVpxFile ? ['VPX'] : []),
+            ...(item.missingRomFile ? ['ROM'] : []),
+            ...(item.missingBackglassFile ? ['Backglass'] : []),
+          ];
+          const tagText = `Missing ${missingFiles.join(' and ')}`;
 
           return (
             <button

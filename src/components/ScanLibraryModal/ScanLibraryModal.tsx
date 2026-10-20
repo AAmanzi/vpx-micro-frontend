@@ -70,7 +70,9 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
     useState<Record<string, boolean>>({});
 
   const tableIdsWithMissingFiles = new Set(
-    tablesWithMissingFiles.map((item) => item.table.id),
+    tablesWithMissingFiles
+      .filter((item) => item.missingVpxFile || item.missingRomFile)
+      .map((item) => item.table.id),
   );
   const assignedRoms = getAssignedRoms(
     tables.filter((table) => !tableIdsWithMissingFiles.has(table.id)),
