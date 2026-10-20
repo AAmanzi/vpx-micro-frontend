@@ -1,14 +1,14 @@
 import { FunctionComponent } from 'react';
 
 import { ViewType } from 'src/types/config';
-import { Table } from 'src/types/table';
+import { ResolvedTable } from 'src/types/table';
 
 import style from './TablesList.module.scss';
 import TableCard from './components/TableCard';
 import TableListItem from './components/TableListItem';
 
 interface Props {
-  tables: Array<Table>;
+  tables: Array<ResolvedTable>;
   viewType: ViewType;
   scrollToTopOnTableStart: boolean;
 }

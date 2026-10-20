@@ -5,12 +5,13 @@ import Icon from 'src/components/Icon';
 import api from 'src/consts';
 import { useTablesContext } from 'src/providers/tables';
 import { useToastContext } from 'src/providers/toast';
-import type { Table } from 'src/types/table';
+import type { ResolvedTable } from 'src/types/table';
 import { getTableGradientVariant } from 'src/utils';
 import useClickOutside from 'src/utils/useClickOutside';
 
 import style from './Settings.module.scss';
 import DeleteTableModal from './components/DeleteTableModal';
+import EditTableBackglassModal from './components/EditTableBackglassModal';
 import EditTableExecutableModal from './components/EditTableExecutableModal';
 import EditTableImageModal from './components/EditTableImageModal/EditTableImageModal';
 import EditTableRomModal from './components/EditTableRomModal/EditTableRomModal';
@@ -22,9 +23,9 @@ interface Props {
   romFile?: string;
   romFilePath?: string;
   imgUrl?: string;
-  imagePreference?: Table['imagePreference'];
+  imagePreference?: ResolvedTable['imagePreference'];
   vpxExecutablePath?: string;
-  launchFlags?: Table['launchFlags'];
+  launchFlags?: ResolvedTable['launchFlags'];
   isArchived?: boolean;
   vpxFile: string;
   vpxFilePath: string;
@@ -48,10 +49,13 @@ const Settings: FunctionComponent<Props> = ({
   const ref = useRef<HTMLDivElement | null>(null);
   useClickOutside(ref, close, { ignoreSelector: '#modal' });
 
-  const { fetchTables } = useTablesContext();
+  const { fetchTables, tables } = useTablesContext();
   const { showErrorToast } = useToastContext();
+  const table = tables.find((item) => item.id === id);
 
   const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
+  const [isEditBackglassModalOpen, setIsEditBackglassModalOpen] =
+    useState(false);
   const [isEditTableRomModalOpen, setIsEditTableRomModalOpen] = useState(false);
   const [isEditTableImageModalOpen, setIsEditTableImageModalOpen] =
     useState(false);
@@ -61,6 +65,12 @@ const Settings: FunctionComponent<Props> = ({
 
   const closeRenameModal = () => {
     setIsRenameModalOpen(false);
+    fetchTables();
+    close();
+  };
+
+  const closeEditBackglassModal = () => {
+    setIsEditBackglassModalOpen(false);
     fetchTables();
     close();
   };
@@ -115,6 +125,16 @@ const Settings: FunctionComponent<Props> = ({
         </span>
       </button>
       <button
+        onClick={() => setIsEditBackglassModalOpen(true)}
+        className={style.button}>
+        <div className={style.iconWrapper}>
+          <Icon icon='wallpaper' className={style.icon} />
+        </div>
+        <span className={classNames('body-sm-semibold', style.label)}>
+          Edit Backglass
+        </span>
+      </button>
+      <button
         onClick={() => setIsEditTableRomModalOpen(true)}
         className={style.button}>
         <div className={style.iconWrapper}>
@@ -165,6 +185,14 @@ const Settings: FunctionComponent<Props> = ({
       {isRenameModalOpen && (
         <RenameTableModal id={id} name={name} close={closeRenameModal} />
       )}
+      {isEditBackglassModalOpen && (
+        <EditTableBackglassModal
+          id={id}
+          currentBackglassName={table?.backglassFile}
+          currentBackglassPath={table?.backglassFilePath}
+          close={closeEditBackglassModal}
+        />
+      )}
       {isEditTableRomModalOpen && (
         <EditTableRomModal
           id={id}
@@ -185,7 +213,7 @@ const Settings: FunctionComponent<Props> = ({
             romFile,
             vpxFile,
             id,
-          } as Table)}
+          } as ResolvedTable)}
         />
       )}
       {isEditExecutableModalOpen && (

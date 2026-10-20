@@ -11,7 +11,7 @@ import { TABLE_STARTUP_LOCK_MS } from 'src/consts/platform';
 import { useConfigContext } from 'src/providers/config';
 import { useTablesContext } from 'src/providers/tables';
 import { useToastContext } from 'src/providers/toast';
-import { Table } from 'src/types/table';
+import { ResolvedTable } from 'src/types/table';
 import {
   displayDate,
   displayRelativeDate,
@@ -22,7 +22,7 @@ import {
 import SettingsPopover from '../SettingsPopover';
 import style from './TableCard.module.scss';
 
-type Props = Table & {
+type Props = ResolvedTable & {
   scrollToTopOnTableStart: boolean;
 };
 
@@ -70,12 +70,12 @@ const TableCard: FunctionComponent<Props> = ({
     romFile,
     vpxFile,
     id,
-  } as Table);
+  } as ResolvedTable);
   const tableGradientColor = getTableGradientVariable({
     romFile,
     vpxFile,
     id,
-  } as Table);
+  } as ResolvedTable);
   const { showErrorToast } = useToastContext();
   const { fetchTables } = useTablesContext();
   const { config } = useConfigContext();

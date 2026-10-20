@@ -131,10 +131,14 @@ If you already have an existing VPX setup, start with Scan Library first.
 ![Import workflow](public/readme/import-tables.gif)
 
 1. Click **Import Tables**.
-2. Drag/drop `.vpx`, `.zip`, or folders.
-3. Review detected tables and unassigned ROMs.
+2. Drag/drop `.vpx`, `.zip`, `.directb2s`, or folders.
+3. Review detected tables, ROMs, and backglass assignments.
 4. Optionally enable **Delete original files after import**.
 5. Click **Import Tables**.
+
+**DirectB2S on macOS:** Playback compatibility hasn't been verified by this
+project. You can import, assign, scan, and export backglass files, but playback
+may require additional setup outside this app.
 
 ## Work with tables
 
@@ -257,6 +261,10 @@ On your Android device:
 - **Clear Library Data** resets app metadata/list only.
 - It does **not** delete your actual VPX/ROM files.
 - **Database Migrations** run automatically on app update to keep existing data compatible.
+
+The library migration saves backups of library data, app configuration, and
+migration history in the active app-data directory's `backups` folder before
+converting the library.
 
 ### Advanced launch settings (Windows)
 

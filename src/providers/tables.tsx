@@ -8,10 +8,10 @@ import {
 } from 'react';
 
 import api from 'src/consts';
-import { Table } from 'src/types/table';
+import { ResolvedTable } from 'src/types/table';
 
 interface TablesContextType {
-  tables: Array<Table>;
+  tables: Array<ResolvedTable>;
   fetchTables: () => void;
 }
 
@@ -30,7 +30,7 @@ export const useTablesContext = () => {
 export const TablesProvider: FunctionComponent<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [tables, setTables] = useState<Array<Table>>([]);
+  const [tables, setTables] = useState<Array<ResolvedTable>>([]);
 
   const fetchTables = () => {
     api.getAllTables().then(({ data }) => {

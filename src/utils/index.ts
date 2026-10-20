@@ -6,7 +6,7 @@ import {
   VPX_DEFAULT_TABLES_PATH,
 } from 'src/consts/vpx';
 import { FileSystemItem } from 'src/types/file';
-import { Table } from 'src/types/table';
+import { ResolvedTable } from 'src/types/table';
 
 export const normalizePathForComparison = (value?: string): string =>
   (value || '').trim().toLowerCase().replace(/\\/g, '/');
@@ -30,7 +30,7 @@ export const mergeRoms = (
 };
 
 export const getAssignedRoms = (
-  tables: Array<Table>,
+  tables: Array<ResolvedTable>,
 ): Array<FileSystemItem> =>
   mergeRoms(
     tables.flatMap((table) =>
@@ -150,7 +150,7 @@ export const getDeterministicVariant = (
   return hash % variantsCount;
 };
 
-export const getTableGradientVariant = (table: Table): string => {
+export const getTableGradientVariant = (table: ResolvedTable): string => {
   const variant = getDeterministicVariant(
     table?.romFile || table.vpxFile || table.id,
     8,
@@ -158,7 +158,7 @@ export const getTableGradientVariant = (table: Table): string => {
   return `tableGradient${variant}`;
 };
 
-export const getTableGradientVariable = (table: Table): string => {
+export const getTableGradientVariable = (table: ResolvedTable): string => {
   const variant = getDeterministicVariant(
     table?.romFile || table.vpxFile || table.id,
     8,

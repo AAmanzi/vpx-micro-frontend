@@ -1,5 +1,6 @@
 .container {
   display: flex;
+  min-width: 0;
   align-items: center;
   padding: 12px;
   border-radius: 16px;
@@ -15,6 +16,7 @@
 .iconWrapper {
   width: 30px;
   height: 30px;
+  flex-shrink: 0;
   margin-right: 12px;
   display: flex;
   align-items: center;
@@ -23,7 +25,14 @@
   border-radius: 12px;
 }
 
+.fileName {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .removeButton {
+  display: flex;
+  flex-shrink: 0;
   opacity: 0;
   margin-left: auto;
   transition: opacity 200ms ease-in;

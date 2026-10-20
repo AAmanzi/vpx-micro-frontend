@@ -8,14 +8,14 @@ import type {
 import type { Api, ApiResult } from 'src/types/api';
 import type { Config, LaunchFlags, Platform } from 'src/types/config';
 import type { FileSystemItem } from 'src/types/file';
-import type { GroupType, ScanResult, Table } from 'src/types/table';
+import type { GroupType, ResolvedTable, ScanResult } from 'src/types/table';
 
 const invoke = <T>(channel: string, ...args: any[]): Promise<T> =>
   ipcRenderer.invoke(channel, ...args);
 
 const frontendApi: Api = {
-  getAllTables: (): Promise<ApiResult<Table[]>> =>
-    invoke<ApiResult<Table[]>>('api:getAllTables'),
+  getAllTables: (): Promise<ApiResult<ResolvedTable[]>> =>
+    invoke<ApiResult<ResolvedTable[]>>('api:getAllTables'),
   setTableFavorite: (id: string, fav: boolean): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:setTableFavorite', id, fav),
   setTableForAndroid: (
@@ -29,6 +29,11 @@ const frontendApi: Api = {
     invoke<ApiResult<null>>('api:deleteTable', id),
   renameTable: (id: string, newName: string): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:renameTable', id, newName),
+  updateTableBackglass: (
+    tableId: string,
+    backglass: FileSystemItem | null,
+  ): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:updateTableBackglass', tableId, backglass),
   updateTableRom: (
     tableId: string,
     rom: FileSystemItem | null,
@@ -108,8 +113,17 @@ const frontendApi: Api = {
       directoryPath,
       acceptedExtensions,
     ),
-  importTables: (tables, deleteAfterImport): Promise<ApiResult<null>> =>
-    invoke<ApiResult<null>>('api:importTables', tables, deleteAfterImport),
+  importTables: (
+    tables,
+    deleteAfterImport,
+    existingTableBackglasses,
+  ): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>(
+      'api:importTables',
+      tables,
+      deleteAfterImport,
+      existingTableBackglasses,
+    ),
   clearTables: (): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:clearTables'),
   scanVpxLibrary: (): Promise<ApiResult<ScanResult>> =>
@@ -194,7 +208,7 @@ const frontendApi: Api = {
     invoke<ApiResult<null>>('api:updateViewType', viewType),
   startTable: (tableId: string): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:startTable', tableId),
-  startRandomTable: (tables: Table[]): Promise<ApiResult<null>> =>
+  startRandomTable: (tables: ResolvedTable[]): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:startRandomTable', tables),
 };
 

@@ -1,15 +1,18 @@
 import classNames from 'classnames';
-import { FunctionComponent, useMemo, useRef, useState } from 'react';
+import { FunctionComponent, RefObject, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 import Icon from 'src/components/Icon';
 import Input, { Size as InputSize } from 'src/components/Input';
 import { FileSystemItem } from 'src/types/file';
 import { mergeRoms, normalizePathForComparison } from 'src/utils';
-import useClickOutside from 'src/utils/useClickOutside';
+import usePickerMenuPosition from 'src/utils/usePickerMenuPosition';
 
 import style from './RomSelect.module.scss';
 
 interface Props {
+  buttonRef: RefObject<HTMLButtonElement>;
+  menuRef: RefObject<HTMLDivElement>;
   manuallyImportedRoms: Array<FileSystemItem>;
   scannedRoms: Array<FileSystemItem>;
   libraryRoms: Array<FileSystemItem>;
@@ -33,6 +36,8 @@ const normalizeRomName = (name: string): string =>
     .toLowerCase();
 
 const RomSelect: FunctionComponent<Props> = ({
+  buttonRef,
+  menuRef,
   manuallyImportedRoms,
   scannedRoms,
   libraryRoms,
@@ -40,9 +45,7 @@ const RomSelect: FunctionComponent<Props> = ({
   onSelect,
   onClose,
 }) => {
-  const ref = useRef<HTMLDivElement | null>(null);
   const [query, setQuery] = useState('');
-  useClickOutside(ref, onClose);
 
   const groups = useMemo(() => {
     const libraryPaths = new Set(
@@ -105,14 +108,28 @@ const RomSelect: FunctionComponent<Props> = ({
       },
     ].filter((group) => group.roms.length > 0);
   }, [expectedRomName, libraryRoms, manuallyImportedRoms, query, scannedRoms]);
+  const menuStyle = usePickerMenuPosition(
+    true,
+    buttonRef,
+    menuRef,
+    groups,
+    onClose,
+  );
 
   const handleSelect = (rom: FileSystemItem) => () => {
     onSelect(rom);
     onClose();
   };
 
-  return (
-    <div className={style.container} ref={ref}>
+  const modalRoot =
+    typeof document === 'undefined' ? null : document.querySelector('#modal');
+
+  if (!modalRoot) {
+    return null;
+  }
+
+  return createPortal(
+    <div className={style.container} ref={menuRef} style={menuStyle}>
       <div className={style.search}>
         <Input
           value={query}
@@ -184,7 +201,8 @@ const RomSelect: FunctionComponent<Props> = ({
           </section>
         ))
       )}
-    </div>
+    </div>,
+    modalRoot,
   );
 };
 

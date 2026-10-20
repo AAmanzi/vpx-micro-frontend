@@ -4,8 +4,8 @@ import {
   AndroidSyncProgressEvent,
 } from './android';
 import { Config, LaunchFlags, Platform } from './config';
-import { FileSystemItem, TableFile } from './file';
-import { GroupType, ScanResult, Table } from './table';
+import { BackglassImportAssignment, FileSystemItem, TableFile } from './file';
+import { GroupType, ResolvedTable, ScanResult } from './table';
 
 export interface ApiError {
   code: string;
@@ -33,7 +33,7 @@ export type ApiResult<T> =
 
 export interface Api {
   // Tables
-  getAllTables: () => Promise<ApiResult<Array<Table>>>;
+  getAllTables: () => Promise<ApiResult<Array<ResolvedTable>>>;
   setTableFavorite: (id: string, fav: boolean) => Promise<ApiResult<null>>;
   setTableForAndroid: (
     id: string,
@@ -42,6 +42,10 @@ export interface Api {
   setTableArchived: (id: string, archived: boolean) => Promise<ApiResult<null>>;
   deleteTable: (id: string) => Promise<ApiResult<null>>;
   renameTable: (id: string, newName: string) => Promise<ApiResult<null>>;
+  updateTableBackglass: (
+    tableId: string,
+    backglass: FileSystemItem | null,
+  ) => Promise<ApiResult<null>>;
   updateTableRom: (
     tableId: string,
     rom: FileSystemItem | null,
@@ -66,6 +70,7 @@ export interface Api {
   importTables: (
     tables: Array<TableFile>,
     deleteAfterImport: boolean,
+    existingTableBackglasses?: Array<BackglassImportAssignment>,
   ) => Promise<ApiResult<null>>;
   startTable: (tableId: string) => Promise<ApiResult<null>>;
   clearTables: () => Promise<ApiResult<null>>;
@@ -75,7 +80,7 @@ export interface Api {
     destinationPath: string,
     exportGroup: GroupType,
   ) => Promise<ApiResult<null>>;
-  startRandomTable: (tables: Array<Table>) => Promise<ApiResult<null>>;
+  startRandomTable: (tables: Array<ResolvedTable>) => Promise<ApiResult<null>>;
 
   // Android Sync
   scanAndroidLibrary: () => Promise<ApiResult<AndroidScanResult>>;

@@ -1,14 +1,17 @@
-import { spawn } from 'child_process';
-import { BrowserWindow, Menu, app, ipcMain } from 'electron';
+// sort-imports-ignore
+// Set the data directory before importing modules that initialize stores.
 import './devPaths';
+
+import { spawn } from 'child_process';
+import { BrowserWindow, Menu, app, dialog, ipcMain } from 'electron';
 import fs from 'fs';
 import http from 'http';
 import path from 'path';
 
 import type { AndroidSyncApplyPayload } from 'src/types/android';
 import type { Config, LaunchFlags } from 'src/types/config';
-import type { TableFile } from 'src/types/file';
-import type { GroupType, ScanResult, Table } from 'src/types/table';
+import type { BackglassImportAssignment, TableFile } from 'src/types/file';
+import type { GroupType, ResolvedTable, ScanResult } from 'src/types/table';
 
 import * as api from './api';
 import { runAppMigrations } from './database/migrations';
@@ -53,6 +56,7 @@ process.on('SIGTERM', () => logStream.end());
 
 const NEXT_PORT = process.env.NEXT_PORT || 3000;
 let nextProcess: any = null;
+let startupComplete = false;
 
 function startNext() {
   const cwd = path.join(__dirname, '..', '..');
@@ -154,6 +158,19 @@ const createWindow = () => {
 };
 
 app.whenReady().then(async () => {
+  try {
+    await runAppMigrations(app.getVersion());
+  } catch (error) {
+    console.error('Startup aborted because database migration failed:', error);
+    const reason = error instanceof Error ? error.message : String(error);
+    dialog.showErrorBox(
+      'Library migration failed',
+      `The app could not upgrade your library and will now close to avoid using incompatible data.\n\n${reason}\n\nYour VPX and ROM files have not been changed by this migration. Please contact support before deleting or resetting app data.\n\nLog file:\n${logFile}`,
+    );
+    app.quit();
+    return;
+  }
+
   if (process.platform === 'win32') {
     app.setAppUserModelId('com.vpx.microfrontend');
   }
@@ -184,8 +201,6 @@ app.whenReady().then(async () => {
     }
   }
 
-  await runAppMigrations(app.getVersion());
-
   // register IPC handlers that call the api layer
   ipcMain.handle('api:getAllTables', async () => api.getAllTables());
   ipcMain.handle('api:deleteTable', async (_, id: string) =>
@@ -206,6 +221,11 @@ app.whenReady().then(async () => {
   );
   ipcMain.handle('api:renameTable', async (_, id: string, newName: string) =>
     api.renameTable(id, newName),
+  );
+  ipcMain.handle(
+    'api:updateTableBackglass',
+    async (_, tableId: string, backglass: TableFile['backglass'] | null) =>
+      api.updateTableBackglass(tableId, backglass || null),
   );
   ipcMain.handle(
     'api:updateTableRom',
@@ -238,8 +258,12 @@ app.whenReady().then(async () => {
   );
   ipcMain.handle(
     'api:importTables',
-    async (_, tables: Array<TableFile>, deleteAfterImport: boolean) =>
-      api.importTables(tables, deleteAfterImport),
+    async (
+      _,
+      tables: Array<TableFile>,
+      deleteAfterImport: boolean,
+      existingTableBackglasses?: Array<BackglassImportAssignment>,
+    ) => api.importTables(tables, deleteAfterImport, existingTableBackglasses),
   );
   ipcMain.handle('api:getExpectedRomName', async (_, vpxFilePath: string) =>
     api.getExpectedRomName(vpxFilePath),
@@ -344,15 +368,18 @@ app.whenReady().then(async () => {
     async (_, destinationPath: string, exportGroup: GroupType) =>
       api.exportTables(destinationPath, exportGroup),
   );
-  ipcMain.handle('api:startRandomTable', async (_, tables: Table[]) =>
+  ipcMain.handle('api:startRandomTable', async (_, tables: ResolvedTable[]) =>
     api.startRandomTable(tables),
   );
 
+  startupComplete = true;
   createWindow();
 });
 
 app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  if (startupComplete && BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
+  }
 });
 
 function shutdownNext() {

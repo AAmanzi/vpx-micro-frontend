@@ -9,7 +9,7 @@ import Input from 'src/components/Input';
 import Modal, { Size as ModalSize } from 'src/components/Modal';
 import api from 'src/consts';
 import { useToastContext } from 'src/providers/toast';
-import type { Table } from 'src/types/table';
+import type { ResolvedTable } from 'src/types/table';
 
 import style from './EditTableImageModal.module.scss';
 
@@ -17,7 +17,7 @@ interface Props {
   id: string;
   name: string;
   currentImgUrl?: string;
-  currentImagePreference?: Table['imagePreference'];
+  currentImagePreference?: ResolvedTable['imagePreference'];
   gradientClassName: string;
   close: () => void;
 }
@@ -198,7 +198,6 @@ const EditTableImageModal: FunctionComponent<Props> = ({
               </button>
             </div>
           ))}
-
         </div>
 
         <div
@@ -212,10 +211,15 @@ const EditTableImageModal: FunctionComponent<Props> = ({
               className={style.manualToggle}
               onClick={handleToggleManualSection}
               aria-expanded={isManualExpanded}>
-              <span className={classNames('body-xs-semibold', style.manualLabel)}>
+              <span
+                className={classNames('body-xs-semibold', style.manualLabel)}>
                 Manual URL
               </span>
-              <span className={classNames('body-xs-semibold', style.manualToggleText)}>
+              <span
+                className={classNames(
+                  'body-xs-semibold',
+                  style.manualToggleText,
+                )}>
                 {isManualExpanded ? 'Hide' : 'Add URL'}
               </span>
             </button>

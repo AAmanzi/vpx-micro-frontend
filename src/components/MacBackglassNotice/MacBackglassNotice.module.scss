@@ -1,0 +1,14 @@
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px;
+  border: thin solid rgba(var(--blue-rgb), 0.3);
+  border-radius: 8px;
+  background-color: rgba(var(--blue-rgb), 0.1);
+  color: var(--blue);
+}
+
+.icon {
+  flex-shrink: 0;
+}
