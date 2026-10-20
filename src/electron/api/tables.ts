@@ -22,6 +22,7 @@ import {
 import {
   copyFile,
   copyFileExclusive,
+  copyFileIfExists,
   createDirectoryIfNotExists,
   deleteFile,
   ensureSourceFile,
@@ -1372,7 +1373,7 @@ export function exportTables(
             tableDirectoryPath,
             table.backglassFile,
           );
-          copyFile(table.backglassFilePath, backglassTargetPath);
+          copyFileIfExists(table.backglassFilePath, backglassTargetPath);
         }
       } catch (error) {
         failedTables.push(table.name);
