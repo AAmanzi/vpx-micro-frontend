@@ -115,7 +115,7 @@ const ExportTablesModal: FunctionComponent<Props> = ({ close }) => {
   return (
     <Modal
       title='Export Tables'
-      description='Create backup bundles with tables and ROMs'
+      description='Create backup bundles with tables, ROMs, and DirectB2S backglasses'
       onExitClick={close}
       color='blue'>
       <Form submit={handleExport} validate={handleValidate}>
@@ -144,8 +144,8 @@ const ExportTablesModal: FunctionComponent<Props> = ({ close }) => {
               'body-xs-regular',
               style.note,
             )}>
-            Each table will be exported with its VPX file and ROM to a dedicated
-            folder
+            Each table will be exported to a dedicated folder with its VPX file,
+            ROM, and DirectB2S backglass when available
           </p>
           <div className={style.spacer} />
           <div
@@ -171,7 +171,10 @@ const ExportTablesModal: FunctionComponent<Props> = ({ close }) => {
                 be exported
               </p>
               <p className='secondary-text-color body-xs-regular'>
-                • Each table + ROM will be in its own folder
+                • Each table gets its own folder
+              </p>
+              <p className='secondary-text-color body-xs-regular'>
+                • VPX, ROM, and DirectB2S files are included when available
               </p>
               <p className='secondary-text-color body-xs-regular'>
                 • Original files will remain in your library

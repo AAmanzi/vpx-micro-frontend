@@ -46,6 +46,26 @@ export const copyFile = (sourcePath: string, destinationPath: string): void => {
   fs.copyFileSync(resolvedSourcePath, resolvedDestinationPath);
 };
 
+export const copyFileIfExists = (
+  sourcePath: string,
+  destinationPath: string,
+): boolean => {
+  const resolvedSourcePath = resolveUserPath(sourcePath);
+
+  try {
+    fs.statSync(resolvedSourcePath);
+  } catch (error) {
+    if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
+      return false;
+    }
+
+    throw error;
+  }
+
+  copyFile(sourcePath, destinationPath);
+  return true;
+};
+
 export const copyFileExclusive = (
   sourcePath: string,
   destinationPath: string,
