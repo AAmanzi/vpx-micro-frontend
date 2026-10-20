@@ -1,6 +1,7 @@
 import type { AppProps } from 'next/app';
 
 import ToastHandler from 'src/components/ToastHandler';
+import UpdateNotice from 'src/components/UpdateNotice/UpdateNotice';
 import { ConfigProvider } from 'src/providers/config';
 import { TablesProvider } from 'src/providers/tables';
 import ToastProvider from 'src/providers/toast';
@@ -14,6 +15,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         <ToastProvider>
           <>
             <ToastHandler />
+            <UpdateNotice />
             <Component {...pageProps} />
           </>
         </ToastProvider>

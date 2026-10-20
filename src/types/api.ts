@@ -6,6 +6,7 @@ import {
 import { Config, LaunchFlags, Platform } from './config';
 import { BackglassImportAssignment, FileSystemItem, TableFile } from './file';
 import { GroupType, ResolvedTable, ScanResult } from './table';
+import { AvailableUpdate } from './updates';
 
 export interface ApiError {
   code: string;
@@ -32,6 +33,9 @@ export type ApiResult<T> =
     };
 
 export interface Api {
+  getAvailableUpdate: () => Promise<ApiResult<AvailableUpdate | null>>;
+  dismissUpdateNotice: () => Promise<ApiResult<null>>;
+
   // Tables
   getAllTables: () => Promise<ApiResult<Array<ResolvedTable>>>;
   setTableFavorite: (id: string, fav: boolean) => Promise<ApiResult<null>>;

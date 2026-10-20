@@ -9,11 +9,16 @@ import type { Api, ApiResult } from 'src/types/api';
 import type { Config, LaunchFlags, Platform } from 'src/types/config';
 import type { FileSystemItem } from 'src/types/file';
 import type { GroupType, ResolvedTable, ScanResult } from 'src/types/table';
+import type { AvailableUpdate } from 'src/types/updates';
 
 const invoke = <T>(channel: string, ...args: any[]): Promise<T> =>
   ipcRenderer.invoke(channel, ...args);
 
 const frontendApi: Api = {
+  getAvailableUpdate: () =>
+    invoke<ApiResult<AvailableUpdate | null>>('api:getAvailableUpdate'),
+  dismissUpdateNotice: () =>
+    invoke<ApiResult<null>>('api:dismissUpdateNotice'),
   getAllTables: (): Promise<ApiResult<ResolvedTable[]>> =>
     invoke<ApiResult<ResolvedTable[]>>('api:getAllTables'),
   setTableFavorite: (id: string, fav: boolean): Promise<ApiResult<null>> =>
