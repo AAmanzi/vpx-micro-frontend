@@ -1,6 +1,6 @@
-import type { Table } from 'src/types/table';
+import type { ResolvedTable } from 'src/types/table';
 
-export const Tables: Table[] = [
+export const Tables: ResolvedTable[] = [
   {
     id: 'table-1',
     name: 'Medieval Madness',

@@ -28,7 +28,8 @@ const DeleteTableModal: FunctionComponent<Props> = ({
   const { showErrorToast } = useToastContext();
   const { tables } = useTablesContext();
 
-  const romFilePath = tables.find((table) => table.id === id)?.romFilePath;
+  const table = tables.find((item) => item.id === id);
+  const romFilePath = table?.romFilePath;
   const isRomSharedWithOtherTables =
     !!romFilePath &&
     tables.some(
@@ -65,6 +66,9 @@ const DeleteTableModal: FunctionComponent<Props> = ({
         <ul className={style.filesList}>
           <li className={style.fileItem}>{vpxFile}</li>
           {willDeleteRom && <li className={style.fileItem}>{romFile}</li>}
+          {table?.backglassFile && (
+            <li className={style.fileItem}>{table.backglassFile}</li>
+          )}
         </ul>
       </div>
       <div className={style.footer}>

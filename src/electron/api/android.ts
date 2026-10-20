@@ -62,7 +62,7 @@ const buildRemoteFilePath = (directory: string, fileName: string): string => {
 };
 
 const toTableFile = (
-  table: ReturnType<typeof tablesDb.getAll>[number],
+  table: ReturnType<typeof tablesDb.getAllResolved>[number],
 ): TableFile => ({
   name: table.name,
   filePath: table.vpxFilePath,
@@ -83,7 +83,7 @@ export async function scanAndroidLibrary(): Promise<
     const missingPaths = new Set<string>();
 
     const tables = tablesDb
-      .getAll()
+      .getAllResolved()
       .filter(
         (table) => table.isForAndroid && !!table.vpxFile && !!table.vpxFilePath,
       );

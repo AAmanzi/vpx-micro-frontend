@@ -5,7 +5,7 @@ import Icon from 'src/components/Icon';
 import api from 'src/consts';
 import { useTablesContext } from 'src/providers/tables';
 import { useToastContext } from 'src/providers/toast';
-import type { Table } from 'src/types/table';
+import type { ResolvedTable } from 'src/types/table';
 import { getTableGradientVariant } from 'src/utils';
 import useClickOutside from 'src/utils/useClickOutside';
 
@@ -22,9 +22,9 @@ interface Props {
   romFile?: string;
   romFilePath?: string;
   imgUrl?: string;
-  imagePreference?: Table['imagePreference'];
+  imagePreference?: ResolvedTable['imagePreference'];
   vpxExecutablePath?: string;
-  launchFlags?: Table['launchFlags'];
+  launchFlags?: ResolvedTable['launchFlags'];
   isArchived?: boolean;
   vpxFile: string;
   vpxFilePath: string;
@@ -185,7 +185,7 @@ const Settings: FunctionComponent<Props> = ({
             romFile,
             vpxFile,
             id,
-          } as Table)}
+          } as ResolvedTable)}
         />
       )}
       {isEditExecutableModalOpen && (

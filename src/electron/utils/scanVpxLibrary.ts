@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { FileSystemItem, TableFile } from 'src/types/file';
-import { Table } from 'src/types/table';
+import { ResolvedTable } from 'src/types/table';
 
 import { normalizePathForComparison, resolveUserPath } from './path';
 import { getExpectedRomNameFromVpxFile } from './vpxParsing';
@@ -196,9 +196,9 @@ export const scanNewTables = (
 };
 
 export const findTablesWithMissingFiles = (
-  tables: Array<Table>,
+  tables: Array<ResolvedTable>,
 ): Array<{
-  table: Table;
+  table: ResolvedTable;
   missingVpxFile: boolean;
   missingRomFile: boolean;
 }> => {
@@ -231,7 +231,7 @@ export const findTablesWithMissingFiles = (
   };
 
   const tablesWithMissingFiles: Array<{
-    table: Table;
+    table: ResolvedTable;
     missingVpxFile: boolean;
     missingRomFile: boolean;
   }> = [];

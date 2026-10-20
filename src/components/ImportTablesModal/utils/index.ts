@@ -2,7 +2,7 @@ import path from 'path';
 
 import { api } from 'src/consts';
 import { FileSystemItem, TableFile } from 'src/types/file';
-import { Table } from 'src/types/table';
+import { ResolvedTable } from 'src/types/table';
 import { normalizePathForComparison } from 'src/utils';
 
 import { ImportSelectionResult } from '../types';
@@ -113,7 +113,7 @@ export const filterExistingFiles = ({
   tables,
   files,
 }: {
-  tables: Array<Table>;
+  tables: Array<ResolvedTable>;
   files: Array<FileSystemItem>;
 }): Array<FileSystemItem> => {
   const getFileName = (value: string): string =>

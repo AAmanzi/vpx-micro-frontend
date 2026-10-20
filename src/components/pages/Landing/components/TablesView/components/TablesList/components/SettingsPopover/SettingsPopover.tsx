@@ -8,7 +8,7 @@ import {
 } from 'react';
 
 import Icon from 'src/components/Icon';
-import type { Table } from 'src/types/table';
+import type { ResolvedTable } from 'src/types/table';
 
 import Settings from '../Settings';
 
@@ -18,9 +18,9 @@ interface Props {
   romFile?: string;
   romFilePath?: string;
   imgUrl?: string;
-  imagePreference?: Table['imagePreference'];
+  imagePreference?: ResolvedTable['imagePreference'];
   vpxExecutablePath?: string;
-  launchFlags?: Table['launchFlags'];
+  launchFlags?: ResolvedTable['launchFlags'];
   isArchived?: boolean;
   vpxFile: string;
   vpxFilePath: string;
