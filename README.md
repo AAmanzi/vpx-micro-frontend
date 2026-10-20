@@ -270,6 +270,10 @@ On your Android device:
 - It does **not** delete your actual VPX/ROM files.
 - **Database Migrations** run automatically on app update to keep existing data compatible.
 
+The library migration saves backups of library data, app configuration, and
+migration history in the active app-data directory's `backups` folder before
+converting the library.
+
 ### Advanced launch settings (Windows)
 
 In **Settings → Advanced → VPX launch flags**, configure the global defaults:

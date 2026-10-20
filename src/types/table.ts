@@ -3,14 +3,26 @@ import { FileSystemItem, TableFile } from './file';
 
 export type TableImagePreference = 'manual' | 'none';
 
+export type LibraryFileType = 'table' | 'rom' | 'directb2s';
+
+export interface LibraryFile {
+  id: string;
+  type: LibraryFileType;
+  path: string;
+}
+
+export interface LibraryStore {
+  tables: Record<string, Table>;
+  files: Record<string, LibraryFile>;
+}
+
 export interface Table {
   id: string;
   name: string;
 
-  vpxFile: string;
-  romFile?: string;
-  vpxFilePath: string;
-  romFilePath?: string;
+  vpxFileId: string;
+  romFileId?: string;
+  backglassFileId?: string;
 
   isFavorite: boolean;
   isArchived?: boolean;
@@ -25,13 +37,25 @@ export interface Table {
   imagePreference?: TableImagePreference;
 }
 
+export interface ResolvedTable extends Omit<
+  Table,
+  'vpxFileId' | 'romFileId' | 'backglassFileId'
+> {
+  vpxFile: string;
+  romFile?: string;
+  vpxFilePath: string;
+  romFilePath?: string;
+  backglassFile?: string;
+  backglassFilePath?: string;
+}
+
 export interface ScanResult {
   newTables: Array<TableFile>;
   // On scan: new tables the user skipped before. On apply: new tables deselected now.
   skippedTablePaths: Array<string>;
   unmatchedRoms: Array<FileSystemItem>;
   tablesWithMissingFiles: Array<{
-    table: Table;
+    table: ResolvedTable;
     missingVpxFile: boolean;
     missingRomFile: boolean;
   }>;

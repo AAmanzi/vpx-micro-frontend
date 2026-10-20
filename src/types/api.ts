@@ -5,7 +5,7 @@ import {
 } from './android';
 import { Config, LaunchFlags, Platform } from './config';
 import { FileSystemItem, TableFile } from './file';
-import { GroupType, ScanResult, Table } from './table';
+import { GroupType, ResolvedTable, ScanResult } from './table';
 
 export interface ApiError {
   code: string;
@@ -33,7 +33,7 @@ export type ApiResult<T> =
 
 export interface Api {
   // Tables
-  getAllTables: () => Promise<ApiResult<Array<Table>>>;
+  getAllTables: () => Promise<ApiResult<Array<ResolvedTable>>>;
   setTableFavorite: (id: string, fav: boolean) => Promise<ApiResult<null>>;
   setTableForAndroid: (
     id: string,
@@ -75,7 +75,7 @@ export interface Api {
     destinationPath: string,
     exportGroup: GroupType,
   ) => Promise<ApiResult<null>>;
-  startRandomTable: (tables: Array<Table>) => Promise<ApiResult<null>>;
+  startRandomTable: (tables: Array<ResolvedTable>) => Promise<ApiResult<null>>;
 
   // Android Sync
   scanAndroidLibrary: () => Promise<ApiResult<AndroidScanResult>>;

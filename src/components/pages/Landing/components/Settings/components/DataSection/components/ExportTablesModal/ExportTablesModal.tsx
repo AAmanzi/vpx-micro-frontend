@@ -195,7 +195,9 @@ const ExportTablesModal: FunctionComponent<Props> = ({ close }) => {
                     {table.name}
                   </p>
                   <p className='secondary-text-color body-xs-regular'>
-                    {table.vpxFile} {table.romFile ? `• ${table.romFile}` : ''}
+                    {table.vpxFile}
+                    {table.romFile ? ` • ${table.romFile}` : ''}
+                    {table.backglassFile ? ` • ${table.backglassFile}` : ''}
                   </p>
                 </div>
               </div>
