@@ -6,6 +6,7 @@ import Button, {
   Type as ButtonType,
 } from 'src/components/Button';
 import Icon from 'src/components/Icon';
+import MacBackglassNotice from 'src/components/MacBackglassNotice';
 import Modal, { Size as ModalSize } from 'src/components/Modal';
 import Spinner from 'src/components/Spinner';
 import { api } from 'src/consts';
@@ -111,6 +112,12 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
       normalizePathForComparison(update.backglass?.path)
     );
   });
+  const hasBackglassResults =
+    newTables.some((table) => Boolean(table.backglass)) ||
+    unmatchedBackglasses.length > 0 ||
+    backglassUpdates.some((update) => Boolean(update.backglass)) ||
+    changedBackglassUpdates.length > 0 ||
+    tablesWithMissingFiles.some((item) => item.missingBackglassFile);
   const tablesToRemoveCount = tablesWithMissingFiles.filter(
     (item) => item.missingVpxFile,
   ).length;
@@ -454,6 +461,7 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
         {!isLoading && scanResult && !scanErrorMessage && (
           <Form submit={handleApply} validate={handleValidate}>
             <div className={style.resultsWrapper}>
+              {hasBackglassResults && <MacBackglassNotice />}
               {isLibraryInSync && (
                 <div className={style.emptyStateWrapper}>
                   <Icon

@@ -148,6 +148,10 @@ If you already have an existing VPX setup, start with Scan Library first.
 4. Optionally enable **Delete original files after import**.
 5. Click **Import Tables**.
 
+**DirectB2S on macOS:** Playback compatibility hasn't been verified by this
+project. You can import, assign, scan, and export backglass files, but playback
+may require additional setup outside this app.
+
 ## Work with tables
 
 ### All Tables

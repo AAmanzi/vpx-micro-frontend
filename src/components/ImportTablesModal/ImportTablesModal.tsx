@@ -3,6 +3,7 @@ import { FunctionComponent, useEffect, useRef, useState } from 'react';
 
 import FileUpload from 'src/components/FileUpload';
 import Icon from 'src/components/Icon';
+import MacBackglassNotice from 'src/components/MacBackglassNotice';
 import Modal from 'src/components/Modal';
 import api from 'src/consts';
 import { useConfigContext } from 'src/providers/config';
@@ -410,6 +411,9 @@ const ImportTablesModal: FunctionComponent<Props> = ({
             onFilesSelected={handleFilesSelected}
             loading={isLoading}
           />
+          {availableBackglasses.length > 0 && (
+            <MacBackglassNotice className={style.section} />
+          )}
           {tablesToImport.length > 0 && (
             <div className={style.section}>
               <div className={style.sectionHeader}>
