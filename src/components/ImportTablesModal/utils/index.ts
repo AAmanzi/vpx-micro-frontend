@@ -20,6 +20,22 @@ const isBackglassFile = (file: FileSystemItem): boolean =>
 const getFileStem = (fileName: string): string =>
   path.basename(fileName, path.extname(fileName)).trim().toLowerCase();
 
+export const filterExistingBackglassAssignments = (
+  tablesToImport: Array<TableFile>,
+  existingAssignments: Array<ExistingTableBackglass>,
+): Array<ExistingTableBackglass> => {
+  const assignedPaths = new Set(
+    tablesToImport
+      .filter((table) => table.backglass)
+      .map((table) => normalizePathForComparison(table.backglass?.path)),
+  );
+
+  return existingAssignments.filter(
+    (item) =>
+      !assignedPaths.has(normalizePathForComparison(item.backglass.path)),
+  );
+};
+
 const createTableFile = async (
   file: FileSystemItem,
   vpxCountByDirectoryPath: Map<string, number>,
@@ -134,7 +150,10 @@ export const buildImportSelectionResult = async ({
       .filter((filePath): filePath is string => Boolean(filePath))
       .map(normalizePathForComparison),
   );
-  const existingAssignments = [...currentExistingTableBackglasses];
+  const existingAssignments = filterExistingBackglassAssignments(
+    nextTables,
+    currentExistingTableBackglasses,
+  );
   existingTables.forEach((table) => {
     if (
       table.backglassFilePath ||

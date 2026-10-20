@@ -223,6 +223,11 @@ app.whenReady().then(async () => {
     api.renameTable(id, newName),
   );
   ipcMain.handle(
+    'api:updateTableBackglass',
+    async (_, tableId: string, backglass: TableFile['backglass'] | null) =>
+      api.updateTableBackglass(tableId, backglass || null),
+  );
+  ipcMain.handle(
     'api:updateTableRom',
     async (_, tableId: string, rom: TableFile['rom'] | null) =>
       api.updateTableRom(tableId, rom || null),

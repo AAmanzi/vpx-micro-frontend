@@ -42,6 +42,10 @@ export interface Api {
   setTableArchived: (id: string, archived: boolean) => Promise<ApiResult<null>>;
   deleteTable: (id: string) => Promise<ApiResult<null>>;
   renameTable: (id: string, newName: string) => Promise<ApiResult<null>>;
+  updateTableBackglass: (
+    tableId: string,
+    backglass: FileSystemItem | null,
+  ) => Promise<ApiResult<null>>;
   updateTableRom: (
     tableId: string,
     rom: FileSystemItem | null,
