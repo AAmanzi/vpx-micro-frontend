@@ -187,7 +187,22 @@ export function deleteTable(id: string): ApiResult<null> {
       deleteFile(table.romFilePath);
     }
 
-    if (backglassPath) {
+    const isBackglassStillAssigned =
+      !!backglassPath &&
+      remainingTables.some((item) => {
+        const assignedBackglassPath = tablesDb.getFile(
+          item.backglassFileId,
+          'directb2s',
+        )?.path;
+
+        return (
+          !!assignedBackglassPath &&
+          normalizePathForComparison(assignedBackglassPath) ===
+            normalizePathForComparison(backglassPath)
+        );
+      });
+
+    if (backglassPath && !isBackglassStillAssigned) {
       deleteFile(backglassPath);
     }
 
@@ -209,6 +224,145 @@ export function renameTable(id: string, newName: string): ApiResult<null> {
           message: `Table not found: ${id}`,
         },
       };
+    }
+
+    return apiSuccess(null);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}
+
+export function updateTableBackglass(
+  tableId: string,
+  backglass: FileSystemItem | null,
+): ApiResult<null> {
+  try {
+    const table = tablesDb.getResolved(tableId);
+
+    if (!table) {
+      return {
+        success: false,
+        error: {
+          code: 'TABLE_NOT_FOUND',
+          message: `Table not found: ${tableId}`,
+        },
+      };
+    }
+
+    const currentBackglassPath = table.backglassFilePath;
+    const isBackglassShared =
+      !!currentBackglassPath &&
+      tablesDb
+        .getAllResolved()
+        .some(
+          (item) =>
+            item.id !== tableId &&
+            item.backglassFilePath &&
+            normalizePathForComparison(item.backglassFilePath) ===
+              normalizePathForComparison(currentBackglassPath),
+        );
+
+    if (!backglass) {
+      if (!currentBackglassPath) {
+        return apiSuccess(null);
+      }
+
+      if (isBackglassShared) {
+        return {
+          success: false,
+          error: {
+            code: 'BACKGLASS_IN_USE',
+            message: 'This backglass is assigned to another table',
+          },
+        };
+      }
+
+      deleteFile(currentBackglassPath);
+      const updatedTable = tablesDb.updateFileReference(
+        tableId,
+        'backglassFileId',
+        'directb2s',
+      );
+
+      if (!updatedTable) {
+        throw new Error(`Table not found: ${tableId}`);
+      }
+
+      return apiSuccess(null);
+    }
+
+    if (isBackglassShared) {
+      return {
+        success: false,
+        error: {
+          code: 'BACKGLASS_IN_USE',
+          message: 'This backglass is assigned to another table',
+        },
+      };
+    }
+
+    if (path.extname(backglass.path).toLowerCase() !== '.directb2s') {
+      return {
+        success: false,
+        error: {
+          code: 'INVALID_BACKGLASS_FILE',
+          message: 'Backglass file must use the .directb2s extension',
+        },
+      };
+    }
+
+    const targetPath =
+      currentBackglassPath ||
+      path.join(
+        path.dirname(table.vpxFilePath),
+        `${path.basename(table.vpxFilePath, path.extname(table.vpxFilePath))}.directb2s`,
+      );
+    const sourceKey = getLibraryFilePathKey(backglass.path);
+    const targetKey = getLibraryFilePathKey(targetPath);
+    let createdDestination = false;
+
+    if (sourceKey !== targetKey) {
+      if (currentBackglassPath) {
+        const stagedPath = `${targetPath}.${uuidv4()}.tmp`;
+
+        try {
+          copyFile(backglass.path, stagedPath);
+          moveFile(stagedPath, targetPath);
+        } catch (error) {
+          try {
+            deleteFile(stagedPath);
+          } catch (cleanupError) {
+            console.warn(
+              `Failed to remove staged backglass ${stagedPath}:`,
+              cleanupError,
+            );
+          }
+
+          throw error;
+        }
+      } else {
+        copyFileExclusive(backglass.path, targetPath);
+        createdDestination = true;
+      }
+    }
+
+    try {
+      const updatedTable = tablesDb.updateFileReference(
+        tableId,
+        'backglassFileId',
+        'directb2s',
+        targetPath,
+      );
+
+      if (!updatedTable) {
+        throw new Error(`Table not found: ${tableId}`);
+      }
+    } catch (error) {
+      if (createdDestination) {
+        deleteFile(targetPath);
+      }
+
+      throw error;
     }
 
     return apiSuccess(null);

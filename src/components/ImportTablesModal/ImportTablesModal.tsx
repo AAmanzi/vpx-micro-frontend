@@ -19,7 +19,11 @@ import style from './ImportTablesModal.module.scss';
 import TableEntry from './components/TableEntry';
 import UnassignedRomEntry from './components/UnassignedRomEntry';
 import { Props } from './types';
-import { buildImportSelectionResult, filterExistingFiles } from './utils';
+import {
+  buildImportSelectionResult,
+  filterExistingBackglassAssignments,
+  filterExistingFiles,
+} from './utils';
 
 const ImportTablesModal: FunctionComponent<Props> = ({
   onClose,
@@ -250,10 +254,12 @@ const ImportTablesModal: FunctionComponent<Props> = ({
       (item) => item.filePath !== table.filePath,
     );
 
-    setTablesToImport((prev) =>
-      prev.map((item) =>
-        item.filePath === table.filePath ? { ...item, backglass } : item,
-      ),
+    const nextTables = tablesToImport.map((item) =>
+      item.filePath === table.filePath ? { ...item, backglass } : item,
+    );
+    setTablesToImport(nextTables);
+    setExistingTableBackglasses((prev) =>
+      filterExistingBackglassAssignments(nextTables, prev),
     );
     setUnassignedBackglasses((prev) =>
       prev.filter(
@@ -311,7 +317,9 @@ const ImportTablesModal: FunctionComponent<Props> = ({
 
   const handleValidate = () => {
     if (isLoading) {
-      showWarningToast('Please wait until the selected files finish processing');
+      showWarningToast(
+        'Please wait until the selected files finish processing',
+      );
       return false;
     }
 
@@ -490,7 +498,7 @@ const ImportTablesModal: FunctionComponent<Props> = ({
                   <UnassignedRomEntry
                     key={backglass.path}
                     rom={backglass}
-                    icon='package'
+                    icon='wallpaper'
                     onRemove={handleRemoveBackglassFile}
                   />
                 ))}

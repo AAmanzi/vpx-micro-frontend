@@ -40,6 +40,17 @@ const DeleteTableModal: FunctionComponent<Props> = ({
           normalizePathForComparison(romFilePath),
     );
   const willDeleteRom = !!romFile && !isRomSharedWithOtherTables;
+  const isBackglassSharedWithOtherTables =
+    !!table?.backglassFilePath &&
+    tables.some(
+      (item) =>
+        item.id !== id &&
+        item.backglassFilePath &&
+        normalizePathForComparison(item.backglassFilePath) ===
+          normalizePathForComparison(table.backglassFilePath),
+    );
+  const willDeleteBackglass =
+    !!table?.backglassFile && !isBackglassSharedWithOtherTables;
 
   const handleDelete = async () => {
     const { error } = await api.deleteTable(id);
@@ -62,11 +73,11 @@ const DeleteTableModal: FunctionComponent<Props> = ({
       size={ModalSize.small}
       color='red'>
       <div className={style.content}>
-        <p className={style.text}>These files will be deleted:</p>
+        <p className={style.text}>These files will be permanently deleted:</p>
         <ul className={style.filesList}>
           <li className={style.fileItem}>{vpxFile}</li>
           {willDeleteRom && <li className={style.fileItem}>{romFile}</li>}
-          {table?.backglassFile && (
+          {willDeleteBackglass && table?.backglassFile && (
             <li className={style.fileItem}>{table.backglassFile}</li>
           )}
         </ul>

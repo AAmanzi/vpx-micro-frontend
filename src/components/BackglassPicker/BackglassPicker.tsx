@@ -85,7 +85,11 @@ const BackglassPicker: FunctionComponent<Props> = ({
   if (selectedBackglass) {
     return (
       <div className={style.selected}>
-        <Tag icon='package' label='Backglass selected' type={TagType.purple} />
+        <Tag
+          icon='wallpaper'
+          label='Backglass selected'
+          type={TagType.purple}
+        />
         <button
           type='button'
           className={style.removeButton}
@@ -122,7 +126,7 @@ const BackglassPicker: FunctionComponent<Props> = ({
         })}
         onClick={() => setIsOpen((open) => !open)}
         aria-expanded={isOpen}>
-        <Icon icon='package' width={10} height={10} />
+        <Icon icon='wallpaper' width={10} height={10} />
         <span className='body-xs-bold'>Assign backglass</span>
         <Icon
           className={classNames(style.chevron, { [style.chevronOpen]: isOpen })}
