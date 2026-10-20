@@ -10,6 +10,7 @@ const Tag: FunctionComponent<Props> = ({ label, icon, type = Type.info }) => {
     <div
       className={classNames(style.container, {
         [style.info]: type === Type.info,
+        [style.purple]: type === Type.purple,
         [style.success]: type === Type.success,
         [style.warning]: type === Type.warning,
       })}>

@@ -195,6 +195,72 @@ export const scanNewTables = (
   return discoveredTables;
 };
 
+export const scanFilesByExtension = (
+  directoryPath: string,
+  extension: string,
+): Array<FileSystemItem> => {
+  if (!directoryPath) {
+    return [];
+  }
+
+  const normalizedDirectoryPath = resolveUserPath(directoryPath);
+
+  if (!normalizedDirectoryPath) {
+    return [];
+  }
+
+  const files: Array<FileSystemItem> = [];
+  const directoriesToScan = [normalizedDirectoryPath];
+
+  while (directoriesToScan.length > 0) {
+    const currentDirectoryPath = directoriesToScan.pop();
+
+    if (!currentDirectoryPath) {
+      continue;
+    }
+
+    let entries: Array<fs.Dirent> = [];
+
+    try {
+      entries = fs.readdirSync(currentDirectoryPath, { withFileTypes: true });
+    } catch (error) {
+      if (
+        currentDirectoryPath === normalizedDirectoryPath &&
+        error &&
+        typeof error === 'object' &&
+        'code' in error &&
+        error.code === 'ENOENT'
+      ) {
+        return [];
+      }
+
+      throw error;
+    }
+
+    entries.forEach((entry) => {
+      if (entry.isSymbolicLink()) {
+        return;
+      }
+
+      const entryPath = path.join(currentDirectoryPath, entry.name);
+
+      if (entry.isDirectory()) {
+        directoriesToScan.push(entryPath);
+        return;
+      }
+
+      if (
+        entry.isFile() &&
+        path.extname(entry.name).toLowerCase() === extension.toLowerCase()
+      ) {
+        files.push({ path: entryPath, name: entry.name });
+      }
+    });
+  }
+
+  return files;
+};
+
 export const findTablesWithMissingFiles = (
   tables: Array<ResolvedTable>,
 ): Array<{

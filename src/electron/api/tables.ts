@@ -25,9 +25,11 @@ import {
 import {
   getLibraryFilePathKey,
   normalizePathForComparison,
+  resolveUserPath,
 } from '../utils/path';
 import {
   findTablesWithMissingFiles,
+  scanFilesByExtension,
   scanNewRoms,
   scanNewTables,
 } from '../utils/scanVpxLibrary';
@@ -683,6 +685,64 @@ export function clearTables(): ApiResult<null> {
   }
 }
 
+function deleteUnmatchedBackglass(filePath: string): ApiResult<null> {
+  try {
+    const tablesDirectoryPath = configDb.getTablesDirectoryPath();
+    if (!tablesDirectoryPath) {
+      throw new Error('Tables directory is not configured');
+    }
+
+    const directoryPath = path.resolve(resolveUserPath(tablesDirectoryPath));
+    const resolvedFilePath = path.resolve(resolveUserPath(filePath));
+    const relativePath = path.relative(directoryPath, resolvedFilePath);
+
+    if (
+      !relativePath ||
+      relativePath === '..' ||
+      relativePath.startsWith(`..${path.sep}`) ||
+      path.isAbsolute(relativePath) ||
+      path.extname(resolvedFilePath).toLowerCase() !== '.directb2s'
+    ) {
+      throw new Error(
+        'Only DirectB2S files in the Tables directory can be deleted',
+      );
+    }
+
+    const normalizedFilePath = normalizePathForComparison(resolvedFilePath);
+    const tables = tablesDb.getAll();
+    const isAssociated = tables.some((table) => {
+      const backglass = tablesDb.getFile(table.backglassFileId, 'directb2s');
+      return normalizePathForComparison(backglass?.path) === normalizedFilePath;
+    });
+    const fileStem = normalizePathForComparison(
+      path.basename(resolvedFilePath, path.extname(resolvedFilePath)),
+    );
+    const vpxFiles = scanFilesByExtension(tablesDirectoryPath, '.vpx');
+    const hasMatchingTable = [
+      ...vpxFiles.map((file) => file.path),
+      ...tables
+        .map((table) => tablesDb.getFile(table.vpxFileId, 'table')?.path)
+        .filter((tablePath): tablePath is string => Boolean(tablePath)),
+    ].some(
+      (tablePath) =>
+        normalizePathForComparison(
+          path.basename(tablePath, path.extname(tablePath)),
+        ) === fileStem,
+    );
+
+    if (isAssociated || hasMatchingTable) {
+      throw new Error(
+        'This backglass is associated with a table and cannot be deleted as unmatched',
+      );
+    }
+
+    deleteFile(resolvedFilePath);
+    return apiSuccess(null);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}
+
 export function scanVpxLibrary(): ApiResult<ScanResult> {
   // info:
   // - all roms are matched by file name
@@ -765,6 +825,48 @@ export function scanVpxLibrary(): ApiResult<ScanResult> {
     Array.from(romCandidatesByPath.values()),
   );
 
+  let backglasses: Array<FileSystemItem>;
+  try {
+    backglasses = scanFilesByExtension(tablesDirectoryPath, '.directb2s');
+  } catch (error) {
+    return apiFailure(error);
+  }
+  const backglassesByStem = new Map<string, FileSystemItem>();
+  backglasses.forEach((backglass) => {
+    const stem = normalizePathForComparison(
+      path.basename(backglass.name, path.extname(backglass.name)),
+    );
+    if (stem && !backglassesByStem.has(stem)) {
+      backglassesByStem.set(stem, backglass);
+    }
+  });
+  const getBackglassForVpxPath = (vpxPath: string) =>
+    backglassesByStem.get(
+      normalizePathForComparison(path.basename(vpxPath, path.extname(vpxPath))),
+    );
+  scannedTables.forEach((table) => {
+    table.backglass = getBackglassForVpxPath(table.filePath);
+  });
+  const backglassUpdates = tables.map((table) => ({
+    tableId: table.id,
+    tableName: table.name,
+    vpxFileName: table.vpxFile,
+    backglass: getBackglassForVpxPath(table.vpxFilePath),
+  }));
+  const matchedBackglassPaths = new Set(
+    [
+      ...tables.map((table) => table.vpxFilePath),
+      ...scannedTables.map((table) => table.filePath),
+    ]
+      .map(getBackglassForVpxPath)
+      .filter((backglass): backglass is FileSystemItem => Boolean(backglass))
+      .map((backglass) => normalizePathForComparison(backglass.path)),
+  );
+  const unmatchedBackglasses = backglasses.filter(
+    (backglass) =>
+      !matchedBackglassPaths.has(normalizePathForComparison(backglass.path)),
+  );
+
   // from scanned vpx tables filter out ones that have been added to newly scanned tables
   //    these are unmatchedRoms
   const unmatchedRoms = scannedRoms.filter(
@@ -783,6 +885,8 @@ export function scanVpxLibrary(): ApiResult<ScanResult> {
 
   return apiSuccess({
     newTables: scannedTables,
+    backglassUpdates,
+    unmatchedBackglasses,
     skippedTablePaths,
     unmatchedRoms,
     tablesWithMissingFiles,
@@ -794,6 +898,41 @@ export async function applyScanResult(
 ): Promise<ApiResult<null>> {
   try {
     await registerTableFiles(scanResult.newTables);
+    scanResult.backglassUpdates.forEach(({ tableId, backglass }) => {
+      tablesDb.updateFileReference(
+        tableId,
+        'backglassFileId',
+        'directb2s',
+        backglass?.path,
+      );
+    });
+    const tablesByPath = new Map(
+      tablesDb
+        .getAllResolved()
+        .map((table) => [
+          normalizePathForComparison(table.vpxFilePath),
+          table.id,
+        ]),
+    );
+    scanResult.newTables.forEach((tableFile) => {
+      const tableId = tablesByPath.get(
+        normalizePathForComparison(tableFile.filePath),
+      );
+      if (tableId) {
+        tablesDb.updateFileReference(
+          tableId,
+          'backglassFileId',
+          'directb2s',
+          tableFile.backglass?.path,
+        );
+      }
+    });
+    for (const backglass of scanResult.unmatchedBackglasses) {
+      const result = deleteUnmatchedBackglass(backglass.path);
+      if (!result.success) {
+        return result;
+      }
+    }
     deleteUnusedRoms(scanResult.unmatchedRoms);
     cleanTablesWithMissingFiles(scanResult.tablesWithMissingFiles);
 
