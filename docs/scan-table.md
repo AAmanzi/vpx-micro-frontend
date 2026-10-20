@@ -26,6 +26,15 @@ And allow the user to reconcile differences safely.
 
 * All `.vpx` files in tables folder
 * All `.zip` (ROM) files in ROMs folder
+* All `.directb2s` files in the Tables folder
+
+DirectB2S files are matched case-insensitively by filename stem to VPX files
+found by the scan and VPX files already in the library. Scanned tables report
+whether a matching backglass was found. Applying scan changes refreshes existing
+associations; unmatched DirectB2S files are never deleted automatically.
+Unmatched backglasses use the same checkbox selection and Select All/Deselect
+All controls as unmatched ROMs, defaulting to unselected. Apply Changes deletes
+only the selected unmatched backglass files, without a separate confirmation dialog.
 
 ---
 

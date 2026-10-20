@@ -16,6 +16,15 @@
   }
 }
 
+.purple {
+  background-color: rgba(var(--purple-rgb), 0.1);
+
+  & > span,
+  & > svg {
+    color: var(--purple);
+  }
+}
+
 .success {
   background-color: rgba(var(--green-rgb), 0.1);
 

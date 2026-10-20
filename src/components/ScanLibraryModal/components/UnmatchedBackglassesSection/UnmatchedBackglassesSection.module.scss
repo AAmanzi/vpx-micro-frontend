@@ -1,0 +1,31 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+}
+
+.row {
+  border: thin solid var(--gray);
+  border-radius: 14px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(var(--gray-rgb), 0.2);
+  transition:
+    border-color 200ms ease-in,
+    background 200ms ease-in;
+
+  &.selected {
+    border-color: var(--yellow);
+    background: rgba(var(--yellow-rgb), 0.1);
+  }
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}

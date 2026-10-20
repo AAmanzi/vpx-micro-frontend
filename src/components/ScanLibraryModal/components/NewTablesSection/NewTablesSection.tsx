@@ -4,7 +4,7 @@ import { FunctionComponent } from 'react';
 import Checkbox from 'src/components/Checkbox';
 import Input, { Size as InputSize } from 'src/components/Input';
 import RomPicker from 'src/components/RomPicker';
-import Tag from 'src/components/Tag';
+import Tag, { Type as TagType } from 'src/components/Tag';
 import type { FileSystemItem, TableFile } from 'src/types/file';
 
 import SectionHeader from '../SectionHeader';
@@ -79,6 +79,13 @@ const NewTablesSection: FunctionComponent<Props> = ({
 
                 <div className={style.meta}>
                   <Tag icon='file-code' label={table.fileName} />
+                  {table.backglass && (
+                    <Tag
+                      icon='file-code'
+                      label={table.backglass.name}
+                      type={TagType.purple}
+                    />
+                  )}
                   <div onClick={(event) => event.stopPropagation()}>
                     <RomPicker
                       selectedRom={table.rom || null}

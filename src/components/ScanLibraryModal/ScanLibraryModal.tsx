@@ -11,7 +11,7 @@ import Spinner from 'src/components/Spinner';
 import { api } from 'src/consts';
 import { useTablesContext } from 'src/providers/tables';
 import { useToastContext } from 'src/providers/toast';
-import { ScanResult } from 'src/types/table';
+import type { ScanResult } from 'src/types/table';
 import {
   getAssignedRoms,
   mergeRoms,
@@ -23,6 +23,7 @@ import style from './ScanLibraryModal.module.scss';
 import Collapsible from './components/Collapsible';
 import MissingFilesSection from './components/MissingFilesSection';
 import NewTablesSection from './components/NewTablesSection';
+import UnmatchedBackglassesSection from './components/UnmatchedBackglassesSection';
 import UnmatchedRomsSection from './components/UnmatchedRomsSection';
 
 interface Props {
@@ -41,7 +42,12 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
   const [isNewTablesOpen, setIsNewTablesOpen] = useState(false);
   const [isSkippedTablesOpen, setIsSkippedTablesOpen] = useState(false);
   const [isUnmatchedRomsOpen, setIsUnmatchedRomsOpen] = useState(false);
+  const [isUnmatchedBackglassesOpen, setIsUnmatchedBackglassesOpen] =
+    useState(false);
   const [isMissingFilesOpen, setIsMissingFilesOpen] = useState(false);
+  const [unmatchedBackglasses, setUnmatchedBackglasses] = useState<
+    ScanResult['unmatchedBackglasses']
+  >([]);
 
   const [newTables, setNewTables] = useState<ScanResult['newTables']>([]);
   const [unmatchedRoms, setUnmatchedRoms] = useState<
@@ -56,6 +62,10 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
   >({});
   const [includedUnmatchedRomsByPath, setIncludedUnmatchedRomsByPath] =
     useState<Record<string, boolean>>({});
+  const [
+    includedUnmatchedBackglassesByPath,
+    setIncludedUnmatchedBackglassesByPath,
+  ] = useState<Record<string, boolean>>({});
   const [includedMissingFilesByTableId, setIncludedMissingFilesByTableId] =
     useState<Record<string, boolean>>({});
 
@@ -91,7 +101,17 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
   const skippedTables = newTables.filter((table) =>
     skippedPathSet.has(table.filePath),
   );
-
+  const backglassUpdates = scanResult?.backglassUpdates ?? [];
+  const changedBackglassUpdates = backglassUpdates.filter((update) => {
+    const table = tables.find((item) => item.id === update.tableId);
+    return (
+      normalizePathForComparison(table?.backglassFilePath) !==
+      normalizePathForComparison(update.backglass?.path)
+    );
+  });
+  const tablesToRemoveCount = tablesWithMissingFiles.filter(
+    (item) => item.missingVpxFile,
+  ).length;
   const modalTitle = isLoading ? 'Scanning VPX Library' : 'Scan Results';
   const modalDescription = isLoading
     ? 'Comparing database with disk files...'
@@ -103,26 +123,31 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
     scanResult &&
     newTables.length === 0 &&
     unmatchedRoms.length === 0 &&
+    unmatchedBackglasses.length === 0 &&
+    changedBackglassUpdates.length === 0 &&
     tablesWithMissingFiles.length === 0;
 
   const selectedNewTablesCount = newTables.filter(
     (table) => includedNewTablesByPath[table.filePath] ?? true,
   ).length;
+  const selectedBackglasses = unmatchedBackglasses.filter(
+    (backglass) => includedUnmatchedBackglassesByPath[backglass.path] ?? false,
+  );
   const selectedUnmatchedRomsCount = unmatchedRoms.filter(
     (rom) => includedUnmatchedRomsByPath[rom.path] ?? false,
   ).length;
-  const selectedTablesToRemoveCount = tablesWithMissingFiles.filter(
-    (item) =>
-      (includedMissingFilesByTableId[item.table.id] ?? true) &&
-      item.missingVpxFile,
-  ).length;
-  const selectedRomLinksToClearCount = tablesWithMissingFiles.filter(
-    (item) =>
-      (includedMissingFilesByTableId[item.table.id] ?? true) &&
-      !item.missingVpxFile &&
-      item.missingRomFile,
-  ).length;
-
+  const recapItems = [
+    `${selectedNewTablesCount} Tables to import`,
+    ...(unmatchedRoms.length > 0
+      ? [`${selectedUnmatchedRomsCount} ROM files to delete`]
+      : []),
+    ...(unmatchedBackglasses.length > 0
+      ? [`${selectedBackglasses.length} Backglasses to delete`]
+      : []),
+    ...(tablesToRemoveCount > 0
+      ? [`${tablesToRemoveCount} Tables to remove`]
+      : []),
+  ];
   const handleScanLibrary = () => {
     setIsLoading(true);
     setScanErrorMessage(null);
@@ -131,14 +156,17 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
     setIsNewTablesOpen(false);
     setIsSkippedTablesOpen(false);
     setIsUnmatchedRomsOpen(false);
+    setIsUnmatchedBackglassesOpen(false);
     setIsMissingFilesOpen(false);
 
     setNewTables([]);
     setUnmatchedRoms([]);
+    setUnmatchedBackglasses([]);
     setTablesWithMissingFiles([]);
 
     setIncludedNewTablesByPath({});
     setIncludedUnmatchedRomsByPath({});
+    setIncludedUnmatchedBackglassesByPath({});
     setIncludedMissingFilesByTableId({});
 
     api.scanVpxLibrary().then((result) => {
@@ -147,6 +175,7 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
 
         setNewTables(result.data.newTables);
         setUnmatchedRoms(result.data.unmatchedRoms);
+        setUnmatchedBackglasses(result.data.unmatchedBackglasses);
         setTablesWithMissingFiles(result.data.tablesWithMissingFiles);
 
         setIncludedNewTablesByPath(
@@ -207,6 +236,21 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
     }));
   };
 
+  const toggleUnmatchedBackglassInclude = (backglassPath: string) => {
+    setIncludedUnmatchedBackglassesByPath((prev) => ({
+      ...prev,
+      [backglassPath]: !(prev[backglassPath] ?? false),
+    }));
+  };
+
+  const setAllUnmatchedBackglassesIncluded = (included: boolean) => {
+    setIncludedUnmatchedBackglassesByPath(
+      Object.fromEntries(
+        unmatchedBackglasses.map((backglass) => [backglass.path, included]),
+      ),
+    );
+  };
+
   const toggleMissingFileInclude = (tableId: string) => {
     setIncludedMissingFilesByTableId((prev) => ({
       ...prev,
@@ -228,7 +272,8 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
 
   const selectAllNewTables = () => setNewTablesIncluded(freshTables, true);
   const deselectAllNewTables = () => setNewTablesIncluded(freshTables, false);
-  const selectAllSkippedTables = () => setNewTablesIncluded(skippedTables, true);
+  const selectAllSkippedTables = () =>
+    setNewTablesIncluded(skippedTables, true);
   const deselectAllSkippedTables = () =>
     setNewTablesIncluded(skippedTables, false);
 
@@ -367,6 +412,8 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
       unmatchedRoms: unmatchedRoms.filter(
         (rom) => includedUnmatchedRomsByPath[rom.path] ?? false,
       ),
+      unmatchedBackglasses: selectedBackglasses,
+      backglassUpdates: scanResult?.backglassUpdates ?? [],
       tablesWithMissingFiles: tablesWithMissingFiles.filter(
         (item) => includedMissingFilesByTableId[item.table.id] ?? true,
       ),
@@ -465,6 +512,29 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
                 </Collapsible>
               )}
 
+              {unmatchedBackglasses.length > 0 && (
+                <Collapsible
+                  title='Unmatched Backglasses'
+                  description='Selected backglass files will be deleted when you apply changes.'
+                  icon='triangle-alert'
+                  color='yellow'
+                  count={unmatchedBackglasses.length}
+                  isOpen={isUnmatchedBackglassesOpen}
+                  onToggle={() =>
+                    setIsUnmatchedBackglassesOpen((prev) => !prev)
+                  }>
+                  <UnmatchedBackglassesSection
+                    backglasses={unmatchedBackglasses}
+                    includedByPath={includedUnmatchedBackglassesByPath}
+                    onToggleInclude={toggleUnmatchedBackglassInclude}
+                    onSelectAll={() => setAllUnmatchedBackglassesIncluded(true)}
+                    onDeselectAll={() =>
+                      setAllUnmatchedBackglassesIncluded(false)
+                    }
+                  />
+                </Collapsible>
+              )}
+
               {tablesWithMissingFiles.length > 0 && (
                 <Collapsible
                   title='Tables With Missing Files'
@@ -509,17 +579,14 @@ const ScanLibraryModal: FunctionComponent<Props> = ({ close }) => {
                 </Collapsible>
               )}
 
-              {!isLibraryInSync && (
+              {recapItems.length > 0 && (
                 <p
                   className={classNames(
                     'secondary-text-color',
                     'body-xs-regular',
                     style.footerMeta,
                   )}>
-                  {selectedNewTablesCount} Tables to import •{' '}
-                  {selectedUnmatchedRomsCount} ROM files to delete •{' '}
-                  {selectedTablesToRemoveCount} Tables to remove •{' '}
-                  {selectedRomLinksToClearCount} ROM links to clear
+                  {recapItems.join(' • ')}
                 </p>
               )}
 

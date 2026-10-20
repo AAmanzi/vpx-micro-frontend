@@ -51,6 +51,13 @@ export interface ResolvedTable extends Omit<
 
 export interface ScanResult {
   newTables: Array<TableFile>;
+  backglassUpdates: Array<{
+    tableId: string;
+    tableName: string;
+    vpxFileName: string;
+    backglass?: FileSystemItem;
+  }>;
+  unmatchedBackglasses: Array<FileSystemItem>;
   // On scan: new tables the user skipped before. On apply: new tables deselected now.
   skippedTablePaths: Array<string>;
   unmatchedRoms: Array<FileSystemItem>;

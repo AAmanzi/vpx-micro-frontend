@@ -9,4 +9,5 @@ export interface TableFile {
   fileName: string;
   rom?: FileSystemItem;
   expectedRomName?: string;
+  backglass?: FileSystemItem;
 }
