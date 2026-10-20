@@ -1,6 +1,7 @@
 import { FunctionComponent } from 'react';
 
 import Icon from 'src/components/Icon';
+import type { Icon as IconType } from 'src/components/Icon/types';
 import { FileSystemItem } from 'src/types/file';
 
 import style from './UnassignedRomEntry.module.scss';
@@ -8,20 +9,25 @@ import style from './UnassignedRomEntry.module.scss';
 interface Props {
   rom: FileSystemItem;
   onRemove: (rom: FileSystemItem) => void;
+  icon?: IconType;
 }
 
-const UnassignedRomEntry: FunctionComponent<Props> = ({ onRemove, rom }) => {
+const UnassignedRomEntry: FunctionComponent<Props> = ({
+  onRemove,
+  rom,
+  icon = 'archive',
+}) => {
   return (
     <div className={style.container}>
       <div className={style.iconWrapper}>
         <Icon
           className='secondary-text-color'
-          icon='archive'
+          icon={icon}
           width={14}
           height={14}
         />
       </div>
-      <div className='secondary-text-color body-sm-regular'>
+      <div className={`${style.fileName} secondary-text-color body-sm-regular`}>
         {rom.name}
       </div>
       <button

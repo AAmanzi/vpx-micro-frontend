@@ -10,7 +10,7 @@ import path from 'path';
 
 import type { AndroidSyncApplyPayload } from 'src/types/android';
 import type { Config, LaunchFlags } from 'src/types/config';
-import type { TableFile } from 'src/types/file';
+import type { BackglassImportAssignment, TableFile } from 'src/types/file';
 import type { GroupType, ResolvedTable, ScanResult } from 'src/types/table';
 
 import * as api from './api';
@@ -253,8 +253,12 @@ app.whenReady().then(async () => {
   );
   ipcMain.handle(
     'api:importTables',
-    async (_, tables: Array<TableFile>, deleteAfterImport: boolean) =>
-      api.importTables(tables, deleteAfterImport),
+    async (
+      _,
+      tables: Array<TableFile>,
+      deleteAfterImport: boolean,
+      existingTableBackglasses?: Array<BackglassImportAssignment>,
+    ) => api.importTables(tables, deleteAfterImport, existingTableBackglasses),
   );
   ipcMain.handle('api:getExpectedRomName', async (_, vpxFilePath: string) =>
     api.getExpectedRomName(vpxFilePath),

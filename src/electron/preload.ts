@@ -108,8 +108,17 @@ const frontendApi: Api = {
       directoryPath,
       acceptedExtensions,
     ),
-  importTables: (tables, deleteAfterImport): Promise<ApiResult<null>> =>
-    invoke<ApiResult<null>>('api:importTables', tables, deleteAfterImport),
+  importTables: (
+    tables,
+    deleteAfterImport,
+    existingTableBackglasses,
+  ): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>(
+      'api:importTables',
+      tables,
+      deleteAfterImport,
+      existingTableBackglasses,
+    ),
   clearTables: (): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:clearTables'),
   scanVpxLibrary: (): Promise<ApiResult<ScanResult>> =>

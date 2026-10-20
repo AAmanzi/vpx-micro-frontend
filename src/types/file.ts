@@ -11,3 +11,8 @@ export interface TableFile {
   expectedRomName?: string;
   backglass?: FileSystemItem;
 }
+
+export interface BackglassImportAssignment {
+  tableId: string;
+  backglass: FileSystemItem;
+}

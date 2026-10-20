@@ -1,8 +1,7 @@
 .container {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  z-index: 10;
+  position: fixed;
+  box-sizing: border-box;
+  z-index: 110;
   animation: fadeInRomSelect 200ms ease-out;
   background-color: var(--gray-800);
   border: thin solid var(--gray);
@@ -12,12 +11,15 @@
   width: 254px;
   max-height: min(70vh, 420px);
   overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(var(--black-rgb), 0.2);
 }
 
 .search {
   padding: 0 8px 6px;
   margin-bottom: 8px;
-  position: relative;
+  position: sticky;
+  top: 0;
+  background-color: var(--gray-800);
 
   &::after {
     content: '';
@@ -113,6 +115,11 @@
   align-items: center;
   min-height: 30px;
 
+  > span:first-child {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
   &:hover {
     background-color: rgba(var(--gray-500-rgb), 0.1);
   }
@@ -135,12 +142,10 @@
 @keyframes fadeInRomSelect {
   from {
     opacity: 0;
-    transform: translateY(4px);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
