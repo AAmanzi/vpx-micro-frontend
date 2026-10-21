@@ -4,6 +4,7 @@ import { FunctionComponent, useState } from 'react';
 import Button, { Size as ButtonSize } from 'src/components/Button';
 import Icon from 'src/components/Icon';
 import ImportTablesModal from 'src/components/ImportTablesModal';
+import Tooltip from 'src/components/Tooltip';
 import { useConfigContext } from 'src/providers/config';
 import { useTablesContext } from 'src/providers/tables';
 
@@ -161,25 +162,28 @@ const Navigation: FunctionComponent<Props> = ({
                   VPX PATH
                 </span>
               </div>
-              <div className={style.metaPathWrapper}>
+              {fullVpxPath ? (
+                <Tooltip
+                  className={style.metaPathWrapper}
+                  content={fullVpxPath}>
+                  <span
+                    className={classNames(
+                      'body-xs-regular',
+                      'secondary-text-color',
+                      style.metaPath,
+                    )}>
+                    {fullVpxPath}
+                  </span>
+                </Tooltip>
+              ) : (
                 <span
                   className={classNames(
                     'body-xs-regular',
                     'secondary-text-color',
                     style.metaPath,
-                  )}>
-                  {fullVpxPath}
-                </span>
-                {fullVpxPath && (
-                  <span
-                    className={classNames(
-                      'body-xs-regular',
-                      style.metaPathTooltip,
-                    )}>
-                    {fullVpxPath}
-                  </span>
-                )}
-              </div>
+                  )}
+                />
+              )}
             </>
           )}
           <div className={style.metaStat}>
