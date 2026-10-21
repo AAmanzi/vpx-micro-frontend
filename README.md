@@ -77,7 +77,19 @@ This app is currently unsigned, so Smart App Control may block it. If the app do
 3. Drag the VPX Micro Frontend app into the **Applications** folder
 4. Open Applications and launch **VPX Micro Frontend**
 
-After installation, open the app and continue with first-time setup below.
+**First-launch security approval (macOS):**
+
+The app is not currently notarized by Apple, so macOS may block it on first launch.
+This doesn't necessarily mean the app is unsafe, but you should only approve it if
+you trust the download from the official [GitHub Releases page](https://github.com/AAmanzi/vpx-micro-frontend/releases):
+
+1. Attempt to open the app in **Applications**, then dismiss the warning.
+2. Open **System Settings > Privacy & Security**.
+3. Find the blocked-app message, click **Open Anyway**, and authenticate if prompted.
+
+Do not disable Gatekeeper system-wide.
+
+Continue with first-time setup below.
 
 ## First-time setup - Windows
 
@@ -374,7 +386,7 @@ Release artifacts can be built using **GitHub Actions** without a local build en
 
 The version is read from `package.json`. Each ZIP contains one file with the same base name; extract it to access the installer, portable executable, or disk image. The workflow fails if a required file is missing. Artifacts are retained for 14 days.
 
-> **Note:** Builds are unsigned. macOS may display security warnings. The workflow does not create drafts or modify releases, even if a release for the same version already exists.
+> **Note:** Windows builds are unsigned. macOS builds are ad-hoc signed and signature-verified, but not notarized; first-launch security approval is still required. No Apple signing credentials are needed. The workflow does not create drafts or modify releases, even if a release for the same version already exists.
 
 ## Troubleshooting
 
