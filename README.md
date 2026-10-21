@@ -280,7 +280,9 @@ On your Android device:
 ### Maintenance
 
 - **Fullscreen** toggles fullscreen mode. Press **F11** on Windows or **Ctrl+Cmd+F** on macOS to toggle it from anywhere in the app. Window size, position, maximized state, and fullscreen state are restored on the next launch.
-- **Clear Library Data** resets app metadata/list only.
+- **Clear Library Data** resets the table list and permanently deletes all
+  app-managed config backups and saved configuration names/timestamps.
+  Table files and active settings (`.ini` files) are kept.
 - It does **not** delete your actual VPX/ROM files.
 - **Database Migrations** run automatically on app update to keep existing data compatible.
 

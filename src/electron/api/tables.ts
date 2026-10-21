@@ -45,7 +45,7 @@ import {
   lookupTableImageCandidates,
   lookupTableImageUrl,
 } from '../utils/tableImages';
-import { deleteTableConfigs } from './iniBackups';
+import { clearLibraryConfigs, deleteTableConfigs } from './iniBackups';
 
 const isZipFile = (name: string): boolean =>
   path.extname(name).toLowerCase() === '.zip';
@@ -1051,8 +1051,16 @@ export async function startTable(tableId: string): Promise<ApiResult<null>> {
 
 export function clearTables(): ApiResult<null> {
   try {
-    tablesDb.clear();
-    return apiSuccess(null);
+    const remainingConfigFiles = clearLibraryConfigs(() => tablesDb.clear());
+    return apiSuccess(
+      null,
+      remainingConfigFiles.length
+        ? {
+            code: 'CONFIG_CLEANUP_INCOMPLETE',
+            message: `Library cleared, but these staged config files need manual removal: ${remainingConfigFiles.join(', ')}`,
+          }
+        : undefined,
+    );
   } catch (error) {
     return apiFailure(error);
   }

@@ -35,6 +35,12 @@
   margin: 0;
 }
 
+.notice {
+  @include body-xs-regular-mixin;
+  margin: 12px 0 0;
+  color: var(--secondary-text-color);
+}
+
 .filesList {
   margin: 12px 0 0;
   padding-left: 20px;
