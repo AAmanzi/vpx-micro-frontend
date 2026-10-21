@@ -5,6 +5,7 @@ import {
 } from './android';
 import { Config, LaunchFlags, Platform } from './config';
 import { BackglassImportAssignment, FileSystemItem, TableFile } from './file';
+import { IniBackup, IniBackupList, TableConfigDeletion } from './iniBackup';
 import { GroupType, ResolvedTable, ScanResult } from './table';
 import { AvailableUpdate } from './updates';
 
@@ -44,7 +45,13 @@ export interface Api {
     isForAndroid: boolean,
   ) => Promise<ApiResult<null>>;
   setTableArchived: (id: string, archived: boolean) => Promise<ApiResult<null>>;
-  deleteTable: (id: string) => Promise<ApiResult<null>>;
+  deleteTable: (
+    id: string,
+    options?: { deleteActiveConfig?: boolean },
+  ) => Promise<ApiResult<null>>;
+  getTableConfigDeletion: (
+    id: string,
+  ) => Promise<ApiResult<TableConfigDeletion>>;
   renameTable: (id: string, newName: string) => Promise<ApiResult<null>>;
   updateTableBackglass: (
     tableId: string,
@@ -77,6 +84,26 @@ export interface Api {
     existingTableBackglasses?: Array<BackglassImportAssignment>,
   ) => Promise<ApiResult<null>>;
   startTable: (tableId: string) => Promise<ApiResult<null>>;
+  getIniBackups: (tableId: string) => Promise<ApiResult<IniBackupList>>;
+  createIniBackup: (
+    tableId: string,
+    name?: string,
+  ) => Promise<ApiResult<IniBackup>>;
+  restoreIniBackup: (
+    tableId: string,
+    backupId: string,
+  ) => Promise<ApiResult<boolean>>;
+  renameCurrentIni: (tableId: string, name: string) => Promise<ApiResult<null>>;
+  deleteCurrentIni: (tableId: string) => Promise<ApiResult<null>>;
+  renameIniBackup: (
+    tableId: string,
+    backupId: string,
+    name: string,
+  ) => Promise<ApiResult<IniBackup>>;
+  deleteIniBackup: (
+    tableId: string,
+    backupId: string,
+  ) => Promise<ApiResult<null>>;
   clearTables: () => Promise<ApiResult<null>>;
   scanVpxLibrary: () => Promise<ApiResult<ScanResult>>;
   applyScanResult: (scanResult: ScanResult) => Promise<ApiResult<null>>;

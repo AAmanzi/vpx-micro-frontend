@@ -174,7 +174,7 @@ may require additional setup outside this app.
 - **Kebab menu** groups table actions:
   - Rename Table and Table Image
   - **Files:** Edit ROM, Edit Backglass, and VPX Executable. The executable action opens launch settings for a different VPX executable and, on Windows, optional per-table launch-flag overrides. Unset flags use the global defaults.
-  - **Library:** Archive Table / Unarchive Table to hide or restore the table in your active library.
+  - **Library:** Archive / Unarchive Table to hide or restore the table in your active library, and Backups to manage saved table configurations.
   - **Delete Table:** removes the DB entry and deletes the table's files from VPX folders.
 
 ### Table Images
@@ -189,6 +189,17 @@ Table images are automatically fetched from the [Virtual Pinball Spreadsheet dat
 
 Images are cached locally; if the VPS DB is unavailable, your previously cached images remain visible.
 There's also a snapshot of VPS DB as backup at [VPS Backup snapshot](https://aamanzi.github.io/vps-db/db/vpsdb.json)
+
+### Config Backups
+
+Use **Backups** in a table's actions menu to save and manage configurations (`.ini` files).
+
+- **Create** backups before experimenting with table settings.
+- **Swap** between saved configurations and the active one without losing either.
+- **Load** a backup if no active configuration exists.
+- **Rename** or **Delete** configurations from the management window.
+
+Backups are stored separately in app-managed storage.
 
 ## Settings reference
 
@@ -257,7 +268,9 @@ On your Android device:
 ### Maintenance
 
 - **Fullscreen** toggles fullscreen mode. Press **F11** on Windows or **Ctrl+Cmd+F** on macOS to toggle it from anywhere in the app. Window size, position, maximized state, and fullscreen state are restored on the next launch.
-- **Clear Library Data** resets app metadata/list only.
+- **Clear Library Data** resets the table list and permanently deletes all
+  app-managed config backups and saved configuration names/timestamps.
+  Table files and active settings (`.ini` files) are kept.
 - It does **not** delete your actual VPX/ROM files.
 - **Database Migrations** run automatically on app update to keep existing data compatible.
 

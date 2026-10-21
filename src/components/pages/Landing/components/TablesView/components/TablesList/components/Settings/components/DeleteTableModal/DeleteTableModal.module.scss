@@ -1,32 +1,152 @@
+.modal.modal {
+  display: flex;
+  width: min(480px, calc(100vw - 48px));
+  max-height: calc(100dvh - 48px);
+  flex-direction: column;
+  padding-bottom: 20px;
+  border-radius: 20px;
+}
+
+.header.header {
+  align-items: flex-start;
+  margin: 0 20px;
+  padding: 24px 0;
+  border-radius: 0;
+
+  > div:first-child {
+    margin-right: 0;
+
+    > h2 {
+      @include heading-6-bold-mixin;
+    }
+
+    > p {
+      @include body-sm-regular-mixin;
+      margin-top: 8px;
+    }
+  }
+
+  > div:last-child > button {
+    width: 24px;
+    height: 24px;
+  }
+}
+
 .content {
-  margin: 24px;
+  min-height: 0;
+  margin: 24px 20px 0;
+  overflow-y: auto;
 }
 
 .text {
   @include body-sm-semibold-mixin;
-  color: var(--primary-text-color);
   margin: 0;
+  color: var(--primary-text-color);
 }
 
 .filesList {
-  margin: 12px 0 0;
-  padding-left: 20px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 20px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
 }
 
 .fileItem {
-  @include body-md-semibold-mixin;
+  @include body-sm-regular-mixin;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
   color: var(--secondary-text-color);
-  word-break: break-word;
+
+  > svg {
+    flex: 0 0 16px;
+    margin-top: 2px;
+    color: var(--gray-500);
+  }
+
+  > span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+.backupDetails {
+  margin-top: 20px;
+
+  > summary {
+    list-style: none;
+    cursor: pointer;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &:hover {
+      color: var(--primary-text-color);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--blue);
+      outline-offset: 4px;
+    }
+  }
+}
+
+.backupList {
+  margin: 12px 0 0 28px;
+  padding-left: 16px;
+}
+
+.backupItem,
+.note {
+  @include body-xs-regular-mixin;
+  color: var(--gray-500);
+  overflow-wrap: anywhere;
+}
+
+.backupItem + .backupItem {
+  margin-top: 8px;
+}
+
+.note {
+  margin: 8px 0 0;
+}
+
+.activeConfig {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--gray);
+}
+
+.configOption {
+  @include body-sm-semibold-mixin;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--primary-text-color);
+  cursor: pointer;
+
+  > input {
+    width: 24px;
+    height: 24px;
+    flex: 0 0 24px;
+    border-radius: 50%;
+  }
 }
 
 .footer {
   display: flex;
+  flex-shrink: 0;
+  align-items: center;
   justify-content: flex-end;
-  margin-top: 24px;
-  margin-left: 24px;
-  margin-right: 24px;
   gap: 12px;
+  margin: 16px 20px 0;
+
+  > button > div {
+    height: 44px;
+    padding: 0 20px;
+    border-radius: 24px;
+  }
 }

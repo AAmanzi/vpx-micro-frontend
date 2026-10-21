@@ -20,6 +20,7 @@ const MaintenanceSection: FunctionComponent = () => {
   const { config, fetchConfig, platform } = useConfigContext();
 
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
 
   useEffect(() => {
@@ -48,19 +49,35 @@ const MaintenanceSection: FunctionComponent = () => {
   };
 
   const closeConfirmation = () => {
-    setIsConfirmationOpen(false);
+    if (!isClearing) setIsConfirmationOpen(false);
   };
 
-  const handleClearLibrary = () => {
-    api.clearTables().then((result) => {
+  const handleClearLibrary = async () => {
+    if (isClearing) return;
+    setIsClearing(true);
+    try {
+      const result = await api.clearTables();
       if (result.success) {
-        closeConfirmation();
+        setIsConfirmationOpen(false);
         fetchTables();
-        showSuccessToast('Library data cleared successfully');
+        if (result.warning) {
+          showErrorToast(
+            result.warning.message ||
+              'Library cleared, but config backup cleanup was incomplete',
+          );
+        } else {
+          showSuccessToast(
+            'Library data and config backups cleared successfully',
+          );
+        }
       } else {
         showErrorToast(result.error.message || 'Something went wrong');
       }
-    });
+    } catch {
+      showErrorToast('Failed to clear library data');
+    } finally {
+      setIsClearing(false);
+    }
   };
 
   const androidFeaturesEnabled = Boolean(config?.androidFeaturesEnabled);
@@ -119,7 +136,8 @@ const MaintenanceSection: FunctionComponent = () => {
             Clear Library Data
           </p>
           <p className='secondary-text-color body-xs-regular'>
-            This will reset your table list but won't delete actual files.
+            Reset your table list and delete all config backups. Table files and
+            active settings (.ini) will be kept.
           </p>
         </div>
         <div className={style.buttonWrapper}>
@@ -142,7 +160,11 @@ const MaintenanceSection: FunctionComponent = () => {
           color='red'>
           <div className={style.content}>
             <p className={style.text}>
-              This will reset your table list but won't delete actual files.
+              This will reset your table list and permanently delete all config
+              backups, including saved configuration names and timestamps.
+            </p>
+            <p className={style.notice}>
+              Your table files and active settings (.ini) will be kept.
             </p>
           </div>
           <div className={style.footer}>
@@ -150,12 +172,14 @@ const MaintenanceSection: FunctionComponent = () => {
               size={ButtonSize.small}
               type={ButtonType.transparent}
               label='Cancel'
+              disabled={isClearing}
               onClick={closeConfirmation}
             />
             <Button
               size={ButtonSize.small}
               type={ButtonType.danger}
               label='Confirm'
+              loading={isClearing}
               onClick={handleClearLibrary}
             />
           </div>

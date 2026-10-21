@@ -3,6 +3,7 @@ import {
   FunctionComponent,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from 'react';
@@ -59,10 +60,9 @@ const SettingsPopover: FunctionComponent<Props> = ({
   const updatePosition = useCallback(() => {
     const trigger = triggerRef.current;
     const menu = menuRef.current;
-    const anchor =
-      (trigger?.offsetParent as HTMLElement | null) || trigger?.parentElement;
+    const anchor = menu?.offsetParent;
 
-    if (!trigger || !menu || !anchor) {
+    if (!trigger || !menu || !(anchor instanceof HTMLElement)) {
       return;
     }
 
@@ -70,8 +70,9 @@ const SettingsPopover: FunctionComponent<Props> = ({
     const menuRect = menu.getBoundingClientRect();
     const anchorRect = anchor.getBoundingClientRect();
 
-    const spaceAbove = triggerRect.top - GUTTER_PX;
-    const spaceBelow = window.innerHeight - triggerRect.bottom - GUTTER_PX;
+    const spaceAbove = triggerRect.top - GUTTER_PX - GAP_PX;
+    const spaceBelow =
+      window.innerHeight - triggerRect.bottom - GUTTER_PX - GAP_PX;
 
     let topViewport = triggerRect.top - menuRect.height - GAP_PX;
 
@@ -97,22 +98,35 @@ const SettingsPopover: FunctionComponent<Props> = ({
 
     setPosition({
       position: 'absolute',
-      top: topViewport - anchorRect.top,
-      left: leftViewport - anchorRect.left,
+      top: topViewport - anchorRect.top - anchor.clientTop + anchor.scrollTop,
+      left:
+        leftViewport - anchorRect.left - anchor.clientLeft + anchor.scrollLeft,
       zIndex: 20,
       visibility: 'visible',
     });
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!isOpen) {
       return;
     }
 
-    const frameId = window.requestAnimationFrame(updatePosition);
+    updatePosition();
+  }, [isOpen, updatePosition]);
 
+  useEffect(() => {
+    if (!isOpen || !menuRef.current) {
+      return;
+    }
+
+    const observer = new ResizeObserver(updatePosition);
+    observer.observe(menuRef.current);
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition, true);
     return () => {
-      window.cancelAnimationFrame(frameId);
+      observer.disconnect();
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition, true);
     };
   }, [isOpen, updatePosition]);
 
@@ -154,6 +168,7 @@ const SettingsPopover: FunctionComponent<Props> = ({
             isArchived={isArchived}
             vpxFile={vpxFile}
             vpxFilePath={vpxFilePath}
+            onContentChange={updatePosition}
             close={close}
           />
         </div>
