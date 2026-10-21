@@ -95,6 +95,14 @@ export const displayDate = (date: Date | number): string => {
   });
 };
 
+export const displayDateTime = (date: Date | number): string =>
+  new Date(date).toLocaleString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+
 export const displayRelativeDate = (
   date: Date | number | null | undefined,
 ): string => {
