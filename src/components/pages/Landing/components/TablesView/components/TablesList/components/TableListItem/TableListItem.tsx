@@ -6,6 +6,7 @@ import Button, {
   Type as ButtonType,
 } from 'src/components/Button';
 import Icon from 'src/components/Icon';
+import Tooltip from 'src/components/Tooltip';
 import api from 'src/consts';
 import { TABLE_STARTUP_LOCK_MS } from 'src/consts/platform';
 import { useConfigContext } from 'src/providers/config';
@@ -52,6 +53,7 @@ const TableListItem: FunctionComponent<Props> = ({
   isArchived,
   name,
   romFile,
+  backglassFile,
   romFilePath,
   vpxFile,
   vpxFilePath,
@@ -231,6 +233,20 @@ const TableListItem: FunctionComponent<Props> = ({
           <span className={style.romDot} />
           <p className='secondary-text-color body-xs-semibold'>{romFile}</p>
         </div>
+      )}
+      {backglassFile && (
+        <Tooltip
+          className={style.backglassTooltipContainer}
+          content='DirectB2S backglass file detected'>
+          <span
+            className={classNames(
+              'secondary-text-color',
+              'body-xs-semibold',
+              style.backglassIndicator,
+            )}>
+            B2S
+          </span>
+        </Tooltip>
       )}
 
       <div className={style.datesContainer}>

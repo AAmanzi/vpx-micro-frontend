@@ -142,6 +142,33 @@
   border: thin solid rgba(var(--white-rgb), 0.1);
   border-radius: 999px;
   padding: 10px 14px;
+  flex: 1;
+}
+
+.romRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 38px;
+}
+
+.romPillWithBackglass {
+  min-width: 0;
+
+  & p {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.backglassTooltipContainer {
+  flex-shrink: 0;
+}
+
+.backglassIndicator {
+  white-space: nowrap;
 }
 
 .romDot {

@@ -114,6 +114,16 @@
   flex-shrink: 0;
 }
 
+.backglassTooltipContainer {
+  flex-shrink: 0;
+  margin-left: 12px;
+  margin-right: 8px;
+}
+
+.backglassIndicator {
+  white-space: nowrap;
+}
+
 .datesContainer {
   display: flex;
   gap: 24px;
