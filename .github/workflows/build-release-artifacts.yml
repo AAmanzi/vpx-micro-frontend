@@ -62,6 +62,10 @@ jobs:
           --config.artifactName="VPX-Micro-Frontend-${{ steps.package.outputs.version }}-${{ matrix.artifact }}.${{ matrix.extension }}"
           --config.nsis.artifactName="VPX-Micro-Frontend-Setup-${{ steps.package.outputs.version }}-${{ matrix.artifact }}.exe"
 
+      - name: Verify macOS app signature integrity
+        if: matrix.platform == 'mac'
+        run: codesign --verify --deep --strict --verbose=2 "dist/mac${{ matrix.arch == 'arm64' && '-arm64' || '' }}/VPX Micro Frontend.app"
+
       - name: Upload distributables
         uses: actions/upload-artifact@v5
         with:
