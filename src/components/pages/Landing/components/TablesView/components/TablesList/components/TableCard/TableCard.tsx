@@ -6,6 +6,7 @@ import Button, {
   Type as ButtonType,
 } from 'src/components/Button';
 import Icon from 'src/components/Icon';
+import Tooltip from 'src/components/Tooltip';
 import api from 'src/consts';
 import { TABLE_STARTUP_LOCK_MS } from 'src/consts/platform';
 import { useConfigContext } from 'src/providers/config';
@@ -52,6 +53,7 @@ const TableCard: FunctionComponent<Props> = ({
   isArchived,
   name,
   romFile,
+  backglassFile,
   romFilePath,
   vpxFile,
   vpxFilePath,
@@ -221,10 +223,34 @@ const TableCard: FunctionComponent<Props> = ({
 
         <div className={style.meta}>
           <p className='secondary-text-color body-xs-semibold'>{vpxFile}</p>
-          {romFile && (
-            <div className={style.romPill}>
-              <span className={style.romDot} />
-              <p className='secondary-text-color body-xs-semibold'>{romFile}</p>
+          {(romFile || backglassFile) && (
+            <div className={style.romRow}>
+              {romFile && (
+                <div
+                  className={classNames(style.romPill, {
+                    [style.romPillWithBackglass]: backglassFile,
+                  })}>
+                  <span className={style.romDot} />
+                  <p className='secondary-text-color body-xs-semibold'>
+                    {romFile}
+                  </p>
+                </div>
+              )}
+              {backglassFile && (
+                <Tooltip
+                  className={style.backglassTooltipContainer}
+                  content='DirectB2S backglass file detected'
+                  placement='top-end'>
+                  <span
+                    className={classNames(
+                      'secondary-text-color',
+                      'body-xs-semibold',
+                      style.backglassIndicator,
+                    )}>
+                    B2S
+                  </span>
+                </Tooltip>
+              )}
             </div>
           )}
 
