@@ -45,6 +45,7 @@ import {
   lookupTableImageCandidates,
   lookupTableImageUrl,
 } from '../utils/tableImages';
+import { deleteTableConfigs } from './iniBackups';
 
 const isZipFile = (name: string): boolean =>
   path.extname(name).toLowerCase() === '.zip';
@@ -152,7 +153,10 @@ export function setTableArchived(
   }
 }
 
-export function deleteTable(id: string): ApiResult<null> {
+export function deleteTable(
+  id: string,
+  options: { deleteActiveConfig?: boolean } = {},
+): ApiResult<null> {
   try {
     const storedTable = tablesDb.get(id);
     const table = tablesDb.getResolved(id);
@@ -171,7 +175,15 @@ export function deleteTable(id: string): ApiResult<null> {
       storedTable.backglassFileId,
       'directb2s',
     )?.path;
-    tablesDb.remove(id);
+    const remainingConfigFiles = deleteTableConfigs(
+      id,
+      options.deleteActiveConfig === true,
+      () => {
+        if (!tablesDb.remove(id)) {
+          throw new Error(`Table not found: ${id}`);
+        }
+      },
+    );
 
     const remainingTables = tablesDb.getAll();
     if (
@@ -207,7 +219,15 @@ export function deleteTable(id: string): ApiResult<null> {
       deleteFile(backglassPath);
     }
 
-    return apiSuccess(null);
+    return apiSuccess(
+      null,
+      remainingConfigFiles.length
+        ? {
+            code: 'CONFIG_CLEANUP_INCOMPLETE',
+            message: `Table deleted, but these staged config files need manual removal: ${remainingConfigFiles.join(', ')}`,
+          }
+        : undefined,
+    );
   } catch (error) {
     return apiFailure(error);
   }

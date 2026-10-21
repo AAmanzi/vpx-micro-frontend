@@ -2,6 +2,7 @@ import type { ApiError, ApiResult, ApiWarning } from 'src/types/api';
 
 export * from './config';
 export * from './fileSystem';
+export * from './iniBackups';
 export * from './tables';
 export * from './android';
 

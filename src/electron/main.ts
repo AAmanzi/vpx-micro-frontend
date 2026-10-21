@@ -205,9 +205,18 @@ app.whenReady().then(async () => {
 
   // register IPC handlers that call the api layer
   ipcMain.handle('api:getAllTables', async () => api.getAllTables());
-  ipcMain.handle('api:deleteTable', async (_, id: string) =>
-    api.deleteTable(id),
+  ipcMain.handle(
+    'api:deleteTable',
+    async (_, id: string, options?: { deleteActiveConfig?: boolean }) =>
+      api.deleteTable(id, options),
   );
+  ipcMain.handle('api:getTableConfigDeletion', async (_, id: string) => {
+    try {
+      return api.apiSuccess(api.getTableConfigDeletion(id));
+    } catch (error) {
+      return api.apiFailure(error);
+    }
+  });
   ipcMain.handle('api:setTableFavorite', async (_, id: string, fav: boolean) =>
     api.setTableFavorite(id, fav),
   );
@@ -349,6 +358,73 @@ app.whenReady().then(async () => {
   );
   ipcMain.handle('api:startTable', async (_, tableId: string) =>
     api.startTable(tableId),
+  );
+  ipcMain.handle('api:getIniBackups', async (_, tableId: string) => {
+    try {
+      return api.apiSuccess(api.getIniBackups(tableId));
+    } catch (error) {
+      return api.apiFailure(error);
+    }
+  });
+  ipcMain.handle(
+    'api:createIniBackup',
+    async (_, tableId: string, name?: string) => {
+      try {
+        return api.apiSuccess(api.createIniBackup(tableId, name));
+      } catch (error) {
+        return api.apiFailure(error);
+      }
+    },
+  );
+  ipcMain.handle(
+    'api:restoreIniBackup',
+    async (_, tableId: string, backupId: string) => {
+      try {
+        return api.apiSuccess(api.restoreIniBackup(tableId, backupId));
+      } catch (error) {
+        return api.apiFailure(error);
+      }
+    },
+  );
+  ipcMain.handle(
+    'api:renameCurrentIni',
+    async (_, tableId: string, name: string) => {
+      try {
+        api.renameCurrentIni(tableId, name);
+        return api.apiSuccess(null);
+      } catch (error) {
+        return api.apiFailure(error);
+      }
+    },
+  );
+  ipcMain.handle('api:deleteCurrentIni', async (_, tableId: string) => {
+    try {
+      api.deleteCurrentIni(tableId);
+      return api.apiSuccess(null);
+    } catch (error) {
+      return api.apiFailure(error);
+    }
+  });
+  ipcMain.handle(
+    'api:renameIniBackup',
+    async (_, tableId: string, backupId: string, name: string) => {
+      try {
+        return api.apiSuccess(api.renameIniBackup(tableId, backupId, name));
+      } catch (error) {
+        return api.apiFailure(error);
+      }
+    },
+  );
+  ipcMain.handle(
+    'api:deleteIniBackup',
+    async (_, tableId: string, backupId: string) => {
+      try {
+        api.deleteIniBackup(tableId, backupId);
+        return api.apiSuccess(null);
+      } catch (error) {
+        return api.apiFailure(error);
+      }
+    },
   );
   ipcMain.handle('api:clearTables', async () => api.clearTables());
   ipcMain.handle('api:scanVpxLibrary', async () => api.scanVpxLibrary());
