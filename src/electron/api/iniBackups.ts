@@ -113,35 +113,62 @@ export const deleteTableConfigs = (
 ): Array<string> => {
   const details = getTableConfigDeletion(tableId);
   const previousState = store.store;
+  const files = details.backups
+    .filter((backup) => backup.isAvailable)
+    .map((backup) => getBackupPath(backup.id));
+  if (
+    deleteActiveConfig &&
+    details.activeIniPath &&
+    !details.isActiveIniShared
+  ) {
+    files.push(details.activeIniPath);
+  }
+  const backups = { ...previousState.backups };
+  const activeNames = { ...previousState.activeNames };
+  const activeSavedAt = { ...previousState.activeSavedAt };
+  delete backups[tableId];
+  delete activeNames[tableId];
+  delete activeSavedAt[tableId];
+  return deleteConfigFiles(
+    files,
+    { backups, activeNames, activeSavedAt },
+    removeTable,
+  );
+};
+
+export const clearLibraryConfigs = (
+  clearLibrary: () => void,
+): Array<string> => {
+  const files = Object.values(store.get('backups'))
+    .flat()
+    .map((backup) => getBackupPath(backup.id))
+    .filter(isFileAvailable);
+  return deleteConfigFiles(
+    [...new Set(files)],
+    { backups: {}, activeNames: {}, activeSavedAt: {} },
+    clearLibrary,
+  );
+};
+
+const deleteConfigFiles = (
+  files: Array<string>,
+  nextState: IniBackupStore,
+  removeLibraryEntries: () => void,
+): Array<string> => {
+  const previousState = store.store;
   const staged: Array<{ original: string; temporary: string }> = [];
   let metadataSaved = false;
 
   try {
-    const files = details.backups
-      .filter((backup) => backup.isAvailable)
-      .map((backup) => getBackupPath(backup.id));
-    if (
-      deleteActiveConfig &&
-      details.activeIniPath &&
-      !details.isActiveIniShared
-    ) {
-      files.push(details.activeIniPath);
-    }
     for (const original of files) {
       const temporary = `${original}.${uuidv4()}.delete`;
       fs.renameSync(original, temporary);
       staged.push({ original, temporary });
     }
 
-    const backups = { ...previousState.backups };
-    const activeNames = { ...previousState.activeNames };
-    const activeSavedAt = { ...previousState.activeSavedAt };
-    delete backups[tableId];
-    delete activeNames[tableId];
-    delete activeSavedAt[tableId];
-    store.set({ backups, activeNames, activeSavedAt });
+    store.set(nextState);
     metadataSaved = true;
-    removeTable();
+    removeLibraryEntries();
   } catch (error) {
     const failures: Array<string> = [];
     for (const file of staged.reverse()) {
@@ -165,7 +192,7 @@ export const deleteTableConfigs = (
     }
     if (failures.length) {
       throw new Error(
-        `Table deletion failed and recovery needs attention: ${failures.join(', ')}`,
+        `Config cleanup failed and recovery needs attention: ${failures.join(', ')}`,
       );
     }
     throw error;
