@@ -885,7 +885,10 @@ export async function importTables(
             }
             const targetPath = getTableIniPath(vpxDestinationFilePath);
             const sourceKey = normalizePathForComparison(tableFile.ini.path);
-            if (sourceKey === normalizePathForComparison(targetPath)) {
+            if (
+              getLibraryFilePathKey(tableFile.ini.path) ===
+              getLibraryFilePathKey(targetPath)
+            ) {
               ensureSourceFile(tableFile.ini.path);
             } else {
               copyFileExclusive(tableFile.ini.path, targetPath);
