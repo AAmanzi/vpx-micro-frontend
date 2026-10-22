@@ -1,5 +1,6 @@
 import { FunctionComponent } from 'react';
 
+import BackglassPicker from 'src/components/BackglassPicker';
 import Icon from 'src/components/Icon';
 import Input, { Size as InputSize } from 'src/components/Input';
 import RomPicker from 'src/components/RomPicker';
@@ -13,9 +14,13 @@ interface Props {
   table: TableFile;
   manuallyImportedRoms: Array<FileSystemItem>;
   libraryRoms: Array<FileSystemItem>;
+  availableBackglasses: Array<FileSystemItem>;
+  libraryBackglasses: Array<FileSystemItem>;
   onAssignRom: (table: TableFile, rom: FileSystemItem) => void;
+  onAssignBackglass: (table: TableFile, backglass: FileSystemItem) => void;
   onRemoveTable: (table: TableFile) => void;
   onRemoveRom: (table: TableFile) => void;
+  onRemoveBackglass: (table: TableFile) => void;
   onTableNameChange: (table: TableFile, newName: string) => void;
 }
 
@@ -23,9 +28,13 @@ const TableEntry: FunctionComponent<Props> = ({
   table,
   manuallyImportedRoms,
   libraryRoms,
+  availableBackglasses,
+  libraryBackglasses,
   onAssignRom,
+  onAssignBackglass,
   onRemoveTable,
   onRemoveRom,
+  onRemoveBackglass,
   onTableNameChange,
 }) => {
   const handleNameChange = (value: string) => {
@@ -54,6 +63,7 @@ const TableEntry: FunctionComponent<Props> = ({
       </div>
       <div className={style.info}>
         <Tag icon='file-code' label={table.fileName} />
+        {table.ini && <Tag icon='file-code' label={table.ini.name} />}
         <RomPicker
           selectedRom={table.rom || null}
           manuallyImportedRoms={manuallyImportedRoms}
@@ -62,6 +72,13 @@ const TableEntry: FunctionComponent<Props> = ({
           expectedRomName={table.expectedRomName || null}
           onRemoveRom={() => onRemoveRom(table)}
           onSelect={handleRomSelect}
+        />
+        <BackglassPicker
+          selectedBackglass={table.backglass || null}
+          availableBackglasses={availableBackglasses}
+          libraryBackglasses={libraryBackglasses}
+          onRemove={() => onRemoveBackglass(table)}
+          onSelect={(backglass) => onAssignBackglass(table, backglass)}
         />
       </div>
     </div>

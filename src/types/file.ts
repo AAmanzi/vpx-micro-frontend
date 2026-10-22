@@ -9,4 +9,11 @@ export interface TableFile {
   fileName: string;
   rom?: FileSystemItem;
   expectedRomName?: string;
+  backglass?: FileSystemItem;
+  ini?: FileSystemItem;
+}
+
+export interface BackglassImportAssignment {
+  tableId: string;
+  backglass: FileSystemItem;
 }

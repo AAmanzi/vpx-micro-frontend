@@ -59,6 +59,13 @@ export function getConfig(): Config {
   return getStoredConfig();
 }
 
+export function dismissUpdateNotice(timestamp: number): void {
+  store.set('config', {
+    ...getStoredConfig(),
+    updateNoticeDismissedAt: timestamp,
+  });
+}
+
 export function getLaunchFlags(): LaunchFlags {
   return getStoredConfig().launchFlags as LaunchFlags;
 }

@@ -1,0 +1,599 @@
+.container {
+  @include body-sm-regular-mixin;
+  animation: fadeInBackups 180ms ease-out;
+  display: flex;
+  width: min(340px, calc(100vw - 16px));
+  height: min(480px, calc(100vh - 16px));
+  height: min(480px, calc(100dvh - 16px));
+  max-height: calc(100vh - 16px);
+  max-height: calc(100dvh - 16px);
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--gray);
+  border-radius: 20px;
+  background-color: var(--gray-800);
+  box-sizing: border-box;
+}
+
+.panelHeader {
+  display: flex;
+  min-height: 64px;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-bottom: 1px solid rgba(var(--white-rgb), 0.08);
+}
+
+.createButton {
+  flex: 0 0 auto;
+  white-space: nowrap;
+
+  > button > div {
+    padding: 0 12px;
+    border-radius: 10px;
+    background-color: var(--blue);
+
+    > div {
+      margin-right: 6px;
+    }
+
+    > span {
+      @include body-xs-semibold-mixin;
+    }
+  }
+
+  > button:hover:not(:disabled) > div {
+    background-color: rgba(var(--blue-rgb), 0.8);
+  }
+
+  > button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  > button:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 2px;
+  }
+}
+
+.createInput > div > div {
+  height: 36px;
+  border-radius: 10px;
+
+  > input {
+    @include body-xs-regular-mixin;
+  }
+}
+
+.backButton {
+  display: grid;
+  width: 24px;
+  height: 32px;
+  flex: 0 0 24px;
+  place-items: center;
+  color: var(--gray-300);
+
+  &:hover {
+    color: var(--white);
+  }
+}
+
+.backIcon {
+  width: 16px;
+  height: 16px;
+  transform: rotate(180deg);
+}
+
+.heading {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.title {
+  @include body-sm-bold-mixin;
+  overflow: hidden;
+  color: var(--white);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tableName {
+  @include body-xs-regular-mixin;
+  overflow: hidden;
+  color: var(--gray-500);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.missingIni {
+  @include body-xs-regular-mixin;
+  margin: 12px 16px;
+  padding: 12px 14px;
+  border: 1px solid rgba(var(--yellow-rgb), 0.35);
+  border-radius: 16px;
+  background-color: rgba(var(--yellow-rgb), 0.06);
+  color: var(--yellow);
+}
+
+.emptyState {
+  @include body-sm-regular-mixin;
+  display: flex;
+  min-height: 160px;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 24px;
+  text-align: center;
+
+  h4 {
+    @include body-md-semibold-mixin;
+    margin: 0;
+    color: var(--gray-100);
+  }
+
+  p {
+    @include body-xs-regular-mixin;
+    max-width: 300px;
+    margin: 4px 0 0;
+    color: var(--gray-500);
+  }
+}
+
+.backupList,
+.manageList {
+  min-height: 0;
+  flex: 1;
+  list-style: none;
+  margin: 0;
+  overflow-y: auto;
+  padding: 12px 16px;
+  scrollbar-color: var(--gray-500) transparent;
+  scrollbar-width: thin;
+}
+
+.recentBackup {
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 4px;
+}
+
+.backupIcon,
+.emptyIcon {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  place-items: center;
+  border-radius: 10px;
+  background-color: rgba(var(--white-rgb), 0.07);
+  color: var(--gray-300);
+}
+
+.backupDetails {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.backupName {
+  @include body-sm-semibold-mixin;
+  overflow: hidden;
+  color: var(--gray-100);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.timestamp,
+.unavailable {
+  @include body-xs-regular-mixin;
+  color: var(--gray-500);
+}
+
+.swapHelp {
+  @include body-xs-regular-mixin;
+  margin: 12px 24px 0;
+  color: var(--gray-300);
+}
+
+.panelDescription {
+  @include body-xs-regular-mixin;
+  margin: 12px 16px 0;
+  color: var(--gray-300);
+}
+
+.currentIni {
+  display: flex;
+  flex: 0 0 auto;
+  min-height: 44px;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 16px 0;
+  padding: 12px;
+  border: 1px solid rgba(var(--blue-rgb), 0.18);
+  border-radius: 18px;
+  background-color: rgba(var(--blue-rgb), 0.08);
+}
+
+.currentHeading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+
+  > .backupName {
+    min-width: 0;
+  }
+}
+
+.activeTag {
+  @include body-xxs-semibold-mixin;
+  flex: 0 0 auto;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background-color: rgba(var(--blue-rgb), 0.16);
+  color: var(--blue);
+}
+
+.currentRenameForm {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  > div {
+    min-width: 120px;
+    flex: 1;
+  }
+}
+
+.manageContent > .currentIni {
+  margin-right: 16px;
+  margin-left: 16px;
+}
+
+.unavailable {
+  color: rgba(var(--red-rgb), 0.9);
+}
+
+.restoreIconButton {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  place-items: center;
+  border-radius: 10px;
+  color: #8b8dff;
+  transition:
+    background-color 150ms ease-out,
+    color 150ms ease-out;
+
+  &:hover:not(:disabled) {
+    background-color: rgba(var(--purple-rgb), 0.12);
+    color: #b1b2ff;
+  }
+
+  &:disabled {
+    color: var(--gray-500);
+    cursor: not-allowed;
+  }
+}
+
+.manageLink {
+  @include body-sm-semibold-mixin;
+  display: flex;
+  min-height: 58px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  border-top: 1px solid rgba(var(--white-rgb), 0.08);
+  color: var(--gray-300);
+  text-align: left;
+  transition: color 150ms ease-out;
+
+  &:hover:not(:disabled) {
+    color: var(--white);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.manageLink svg {
+  color: var(--gray-300);
+}
+
+.manageModal {
+  @include body-sm-regular-mixin;
+  display: flex;
+  width: min(640px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  max-height: calc(100dvh - 32px);
+  flex-direction: column;
+  overflow: hidden;
+  padding-bottom: 0;
+  border-radius: 16px;
+
+  > div:first-child {
+    flex: 0 0 auto;
+    padding: 20px 24px;
+  }
+}
+
+.manageModal.manageModal {
+  width: min(640px, calc(100vw - 32px));
+}
+
+.modalHeader {
+  > div:first-child > p {
+    @include body-sm-regular-mixin;
+    margin-top: 4px;
+  }
+}
+
+.modalTitle {
+  @include heading-5-bold-mixin;
+}
+
+.manageContent {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.createForm {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
+  border-bottom: 1px solid rgba(var(--white-rgb), 0.08);
+  background-color: rgba(var(--black-rgb), 0.12);
+
+  > div:first-child {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.manageList {
+  width: 100%;
+  max-height: min(62vh, 620px);
+  flex: 1;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.backup {
+  margin-bottom: 8px;
+  padding: 12px;
+  border: 1px solid transparent;
+  border-radius: 18px;
+  background-color: rgba(var(--black-rgb), 0.18);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.backupRow {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 12px;
+}
+
+.backupActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.restoreButton {
+  @include body-sm-semibold-mixin;
+  display: flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 4px;
+  border-radius: 8px;
+  color: #a9aaff;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    color: #c4c5ff;
+  }
+
+  &:disabled {
+    color: var(--gray-500);
+    cursor: not-allowed;
+  }
+}
+
+.manageActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  > button {
+    display: grid;
+    width: 34px;
+    height: 34px;
+    place-items: center;
+    border-radius: 9px;
+    color: var(--gray-500);
+
+    &:hover:not(:disabled) {
+      background-color: rgba(var(--white-rgb), 0.06);
+      color: var(--gray-100);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
+
+  > button:last-child:hover:not(:disabled) {
+    color: var(--red);
+  }
+}
+
+.renameForm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  > div:first-of-type {
+    flex: 1;
+    min-width: 120px;
+  }
+
+  > button {
+    flex: 0 0 auto;
+  }
+}
+
+.modalEmptyState {
+  @include body-sm-regular-mixin;
+  display: flex;
+  min-height: 280px;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+  text-align: center;
+
+  h3 {
+    @include heading-6-bold-mixin;
+    margin: 20px 0 0;
+    color: var(--gray-100);
+  }
+
+  p {
+    @include body-sm-regular-mixin;
+    max-width: 380px;
+    margin: 4px 0 0;
+    color: var(--gray-500);
+  }
+}
+
+.emptyIcon {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  place-items: center;
+  border-radius: 16px;
+  background-color: rgba(var(--white-rgb), 0.06);
+  color: var(--gray-500);
+}
+
+.deleteContent {
+  @include body-sm-regular-mixin;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 24px;
+  color: var(--secondary-text-color);
+}
+
+.deleteBackupName {
+  @include body-sm-semibold-mixin;
+  color: var(--primary-text-color);
+  overflow-wrap: anywhere;
+}
+
+.deleteFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin: 24px 24px 0;
+}
+
+.backButton,
+.restoreIconButton,
+.restoreButton,
+.manageLink,
+.manageActions > button {
+  &:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 2px;
+  }
+}
+
+@keyframes fadeInBackups {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 520px) {
+  .panelHeader {
+    gap: 8px;
+    padding-right: 10px;
+    padding-left: 12px;
+  }
+
+  .manageModal {
+    width: calc(100vw - 24px);
+
+    > div:first-child {
+      padding: 16px;
+    }
+  }
+
+  .manageModal.manageModal {
+    width: calc(100vw - 24px);
+  }
+
+  .createForm {
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .manageList {
+    padding: 10px;
+  }
+
+  .backup {
+    padding: 10px;
+  }
+
+  .backupRow {
+    gap: 8px;
+  }
+
+  .backupActions {
+    gap: 2px;
+  }
+
+  .manageActions {
+    gap: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .container {
+    animation: none;
+  }
+}

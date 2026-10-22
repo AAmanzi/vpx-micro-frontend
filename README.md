@@ -73,6 +73,7 @@ This app is currently unsigned, so Smart App Control may block it. If the app do
    - **Intel**: `VPX-Micro-Frontend-<version>-macos-x64.dmg`
 
    Not sure which you have? Open **Apple menu → About This Mac** and check **Chip** (Apple M-series) or **Processor** (Intel).
+
 2. Open the `.dmg` file
 3. Drag the VPX Micro Frontend app into the **Applications** folder
 4. Open Applications and launch **VPX Micro Frontend**
@@ -109,6 +110,7 @@ The app includes a guided setup wizard to help you configure VPX on macOS.
 **Guided Setup (Recommended):**
 
 Click **Begin Setup** in the Settings → File Paths section to start a step-by-step guide that covers:
+
 1. Installing/locating VPX
 2. Configuring the VPX executable path
 3. Setting up Tables and ROMs folders
@@ -143,10 +145,14 @@ If you already have an existing VPX setup, start with Scan Library first.
 ![Import workflow](public/readme/import-tables.gif)
 
 1. Click **Import Tables**.
-2. Drag/drop `.vpx`, `.zip`, or folders.
-3. Review detected tables and unassigned ROMs.
+2. Drag/drop `.vpx`, `.zip`, `.directb2s`, `.ini`, or folders.
+3. Review detected tables, ROMs, backglass assignments, and matched INIs.
 4. Optionally enable **Delete original files after import**.
 5. Click **Import Tables**.
+
+**DirectB2S on macOS:** Playback compatibility hasn't been verified by this
+project. You can import, assign, scan, and export backglass files, but playback
+may require additional setup outside this app.
 
 ## Work with tables
 
@@ -177,13 +183,11 @@ If you already have an existing VPX setup, start with Scan Library first.
 ![Table card actions](public/readme/table-card-actions.png)
 
 - **Play** button launches the table.
-- **Kebab menu** lets you:
-  - Rename table
-  - Edit ROM — set the ROM file associated with this table
-  - Table Image (if available from VPS DB) — click to view or edit image selection from alternate results.
-  - VPX Executable — open launch settings to set a different VPX executable for this table and, on Windows, optional per-table launch-flag overrides. Unset flags use the global defaults.
-  - Delete Table — removes the DB entry and deletes the table's files from VPX folders
-  - Archive / Unarchive table — archive the table to hide it from your active library.
+- **Kebab menu** groups table actions:
+  - Rename Table and Table Image
+  - **Files:** Edit ROM, Edit Backglass, and VPX Executable. The executable action opens launch settings for a different VPX executable and, on Windows, optional per-table launch-flag overrides. Unset flags use the global defaults.
+  - **Library:** Archive / Unarchive Table to hide or restore the table in your active library, and Backups to manage saved table configurations.
+  - **Delete Table:** removes the DB entry and deletes the table's files from VPX folders.
 
 ### Table Images
 
@@ -197,6 +201,17 @@ Table images are automatically fetched from the [Virtual Pinball Spreadsheet dat
 
 Images are cached locally; if the VPS DB is unavailable, your previously cached images remain visible.
 There's also a snapshot of VPS DB as backup at [VPS Backup snapshot](https://aamanzi.github.io/vps-db/db/vpsdb.json)
+
+### Config Backups
+
+Use **Backups** in a table's actions menu to save and manage configurations (`.ini` files).
+
+- **Create** backups before experimenting with table settings.
+- **Swap** between saved configurations and the active one without losing either.
+- **Load** a backup if no active configuration exists.
+- **Rename** or **Delete** configurations from the management window.
+
+Backups are stored separately in app-managed storage.
 
 ## Settings reference
 
@@ -230,7 +245,6 @@ There's also a snapshot of VPS DB as backup at [VPS Backup snapshot](https://aam
 - Mark tables as "Android" and preview them in the Android tab
 - From the **Android tab**, select **Sync Android**
 - Preview Changes and sync your libraries
-
 
 ![Enable android features](public/readme/android-features-enabled.png)
 ![Mark table for android](public/readme/mark-for-android.png)
@@ -266,9 +280,15 @@ On your Android device:
 ### Maintenance
 
 - **Fullscreen** toggles fullscreen mode. Press **F11** on Windows or **Ctrl+Cmd+F** on macOS to toggle it from anywhere in the app. Window size, position, maximized state, and fullscreen state are restored on the next launch.
-- **Clear Library Data** resets app metadata/list only.
+- **Clear Library Data** resets the table list and permanently deletes all
+  app-managed config backups and saved configuration names/timestamps.
+  Table files and active settings (`.ini` files) are kept.
 - It does **not** delete your actual VPX/ROM files.
 - **Database Migrations** run automatically on app update to keep existing data compatible.
+
+The library migration saves backups of library data, app configuration, and
+migration history in the active app-data directory's `backups` folder before
+converting the library.
 
 ### Advanced launch settings (Windows)
 

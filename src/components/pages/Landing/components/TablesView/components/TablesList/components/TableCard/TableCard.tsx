@@ -6,12 +6,13 @@ import Button, {
   Type as ButtonType,
 } from 'src/components/Button';
 import Icon from 'src/components/Icon';
+import Tooltip from 'src/components/Tooltip';
 import api from 'src/consts';
 import { TABLE_STARTUP_LOCK_MS } from 'src/consts/platform';
 import { useConfigContext } from 'src/providers/config';
 import { useTablesContext } from 'src/providers/tables';
 import { useToastContext } from 'src/providers/toast';
-import { Table } from 'src/types/table';
+import { ResolvedTable } from 'src/types/table';
 import {
   displayDate,
   displayRelativeDate,
@@ -22,7 +23,7 @@ import {
 import SettingsPopover from '../SettingsPopover';
 import style from './TableCard.module.scss';
 
-type Props = Table & {
+type Props = ResolvedTable & {
   scrollToTopOnTableStart: boolean;
 };
 
@@ -52,6 +53,7 @@ const TableCard: FunctionComponent<Props> = ({
   isArchived,
   name,
   romFile,
+  backglassFile,
   romFilePath,
   vpxFile,
   vpxFilePath,
@@ -70,12 +72,12 @@ const TableCard: FunctionComponent<Props> = ({
     romFile,
     vpxFile,
     id,
-  } as Table);
+  } as ResolvedTable);
   const tableGradientColor = getTableGradientVariable({
     romFile,
     vpxFile,
     id,
-  } as Table);
+  } as ResolvedTable);
   const { showErrorToast } = useToastContext();
   const { fetchTables } = useTablesContext();
   const { config } = useConfigContext();
@@ -221,10 +223,34 @@ const TableCard: FunctionComponent<Props> = ({
 
         <div className={style.meta}>
           <p className='secondary-text-color body-xs-semibold'>{vpxFile}</p>
-          {romFile && (
-            <div className={style.romPill}>
-              <span className={style.romDot} />
-              <p className='secondary-text-color body-xs-semibold'>{romFile}</p>
+          {(romFile || backglassFile) && (
+            <div className={style.romRow}>
+              {romFile && (
+                <div
+                  className={classNames(style.romPill, {
+                    [style.romPillWithBackglass]: backglassFile,
+                  })}>
+                  <span className={style.romDot} />
+                  <p className='secondary-text-color body-xs-semibold'>
+                    {romFile}
+                  </p>
+                </div>
+              )}
+              {backglassFile && (
+                <Tooltip
+                  className={style.backglassTooltipContainer}
+                  content='DirectB2S backglass file detected'
+                  placement='top-end'>
+                  <span
+                    className={classNames(
+                      'secondary-text-color',
+                      'body-xs-semibold',
+                      style.backglassIndicator,
+                    )}>
+                    B2S
+                  </span>
+                </Tooltip>
+              )}
             </div>
           )}
 

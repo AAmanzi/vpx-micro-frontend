@@ -22,11 +22,31 @@
   <symbol id="icon-folder" viewBox="0 0 13 12">
     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.167" d="m2.917 7 .874-1.692a1.17 1.17 0 0 1 1.015-.642h6.276m0 0a1.166 1.166 0 0 1 1.132 1.458l-.898 3.5a1.166 1.166 0 0 1-1.138.875H1.75A1.166 1.166 0 0 1 .583 9.332V1.75A1.167 1.167 0 0 1 1.75.583h2.275a1.17 1.17 0 0 1 .986.525l.472.7a1.17 1.17 0 0 0 .974.525h3.459A1.167 1.167 0 0 1 11.082 3.5z"/>
   </symbol>
+  <symbol id="icon-image" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+    <rect x="3" y="3" width="18" height="18" rx="2"/>
+    <circle cx="8.5" cy="8.5" r="1.5"/>
+    <path d="m21 15-5-5L5 21"/>
+  </symbol>
+  <symbol id="icon-disc" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+    <circle cx="12" cy="12" r="10"/>
+    <circle cx="12" cy="12" r="2"/>
+  </symbol>
+  <symbol id="icon-cpu" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+    <rect x="5" y="5" width="14" height="14" rx="2"/>
+    <path d="M9 9h6v6H9zM9 1v4M15 1v4M9 19v4M15 19v4M19 9h4M19 14h4M1 9h4M1 14h4"/>
+  </symbol>
   <symbol id="icon-play" viewBox="0 0 32 32">
     <path d="M8 6 L26 16 L8 26 Z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" fill="none" />
   </symbol>
   <symbol id="icon-monitor" viewBox="0 0 20 20">
     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.666" d="M16.664 2.5H3.333c-.92 0-1.666.746-1.666 1.666v8.332c0 .92.746 1.666 1.666 1.666h13.33c.921 0 1.667-.746 1.667-1.666V4.166c0-.92-.746-1.666-1.666-1.666M6.665 17.497h5M9.998 14.158v3"/>
+  </symbol>
+  <symbol id="icon-wallpaper" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+    <path d="M12 17v4"/>
+    <path d="M8 21h8"/>
+    <path d="m9 17 6.1-6.1a2 2 0 0 1 2.81.01L22 15"/>
+    <circle cx="8" cy="9" r="2"/>
+    <rect x="2" y="3" width="20" height="14" rx="2"/>
   </symbol>
   <symbol id="icon-phone" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
     <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>

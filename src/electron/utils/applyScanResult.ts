@@ -13,7 +13,7 @@ export async function registerTableFiles(
 ): Promise<void> {
   const existingVpxPaths = new Set(
     tablesDb
-      .getAll()
+      .getAllResolved()
       .map((table) => normalizePathForComparison(table.vpxFilePath)),
   );
 
@@ -30,13 +30,12 @@ export async function registerTableFiles(
       romFileName: tableFile.rom?.name,
     });
 
-    const nextTable: Table = {
+    const nextTable: Omit<
+      Table,
+      'vpxFileId' | 'romFileId' | 'backglassFileId'
+    > = {
       id: uuidv4(),
       name: tableFile.name,
-      vpxFile: tableFile.fileName,
-      romFile: tableFile.rom?.name,
-      vpxFilePath: tableFile.filePath,
-      romFilePath: tableFile.rom?.path,
       isFavorite: false,
       isForAndroid: false,
       isArchived: false,
@@ -44,7 +43,11 @@ export async function registerTableFiles(
       imgUrl,
     };
 
-    tablesDb.create(nextTable);
+    tablesDb.createWithFiles(
+      nextTable,
+      tableFile.filePath,
+      tableFile.rom?.path,
+    );
     existingVpxPaths.add(normalizedVpxPath);
   }
 }
@@ -61,15 +64,18 @@ export function cleanTablesWithMissingFiles(
   data: ScanResult['tablesWithMissingFiles'],
 ): void {
   data.forEach((item) => {
-    const { table, missingVpxFile, missingRomFile } = item;
+    const { table, missingVpxFile, missingRomFile, missingBackglassFile } =
+      item;
 
     if (missingVpxFile) {
       tablesDb.remove(table.id);
-    } else if (missingRomFile) {
-      tablesDb.update(table.id, {
-        romFile: undefined,
-        romFilePath: undefined,
-      });
+    } else {
+      if (missingRomFile) {
+        tablesDb.updateFileReference(table.id, 'romFileId', 'rom');
+      }
+      if (missingBackglassFile) {
+        tablesDb.updateFileReference(table.id, 'backglassFileId', 'directb2s');
+      }
     }
   });
 }

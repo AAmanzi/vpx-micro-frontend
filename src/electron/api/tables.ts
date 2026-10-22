@@ -5,8 +5,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { TABLE_STARTUP_LOCK_MS } from 'src/consts/platform';
 import type { ApiResult } from 'src/types/api';
 import type { LaunchFlags } from 'src/types/config';
-import type { FileSystemItem, TableFile } from 'src/types/file';
-import { GroupType, ScanResult, Table } from 'src/types/table';
+import type {
+  BackglassImportAssignment,
+  FileSystemItem,
+  TableFile,
+} from 'src/types/file';
+import { GroupType, ResolvedTable, ScanResult, Table } from 'src/types/table';
 
 import * as configDb from '../database/config';
 import * as tablesDb from '../database/tables';
@@ -17,14 +21,23 @@ import {
 } from '../utils/applyScanResult';
 import {
   copyFile,
+  copyFileExclusive,
+  copyFileIfExists,
   createDirectoryIfNotExists,
   deleteFile,
+  ensureSourceFile,
   moveFile,
   removeEmptyParentDirectories,
 } from '../utils/fileManagement';
-import { normalizePathForComparison } from '../utils/path';
+import {
+  getLibraryFilePathKey,
+  getTableIniPath,
+  normalizePathForComparison,
+  resolveUserPath,
+} from '../utils/path';
 import {
   findTablesWithMissingFiles,
+  scanFilesByExtension,
   scanNewRoms,
   scanNewTables,
 } from '../utils/scanVpxLibrary';
@@ -33,11 +46,14 @@ import {
   lookupTableImageCandidates,
   lookupTableImageUrl,
 } from '../utils/tableImages';
+import { clearLibraryConfigs, deleteTableConfigs } from './iniBackups';
 
 const isZipFile = (name: string): boolean =>
   path.extname(name).toLowerCase() === '.zip';
 
-const resolveLaunchFlags = (table: Table): LaunchFlags => ({
+const resolveLaunchFlags = (
+  table: Pick<Table, 'launchFlags'>,
+): LaunchFlags => ({
   ...configDb.getLaunchFlags(),
   ...table.launchFlags,
 });
@@ -64,9 +80,9 @@ const lockTableStart = (tableId: string): void => {
   tableStartLockById.set(tableId, Date.now() + TABLE_STARTUP_LOCK_MS);
 };
 
-export function getAllTables(): ApiResult<Table[]> {
+export function getAllTables(): ApiResult<ResolvedTable[]> {
   try {
-    return apiSuccess(tablesDb.getAll());
+    return apiSuccess(tablesDb.getAllResolved());
   } catch (error) {
     return apiFailure(error);
   }
@@ -138,11 +154,15 @@ export function setTableArchived(
   }
 }
 
-export function deleteTable(id: string): ApiResult<null> {
+export function deleteTable(
+  id: string,
+  options: { deleteActiveConfig?: boolean } = {},
+): ApiResult<null> {
   try {
-    const table = tablesDb.get(id);
+    const storedTable = tablesDb.get(id);
+    const table = tablesDb.getResolved(id);
 
-    if (!table) {
+    if (!storedTable || !table) {
       return {
         success: false,
         error: {
@@ -152,24 +172,63 @@ export function deleteTable(id: string): ApiResult<null> {
       };
     }
 
-    tablesDb.remove(id);
+    const backglassPath = tablesDb.getFile(
+      storedTable.backglassFileId,
+      'directb2s',
+    )?.path;
+    const remainingConfigFiles = deleteTableConfigs(
+      id,
+      options.deleteActiveConfig === true,
+      () => {
+        if (!tablesDb.remove(id)) {
+          throw new Error(`Table not found: ${id}`);
+        }
+      },
+    );
 
-    deleteFile(table.vpxFilePath);
+    const remainingTables = tablesDb.getAll();
+    if (
+      !remainingTables.some((item) => item.vpxFileId === storedTable.vpxFileId)
+    ) {
+      deleteFile(table.vpxFilePath);
+    }
 
-    const isRomStillAssigned =
-      table.romFilePath &&
-      tablesDb.getAll().some(
-        (item) =>
-          item.romFilePath &&
-          normalizePathForComparison(item.romFilePath) ===
-            normalizePathForComparison(table.romFilePath),
-      );
+    const isRomStillAssigned = storedTable.romFileId
+      ? remainingTables.some((item) => item.romFileId === storedTable.romFileId)
+      : false;
 
     if (table.romFilePath && !isRomStillAssigned) {
       deleteFile(table.romFilePath);
     }
 
-    return apiSuccess(null);
+    const isBackglassStillAssigned =
+      !!backglassPath &&
+      remainingTables.some((item) => {
+        const assignedBackglassPath = tablesDb.getFile(
+          item.backglassFileId,
+          'directb2s',
+        )?.path;
+
+        return (
+          !!assignedBackglassPath &&
+          normalizePathForComparison(assignedBackglassPath) ===
+            normalizePathForComparison(backglassPath)
+        );
+      });
+
+    if (backglassPath && !isBackglassStillAssigned) {
+      deleteFile(backglassPath);
+    }
+
+    return apiSuccess(
+      null,
+      remainingConfigFiles.length
+        ? {
+            code: 'CONFIG_CLEANUP_INCOMPLETE',
+            message: `Table deleted, but these staged config files need manual removal: ${remainingConfigFiles.join(', ')}`,
+          }
+        : undefined,
+    );
   } catch (error) {
     return apiFailure(error);
   }
@@ -187,6 +246,145 @@ export function renameTable(id: string, newName: string): ApiResult<null> {
           message: `Table not found: ${id}`,
         },
       };
+    }
+
+    return apiSuccess(null);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}
+
+export function updateTableBackglass(
+  tableId: string,
+  backglass: FileSystemItem | null,
+): ApiResult<null> {
+  try {
+    const table = tablesDb.getResolved(tableId);
+
+    if (!table) {
+      return {
+        success: false,
+        error: {
+          code: 'TABLE_NOT_FOUND',
+          message: `Table not found: ${tableId}`,
+        },
+      };
+    }
+
+    const currentBackglassPath = table.backglassFilePath;
+    const isBackglassShared =
+      !!currentBackglassPath &&
+      tablesDb
+        .getAllResolved()
+        .some(
+          (item) =>
+            item.id !== tableId &&
+            item.backglassFilePath &&
+            normalizePathForComparison(item.backglassFilePath) ===
+              normalizePathForComparison(currentBackglassPath),
+        );
+
+    if (!backglass) {
+      if (!currentBackglassPath) {
+        return apiSuccess(null);
+      }
+
+      if (isBackglassShared) {
+        return {
+          success: false,
+          error: {
+            code: 'BACKGLASS_IN_USE',
+            message: 'This backglass is assigned to another table',
+          },
+        };
+      }
+
+      deleteFile(currentBackglassPath);
+      const updatedTable = tablesDb.updateFileReference(
+        tableId,
+        'backglassFileId',
+        'directb2s',
+      );
+
+      if (!updatedTable) {
+        throw new Error(`Table not found: ${tableId}`);
+      }
+
+      return apiSuccess(null);
+    }
+
+    if (isBackglassShared) {
+      return {
+        success: false,
+        error: {
+          code: 'BACKGLASS_IN_USE',
+          message: 'This backglass is assigned to another table',
+        },
+      };
+    }
+
+    if (path.extname(backglass.path).toLowerCase() !== '.directb2s') {
+      return {
+        success: false,
+        error: {
+          code: 'INVALID_BACKGLASS_FILE',
+          message: 'Backglass file must use the .directb2s extension',
+        },
+      };
+    }
+
+    const targetPath =
+      currentBackglassPath ||
+      path.join(
+        path.dirname(table.vpxFilePath),
+        `${path.basename(table.vpxFilePath, path.extname(table.vpxFilePath))}.directb2s`,
+      );
+    const sourceKey = getLibraryFilePathKey(backglass.path);
+    const targetKey = getLibraryFilePathKey(targetPath);
+    let createdDestination = false;
+
+    if (sourceKey !== targetKey) {
+      if (currentBackglassPath) {
+        const stagedPath = `${targetPath}.${uuidv4()}.tmp`;
+
+        try {
+          copyFile(backglass.path, stagedPath);
+          moveFile(stagedPath, targetPath);
+        } catch (error) {
+          try {
+            deleteFile(stagedPath);
+          } catch (cleanupError) {
+            console.warn(
+              `Failed to remove staged backglass ${stagedPath}:`,
+              cleanupError,
+            );
+          }
+
+          throw error;
+        }
+      } else {
+        copyFileExclusive(backglass.path, targetPath);
+        createdDestination = true;
+      }
+    }
+
+    try {
+      const updatedTable = tablesDb.updateFileReference(
+        tableId,
+        'backglassFileId',
+        'directb2s',
+        targetPath,
+      );
+
+      if (!updatedTable) {
+        throw new Error(`Table not found: ${tableId}`);
+      }
+    } catch (error) {
+      if (createdDestination) {
+        deleteFile(targetPath);
+      }
+
+      throw error;
     }
 
     return apiSuccess(null);
@@ -222,40 +420,41 @@ export function updateTableRom(
       };
     }
 
-    const currentRomPath = table.romFilePath;
-    const currentRomName = table.romFile;
+    const currentRomPath = tablesDb.getFile(table.romFileId, 'rom')?.path;
 
     let nextRomPath: string | undefined;
-    let nextRomName: string | undefined;
 
     if (rom) {
       const romsDirectoryPath = configDb.getRomsDirectoryPath();
       const destinationRomPath = path.join(romsDirectoryPath, rom.name);
 
       nextRomPath = destinationRomPath;
-      nextRomName = rom.name;
     }
 
-    const hasRomChanged =
-      normalizePathForComparison(currentRomPath) !==
-      normalizePathForComparison(nextRomPath);
+    const currentRomKey = currentRomPath
+      ? getLibraryFilePathKey(currentRomPath)
+      : undefined;
+    const nextRomKey = nextRomPath
+      ? getLibraryFilePathKey(nextRomPath)
+      : undefined;
+    const hasRomChanged = currentRomKey !== nextRomKey;
 
     if (hasRomChanged && nextRomPath) {
       if (rom) {
-        const normalizedSourceRomPath = normalizePathForComparison(rom.path);
+        const normalizedSourceRomPath = getLibraryFilePathKey(rom.path);
 
-        if (
-          normalizedSourceRomPath !== normalizePathForComparison(nextRomPath)
-        ) {
+        if (normalizedSourceRomPath !== getLibraryFilePathKey(nextRomPath)) {
           copyFile(rom.path, nextRomPath);
         }
       }
     }
 
-    const updatedTable = tablesDb.update(tableId, {
-      romFile: nextRomName,
-      romFilePath: nextRomPath,
-    });
+    const updatedTable = tablesDb.updateFileReference(
+      tableId,
+      'romFileId',
+      'rom',
+      nextRomPath,
+    );
 
     if (!updatedTable) {
       return {
@@ -267,17 +466,12 @@ export function updateTableRom(
       };
     }
 
-    if (hasRomChanged && currentRomPath && currentRomName) {
-      const isCurrentRomStillAssigned = tablesDb.getAll().some((item) => {
-        if (item.id === tableId || !item.romFilePath) {
-          return false;
-        }
-
-        return (
-          normalizePathForComparison(item.romFilePath) ===
-          normalizePathForComparison(currentRomPath)
+    if (hasRomChanged && currentRomPath) {
+      const isCurrentRomStillAssigned = tablesDb
+        .getAll()
+        .some(
+          (item) => item.id !== tableId && item.romFileId === table.romFileId,
         );
-      });
 
       if (!isCurrentRomStillAssigned) {
         deleteFile(currentRomPath);
@@ -295,7 +489,7 @@ export function updateTableVpxExecutablePath(
   executablePath: string | null,
 ): ApiResult<null> {
   try {
-    const table = tablesDb.get(tableId);
+    const table = tablesDb.getResolved(tableId);
 
     if (!table) {
       return {
@@ -368,7 +562,7 @@ export async function getTableImageCandidates(
   tableId: string,
 ): Promise<ApiResult<Array<string>>> {
   try {
-    const table = tablesDb.get(tableId);
+    const table = tablesDb.getResolved(tableId);
 
     if (!table) {
       return {
@@ -456,20 +650,139 @@ export function clearTableImage(tableId: string): ApiResult<null> {
 export async function importTables(
   tableFiles: Array<TableFile>,
   deleteAfterImport: boolean,
+  existingTableBackglasses: Array<BackglassImportAssignment> = [],
 ): Promise<ApiResult<null>> {
   try {
+    if (tableFiles.length === 0) {
+      return {
+        success: false,
+        error: {
+          code: 'NO_TABLES_TO_IMPORT',
+          message:
+            'Import at least one VPX table to import or assign backglasses',
+        },
+      };
+    }
+
     const transferFile = deleteAfterImport ? moveFile : copyFile;
     const movedSourceFilePaths = new Set<string>();
     let missingSourceFailures = 0;
     let permissionFailures = 0;
+    let backglassFailures = 0;
+    let iniFailures = 0;
+    let sourceCleanupFailures = 0;
+    let hasImportedFiles = false;
     const tablesDirectoryPath = configDb.getTablesDirectoryPath();
     const romsDirectoryPath = configDb.getRomsDirectoryPath();
+    const existingLibraryBackglassPaths = new Set(
+      tablesDb
+        .getFilesByType('directb2s')
+        .map((file) => normalizePathForComparison(file.path)),
+    );
+    const expectedBackglassCopies = new Map<
+      string,
+      { sourcePath: string; expected: number; completed: number }
+    >();
+    const protectedBackglassPaths = new Set<string>();
+    const getBackglassDestinationPath = (vpxFilePath: string) =>
+      path.join(
+        path.dirname(vpxFilePath),
+        `${path.basename(vpxFilePath, path.extname(vpxFilePath))}.directb2s`,
+      );
+
+    const expectBackglassCopy = (sourcePath: string, targetPath: string) => {
+      const sourceKey = normalizePathForComparison(sourcePath);
+      const copy = expectedBackglassCopies.get(sourceKey) ?? {
+        sourcePath,
+        expected: 0,
+        completed: 0,
+      };
+      copy.expected += 1;
+      expectedBackglassCopies.set(sourceKey, copy);
+      protectedBackglassPaths.add(normalizePathForComparison(targetPath));
+    };
+    tableFiles.forEach((tableFile) => {
+      if (tableFile.backglass) {
+        const targetPath = getBackglassDestinationPath(
+          path.join(tablesDirectoryPath, tableFile.fileName),
+        );
+        expectBackglassCopy(tableFile.backglass.path, targetPath);
+      }
+    });
+    existingTableBackglasses.forEach(({ tableId, backglass }) => {
+      const table = tablesDb.getResolved(tableId);
+      if (table) {
+        const targetPath = getBackglassDestinationPath(table.vpxFilePath);
+        expectBackglassCopy(backglass.path, targetPath);
+      }
+    });
+
+    const importBackglass = (
+      tableId: string,
+      sourcePath: string,
+      targetPath: string,
+    ) => {
+      const sourceKey = normalizePathForComparison(sourcePath);
+      const normalizedTargetPath = normalizePathForComparison(targetPath);
+
+      if (sourceKey !== normalizedTargetPath) {
+        copyFileExclusive(sourcePath, targetPath);
+      } else {
+        ensureSourceFile(sourcePath);
+      }
+
+      try {
+        const updatedTable = tablesDb.updateFileReference(
+          tableId,
+          'backglassFileId',
+          'directb2s',
+          targetPath,
+        );
+        if (!updatedTable) {
+          throw new Error(`Table not found: ${tableId}`);
+        }
+      } catch (error) {
+        if (sourceKey !== normalizedTargetPath) {
+          deleteFile(targetPath);
+        }
+        throw error;
+      }
+
+      const copy = expectedBackglassCopies.get(sourceKey);
+      if (copy) {
+        copy.completed += 1;
+      }
+      hasImportedFiles = true;
+    };
 
     const existingVpxPaths = new Set(
       tablesDb
-        .getAll()
+        .getAllResolved()
         .map((table) => normalizePathForComparison(table.vpxFilePath)),
     );
+    const protectedIniPaths = new Set(
+      [
+        ...tablesDb.getAllResolved().map((table) => table.vpxFilePath),
+        ...tableFiles.map((table) =>
+          path.join(tablesDirectoryPath, table.fileName),
+        ),
+      ].map((vpxPath) => normalizePathForComparison(getTableIniPath(vpxPath))),
+    );
+    const iniCopies = new Map<
+      string,
+      { sourcePath: string; expected: number; completed: number }
+    >();
+    tableFiles.forEach(({ ini }) => {
+      if (!ini) return;
+      const key = normalizePathForComparison(ini.path);
+      const copy = iniCopies.get(key) ?? {
+        sourcePath: ini.path,
+        expected: 0,
+        completed: 0,
+      };
+      copy.expected += 1;
+      iniCopies.set(key, copy);
+    });
 
     for (const tableFile of tableFiles) {
       try {
@@ -487,12 +800,12 @@ export async function importTables(
         // a rom already in the library is referenced as is, never transferred
         const libraryRomPath = romSourceFilePath
           ? tablesDb
-              .getAll()
+              .getFilesByType('rom')
               .find(
-                (table) =>
-                  normalizePathForComparison(table.romFilePath) ===
+                (file) =>
+                  normalizePathForComparison(file.path) ===
                   normalizePathForComparison(romSourceFilePath),
-              )?.romFilePath
+              )?.path
           : undefined;
 
         if (libraryRomPath) {
@@ -504,6 +817,12 @@ export async function importTables(
         );
 
         if (existingVpxPaths.has(normalizedDestinationPath)) {
+          if (tableFile.backglass) {
+            backglassFailures += 1;
+          }
+          if (tableFile.ini) {
+            iniFailures += 1;
+          }
           continue;
         }
 
@@ -538,22 +857,71 @@ export async function importTables(
           romFileName: tableFile.rom?.name,
         });
 
-        const nextTable: Table = {
+        const nextTable: Omit<
+          Table,
+          'vpxFileId' | 'romFileId' | 'backglassFileId'
+        > = {
           id: uuidv4(),
           name: tableFile.name,
-          vpxFile: tableFile.fileName,
-          romFile: tableFile.rom?.name,
           isFavorite: false,
           isForAndroid: false,
           isArchived: false,
-          vpxFilePath: vpxDestinationFilePath,
-          romFilePath: romDestinationFilePath,
           dateAddedTimestamp: Date.now(),
           imgUrl,
         };
 
-        tablesDb.create(nextTable);
+        tablesDb.createWithFiles(
+          nextTable,
+          vpxDestinationFilePath,
+          romDestinationFilePath,
+        );
+        hasImportedFiles = true;
         existingVpxPaths.add(normalizedDestinationPath);
+
+        if (tableFile.ini) {
+          try {
+            if (path.extname(tableFile.ini.path).toLowerCase() !== '.ini') {
+              throw new Error('INI file must use the .ini extension');
+            }
+            const targetPath = getTableIniPath(vpxDestinationFilePath);
+            const sourceKey = normalizePathForComparison(tableFile.ini.path);
+            if (
+              getLibraryFilePathKey(tableFile.ini.path) ===
+              getLibraryFilePathKey(targetPath)
+            ) {
+              ensureSourceFile(tableFile.ini.path);
+            } else {
+              copyFileExclusive(tableFile.ini.path, targetPath);
+            }
+            const copy = iniCopies.get(sourceKey);
+            if (copy) copy.completed += 1;
+          } catch (error) {
+            iniFailures += 1;
+            console.warn(
+              `Failed to import INI for ${tableFile.fileName}; existing files were preserved:`,
+              error,
+            );
+          }
+        }
+
+        if (tableFile.backglass) {
+          const backglassDestinationPath = getBackglassDestinationPath(
+            vpxDestinationFilePath,
+          );
+          try {
+            importBackglass(
+              nextTable.id,
+              tableFile.backglass.path,
+              backglassDestinationPath,
+            );
+          } catch (error) {
+            backglassFailures += 1;
+            console.warn(
+              `Failed to import backglass for ${tableFile.fileName}:`,
+              error,
+            );
+          }
+        }
       } catch (error) {
         if (
           error &&
@@ -580,29 +948,124 @@ export async function importTables(
       }
     }
 
+    existingTableBackglasses.forEach(({ tableId, backglass }) => {
+      try {
+        const table = tablesDb.getResolved(tableId);
+        if (!table || table.backglassFilePath) {
+          backglassFailures += 1;
+          return;
+        }
+
+        const backglassDestinationPath = getBackglassDestinationPath(
+          table.vpxFilePath,
+        );
+        importBackglass(tableId, backglass.path, backglassDestinationPath);
+      } catch (error) {
+        backglassFailures += 1;
+        console.warn(
+          `Failed to import backglass for library table ${tableId}:`,
+          error,
+        );
+      }
+    });
+
     if (deleteAfterImport) {
+      iniCopies.forEach((copy, sourceKey) => {
+        if (
+          copy.completed === copy.expected &&
+          !protectedIniPaths.has(sourceKey)
+        ) {
+          try {
+            deleteFile(copy.sourcePath);
+            movedSourceFilePaths.add(copy.sourcePath);
+          } catch (error) {
+            sourceCleanupFailures += 1;
+            console.warn(
+              `INI imported, but failed to delete source ${copy.sourcePath}:`,
+              error,
+            );
+          }
+        }
+      });
+      expectedBackglassCopies.forEach((copy) => {
+        if (
+          copy.expected === copy.completed &&
+          copy.expected > 0 &&
+          !existingLibraryBackglassPaths.has(
+            normalizePathForComparison(copy.sourcePath),
+          ) &&
+          !protectedBackglassPaths.has(
+            normalizePathForComparison(copy.sourcePath),
+          )
+        ) {
+          try {
+            deleteFile(copy.sourcePath);
+            movedSourceFilePaths.add(copy.sourcePath);
+          } catch (error) {
+            sourceCleanupFailures += 1;
+            console.warn(
+              `Backglass imported, but failed to delete source ${copy.sourcePath}:`,
+              error,
+            );
+          }
+        }
+      });
       Array.from(movedSourceFilePaths).forEach((sourceFilePath) => {
-        removeEmptyParentDirectories(sourceFilePath);
+        try {
+          removeEmptyParentDirectories(sourceFilePath, true);
+        } catch (error) {
+          sourceCleanupFailures += 1;
+          console.warn(
+            `Files imported, but failed to clean up source folders for ${sourceFilePath}:`,
+            error,
+          );
+        }
       });
     }
 
-    if (missingSourceFailures > 0) {
-      return {
-        success: true,
-        data: null,
-        warning: {
-          code: 'IMPORT_MISSING_SOURCE_FILES',
-          message: `${missingSourceFailures} table(s) failed to import because source files were missing`,
-        },
-      };
-    }
+    const failureMessage = [
+      missingSourceFailures > 0
+        ? `${missingSourceFailures} table(s) failed to import because source files were missing`
+        : '',
+      permissionFailures > 0
+        ? `${permissionFailures} table(s) failed to import because access was denied. The destination folder (e.g. Program Files) may require administrator access. Move your VPX library to C:\\Visual Pinball and update the library path in Settings, then try again`
+        : '',
+      backglassFailures > 0
+        ? `${backglassFailures} backglass file(s) could not be assigned because the destination already exists or the copy failed; existing files were preserved`
+        : '',
+      iniFailures > 0
+        ? `${iniFailures} INI file(s) were skipped because the table was not imported, the destination already exists, or the copy failed; existing INIs and skipped source INIs were preserved`
+        : '',
+      sourceCleanupFailures > 0
+        ? `${sourceCleanupFailures} source file/folder cleanup operation(s) failed after import; imported files were kept, but some originals or source folders may remain`
+        : '',
+    ]
+      .filter(Boolean)
+      .join('. ');
 
-    if (permissionFailures > 0) {
+    if (permissionFailures > 0 && !hasImportedFiles) {
       return {
         success: false,
         error: {
           code: 'IMPORT_PERMISSION_DENIED',
-          message: `Permission denied. The destination folder (e.g. Program Files) requires administrator access. Move your VPX library to C:\\Visual Pinball and update the library path in Settings, then try again.`,
+          message: failureMessage,
+        },
+      };
+    }
+
+    if (failureMessage) {
+      return {
+        success: true,
+        data: null,
+        warning: {
+          code:
+            backglassFailures > 0 ||
+            iniFailures > 0 ||
+            permissionFailures > 0 ||
+            sourceCleanupFailures > 0
+              ? 'IMPORT_PARTIAL_FAILURE'
+              : 'IMPORT_MISSING_SOURCE_FILES',
+          message: failureMessage,
         },
       };
     }
@@ -616,7 +1079,7 @@ export async function importTables(
 export async function startTable(tableId: string): Promise<ApiResult<null>> {
   try {
     const configVpxExecutablePath = configDb.getVpxExecutablePath();
-    const table = tablesDb.get(tableId);
+    const table = tablesDb.getResolved(tableId);
 
     if (!table) {
       return {
@@ -663,7 +1126,73 @@ export async function startTable(tableId: string): Promise<ApiResult<null>> {
 
 export function clearTables(): ApiResult<null> {
   try {
-    tablesDb.clear();
+    const remainingConfigFiles = clearLibraryConfigs(() => tablesDb.clear());
+    return apiSuccess(
+      null,
+      remainingConfigFiles.length
+        ? {
+            code: 'CONFIG_CLEANUP_INCOMPLETE',
+            message: `Library cleared, but these staged config files need manual removal: ${remainingConfigFiles.join(', ')}`,
+          }
+        : undefined,
+    );
+  } catch (error) {
+    return apiFailure(error);
+  }
+}
+
+function deleteUnmatchedBackglass(filePath: string): ApiResult<null> {
+  try {
+    const tablesDirectoryPath = configDb.getTablesDirectoryPath();
+    if (!tablesDirectoryPath) {
+      throw new Error('Tables directory is not configured');
+    }
+
+    const directoryPath = path.resolve(resolveUserPath(tablesDirectoryPath));
+    const resolvedFilePath = path.resolve(resolveUserPath(filePath));
+    const relativePath = path.relative(directoryPath, resolvedFilePath);
+
+    if (
+      !relativePath ||
+      relativePath === '..' ||
+      relativePath.startsWith(`..${path.sep}`) ||
+      path.isAbsolute(relativePath) ||
+      path.extname(resolvedFilePath).toLowerCase() !== '.directb2s'
+    ) {
+      throw new Error(
+        'Only DirectB2S files in the Tables directory can be deleted',
+      );
+    }
+
+    const normalizedFilePath = normalizePathForComparison(resolvedFilePath);
+    const tables = tablesDb.getAll();
+    const isAssociated = tables.some((table) => {
+      const backglass = tablesDb.getFile(table.backglassFileId, 'directb2s');
+      return normalizePathForComparison(backglass?.path) === normalizedFilePath;
+    });
+    const fileStem = normalizePathForComparison(
+      path.basename(resolvedFilePath, path.extname(resolvedFilePath)),
+    );
+    const vpxFiles = scanFilesByExtension(tablesDirectoryPath, '.vpx');
+    const hasMatchingTable = [
+      ...vpxFiles.map((file) => file.path),
+      ...tables
+        .map((table) => tablesDb.getFile(table.vpxFileId, 'table')?.path)
+        .filter((tablePath): tablePath is string => Boolean(tablePath)),
+    ].some(
+      (tablePath) =>
+        normalizePathForComparison(
+          path.basename(tablePath, path.extname(tablePath)),
+        ) === fileStem,
+    );
+
+    if (isAssociated || hasMatchingTable) {
+      throw new Error(
+        'This backglass is associated with a table and cannot be deleted as unmatched',
+      );
+    }
+
+    deleteFile(resolvedFilePath);
     return apiSuccess(null);
   } catch (error) {
     return apiFailure(error);
@@ -677,7 +1206,7 @@ export function scanVpxLibrary(): ApiResult<ScanResult> {
 
   // get all tables
   // get config paths
-  const tables = tablesDb.getAll();
+  const tables = tablesDb.getAllResolved();
   const tablesDirectoryPath = configDb.getTablesDirectoryPath();
   const romsDirectoryPath = configDb.getRomsDirectoryPath();
 
@@ -715,9 +1244,7 @@ export function scanVpxLibrary(): ApiResult<ScanResult> {
     .filter(
       (romPath): romPath is string =>
         Boolean(romPath) &&
-        !romPathsUsedByRemainingTables.has(
-          normalizePathForComparison(romPath),
-        ),
+        !romPathsUsedByRemainingTables.has(normalizePathForComparison(romPath)),
     );
   const existingRomFilesWithTables = existingRomFiles.filter(
     (romFile) => !unmatchedRomsInDatabase.includes(romFile),
@@ -736,9 +1263,7 @@ export function scanVpxLibrary(): ApiResult<ScanResult> {
   const existingRomCandidates = tables
     .filter(
       (table) =>
-        table.romFile &&
-        table.romFilePath &&
-        !missingRomTableIds.has(table.id),
+        table.romFile && table.romFilePath && !missingRomTableIds.has(table.id),
     )
     .map((table) => ({
       path: table.romFilePath!,
@@ -754,6 +1279,59 @@ export function scanVpxLibrary(): ApiResult<ScanResult> {
     tablesDirectoryPath,
     existingVpxFiles,
     Array.from(romCandidatesByPath.values()),
+  );
+
+  let backglasses: Array<FileSystemItem>;
+  try {
+    backglasses = scanFilesByExtension(tablesDirectoryPath, '.directb2s');
+  } catch (error) {
+    return apiFailure(error);
+  }
+  const backglassesByStem = new Map<string, FileSystemItem>();
+  backglasses.forEach((backglass) => {
+    const stem = normalizePathForComparison(
+      path.basename(backglass.name, path.extname(backglass.name)),
+    );
+    if (stem && !backglassesByStem.has(stem)) {
+      backglassesByStem.set(stem, backglass);
+    }
+  });
+  const getBackglassForVpxPath = (vpxPath: string) =>
+    backglassesByStem.get(
+      normalizePathForComparison(path.basename(vpxPath, path.extname(vpxPath))),
+    );
+  scannedTables.forEach((table) => {
+    table.backglass = getBackglassForVpxPath(table.filePath);
+  });
+  const backglassUpdates = tables.map((table) => ({
+    tableId: table.id,
+    tableName: table.name,
+    vpxFileName: table.vpxFile,
+    backglass: getBackglassForVpxPath(table.vpxFilePath),
+  }));
+  const matchedBackglassPaths = new Set(
+    [
+      ...tables
+        .filter((table) => !tableIdsWithMissingVpx.has(table.id))
+        .map((table) => table.vpxFilePath),
+      ...scannedTables.map((table) => table.filePath),
+    ]
+      .map(getBackglassForVpxPath)
+      .filter((backglass): backglass is FileSystemItem => Boolean(backglass))
+      .map((backglass) => normalizePathForComparison(backglass.path)),
+  );
+  tables
+    .filter((table) => !tableIdsWithMissingVpx.has(table.id))
+    .forEach((table) => {
+      if (table.backglassFilePath) {
+        matchedBackglassPaths.add(
+          normalizePathForComparison(table.backglassFilePath),
+        );
+      }
+    });
+  const unmatchedBackglasses = backglasses.filter(
+    (backglass) =>
+      !matchedBackglassPaths.has(normalizePathForComparison(backglass.path)),
   );
 
   // from scanned vpx tables filter out ones that have been added to newly scanned tables
@@ -774,6 +1352,8 @@ export function scanVpxLibrary(): ApiResult<ScanResult> {
 
   return apiSuccess({
     newTables: scannedTables,
+    backglassUpdates,
+    unmatchedBackglasses,
     skippedTablePaths,
     unmatchedRoms,
     tablesWithMissingFiles,
@@ -785,8 +1365,45 @@ export async function applyScanResult(
 ): Promise<ApiResult<null>> {
   try {
     await registerTableFiles(scanResult.newTables);
+    const tablesByPath = new Map(
+      tablesDb
+        .getAllResolved()
+        .map((table) => [
+          normalizePathForComparison(table.vpxFilePath),
+          table.id,
+        ]),
+    );
+    scanResult.newTables.forEach((tableFile) => {
+      const tableId = tablesByPath.get(
+        normalizePathForComparison(tableFile.filePath),
+      );
+      if (tableId) {
+        tablesDb.updateFileReference(
+          tableId,
+          'backglassFileId',
+          'directb2s',
+          tableFile.backglass?.path,
+        );
+      }
+    });
     deleteUnusedRoms(scanResult.unmatchedRoms);
     cleanTablesWithMissingFiles(scanResult.tablesWithMissingFiles);
+    for (const backglass of scanResult.unmatchedBackglasses) {
+      const result = deleteUnmatchedBackglass(backglass.path);
+      if (!result.success) {
+        return result;
+      }
+    }
+    scanResult.backglassUpdates.forEach(({ tableId, backglass }) => {
+      if (backglass) {
+        tablesDb.updateFileReference(
+          tableId,
+          'backglassFileId',
+          'directb2s',
+          backglass.path,
+        );
+      }
+    });
 
     const importedPaths = new Set(
       scanResult.newTables.map((table) =>
@@ -830,7 +1447,7 @@ export function exportTables(
       };
     }
 
-    const allTables = tablesDb.getAll();
+    const allTables = tablesDb.getAllResolved();
     const tables = allTables.filter((table) => {
       switch (exportGroup) {
         case GroupType.allTablesIncludingArchived:
@@ -845,6 +1462,7 @@ export function exportTables(
       }
     });
     const failedTables: string[] = [];
+    const failedInis: string[] = [];
 
     tables.forEach((table) => {
       try {
@@ -859,23 +1477,49 @@ export function exportTables(
 
         const vpxTargetPath = path.join(tableDirectoryPath, table.vpxFile);
         copyFile(table.vpxFilePath, vpxTargetPath);
+        try {
+          copyFileIfExists(
+            getTableIniPath(table.vpxFilePath),
+            getTableIniPath(vpxTargetPath),
+          );
+        } catch (error) {
+          failedInis.push(table.name);
+          console.warn(`Failed to export INI for ${table.vpxFile}:`, error);
+        }
 
         if (table.romFilePath && table.romFile) {
           const romTargetPath = path.join(tableDirectoryPath, table.romFile);
           copyFile(table.romFilePath, romTargetPath);
+        }
+
+        if (table.backglassFilePath && table.backglassFile) {
+          const backglassTargetPath = path.join(
+            tableDirectoryPath,
+            table.backglassFile,
+          );
+          copyFileIfExists(table.backglassFilePath, backglassTargetPath);
         }
       } catch (error) {
         failedTables.push(table.name);
       }
     });
 
-    if (failedTables.length > 0) {
+    if (failedTables.length > 0 || failedInis.length > 0) {
       return {
         success: true,
         data: null,
         warning: {
           code: 'EXPORT_PARTIAL_FAILURE',
-          message: `Failed to export ${failedTables.length} table(s) because of missing files`,
+          message: [
+            failedTables.length > 0
+              ? `Failed to export ${failedTables.length} table(s) because of missing files`
+              : '',
+            failedInis.length > 0
+              ? `Failed to export INI files for ${failedInis.length} table(s); other table files were still processed`
+              : '',
+          ]
+            .filter(Boolean)
+            .join('. '),
         },
       };
     }
@@ -887,7 +1531,7 @@ export function exportTables(
 }
 
 export async function startRandomTable(
-  tables: Array<Table>,
+  tables: Array<ResolvedTable>,
 ): Promise<ApiResult<null>> {
   try {
     if (tables.length === 0) {
@@ -902,7 +1546,17 @@ export async function startRandomTable(
 
     const configVpxExecutablePath = configDb.getVpxExecutablePath();
     const randomIndex = Math.floor(Math.random() * tables.length);
-    const table = tables[randomIndex];
+    const table = tablesDb.getResolved(tables[randomIndex].id);
+
+    if (!table) {
+      return {
+        success: false,
+        error: {
+          code: 'TABLE_NOT_FOUND',
+          message: `Table not found: ${tables[randomIndex].id}`,
+        },
+      };
+    }
 
     await startVpxTable(
       table.vpxFilePath,

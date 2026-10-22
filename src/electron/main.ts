@@ -1,18 +1,23 @@
-import { spawn } from 'child_process';
-import { BrowserWindow, Menu, app, ipcMain } from 'electron';
+// sort-imports-ignore
+// Set the data directory before importing modules that initialize stores.
 import './devPaths';
+
+import { spawn } from 'child_process';
+import { BrowserWindow, Menu, app, dialog, ipcMain } from 'electron';
 import fs from 'fs';
 import http from 'http';
 import path from 'path';
 
 import type { AndroidSyncApplyPayload } from 'src/types/android';
 import type { Config, LaunchFlags } from 'src/types/config';
-import type { TableFile } from 'src/types/file';
-import type { GroupType, ScanResult, Table } from 'src/types/table';
+import type { BackglassImportAssignment, TableFile } from 'src/types/file';
+import type { GroupType, ResolvedTable, ScanResult } from 'src/types/table';
 
 import * as api from './api';
+import { dismissUpdateNotice, getConfig } from './database/config';
 import { runAppMigrations } from './database/migrations';
 import * as db from './database/tables';
+import { createUpdateChecker } from './utils/updates';
 import {
   loadWindowState,
   setupFullScreenControls,
@@ -53,6 +58,7 @@ process.on('SIGTERM', () => logStream.end());
 
 const NEXT_PORT = process.env.NEXT_PORT || 3000;
 let nextProcess: any = null;
+let startupComplete = false;
 
 function startNext() {
   const cwd = path.join(__dirname, '..', '..');
@@ -154,6 +160,19 @@ const createWindow = () => {
 };
 
 app.whenReady().then(async () => {
+  try {
+    await runAppMigrations(app.getVersion());
+  } catch (error) {
+    console.error('Startup aborted because database migration failed:', error);
+    const reason = error instanceof Error ? error.message : String(error);
+    dialog.showErrorBox(
+      'Library migration failed',
+      `The app could not upgrade your library and will now close to avoid using incompatible data.\n\n${reason}\n\nYour VPX and ROM files have not been changed by this migration. Please contact support before deleting or resetting app data.\n\nLog file:\n${logFile}`,
+    );
+    app.quit();
+    return;
+  }
+
   if (process.platform === 'win32') {
     app.setAppUserModelId('com.vpx.microfrontend');
   }
@@ -184,13 +203,20 @@ app.whenReady().then(async () => {
     }
   }
 
-  await runAppMigrations(app.getVersion());
-
   // register IPC handlers that call the api layer
   ipcMain.handle('api:getAllTables', async () => api.getAllTables());
-  ipcMain.handle('api:deleteTable', async (_, id: string) =>
-    api.deleteTable(id),
+  ipcMain.handle(
+    'api:deleteTable',
+    async (_, id: string, options?: { deleteActiveConfig?: boolean }) =>
+      api.deleteTable(id, options),
   );
+  ipcMain.handle('api:getTableConfigDeletion', async (_, id: string) => {
+    try {
+      return api.apiSuccess(api.getTableConfigDeletion(id));
+    } catch (error) {
+      return api.apiFailure(error);
+    }
+  });
   ipcMain.handle('api:setTableFavorite', async (_, id: string, fav: boolean) =>
     api.setTableFavorite(id, fav),
   );
@@ -206,6 +232,11 @@ app.whenReady().then(async () => {
   );
   ipcMain.handle('api:renameTable', async (_, id: string, newName: string) =>
     api.renameTable(id, newName),
+  );
+  ipcMain.handle(
+    'api:updateTableBackglass',
+    async (_, tableId: string, backglass: TableFile['backglass'] | null) =>
+      api.updateTableBackglass(tableId, backglass || null),
   );
   ipcMain.handle(
     'api:updateTableRom',
@@ -238,8 +269,12 @@ app.whenReady().then(async () => {
   );
   ipcMain.handle(
     'api:importTables',
-    async (_, tables: Array<TableFile>, deleteAfterImport: boolean) =>
-      api.importTables(tables, deleteAfterImport),
+    async (
+      _,
+      tables: Array<TableFile>,
+      deleteAfterImport: boolean,
+      existingTableBackglasses?: Array<BackglassImportAssignment>,
+    ) => api.importTables(tables, deleteAfterImport, existingTableBackglasses),
   );
   ipcMain.handle('api:getExpectedRomName', async (_, vpxFilePath: string) =>
     api.getExpectedRomName(vpxFilePath),
@@ -324,6 +359,73 @@ app.whenReady().then(async () => {
   ipcMain.handle('api:startTable', async (_, tableId: string) =>
     api.startTable(tableId),
   );
+  ipcMain.handle('api:getIniBackups', async (_, tableId: string) => {
+    try {
+      return api.apiSuccess(api.getIniBackups(tableId));
+    } catch (error) {
+      return api.apiFailure(error);
+    }
+  });
+  ipcMain.handle(
+    'api:createIniBackup',
+    async (_, tableId: string, name?: string) => {
+      try {
+        return api.apiSuccess(api.createIniBackup(tableId, name));
+      } catch (error) {
+        return api.apiFailure(error);
+      }
+    },
+  );
+  ipcMain.handle(
+    'api:restoreIniBackup',
+    async (_, tableId: string, backupId: string) => {
+      try {
+        return api.apiSuccess(api.restoreIniBackup(tableId, backupId));
+      } catch (error) {
+        return api.apiFailure(error);
+      }
+    },
+  );
+  ipcMain.handle(
+    'api:renameCurrentIni',
+    async (_, tableId: string, name: string) => {
+      try {
+        api.renameCurrentIni(tableId, name);
+        return api.apiSuccess(null);
+      } catch (error) {
+        return api.apiFailure(error);
+      }
+    },
+  );
+  ipcMain.handle('api:deleteCurrentIni', async (_, tableId: string) => {
+    try {
+      api.deleteCurrentIni(tableId);
+      return api.apiSuccess(null);
+    } catch (error) {
+      return api.apiFailure(error);
+    }
+  });
+  ipcMain.handle(
+    'api:renameIniBackup',
+    async (_, tableId: string, backupId: string, name: string) => {
+      try {
+        return api.apiSuccess(api.renameIniBackup(tableId, backupId, name));
+      } catch (error) {
+        return api.apiFailure(error);
+      }
+    },
+  );
+  ipcMain.handle(
+    'api:deleteIniBackup',
+    async (_, tableId: string, backupId: string) => {
+      try {
+        api.deleteIniBackup(tableId, backupId);
+        return api.apiSuccess(null);
+      } catch (error) {
+        return api.apiFailure(error);
+      }
+    },
+  );
   ipcMain.handle('api:clearTables', async () => api.clearTables());
   ipcMain.handle('api:scanVpxLibrary', async () => api.scanVpxLibrary());
   ipcMain.handle('api:scanAndroidLibrary', async () =>
@@ -344,15 +446,43 @@ app.whenReady().then(async () => {
     async (_, destinationPath: string, exportGroup: GroupType) =>
       api.exportTables(destinationPath, exportGroup),
   );
-  ipcMain.handle('api:startRandomTable', async (_, tables: Table[]) =>
+  ipcMain.handle('api:startRandomTable', async (_, tables: ResolvedTable[]) =>
     api.startRandomTable(tables),
   );
 
+  const updateChecker = createUpdateChecker({
+    installedVersion: app.getVersion(),
+    getDismissedAt: () => getConfig().updateNoticeDismissedAt,
+    saveDismissedAt: dismissUpdateNotice,
+    fetchRelease: fetch,
+  });
+  let availableUpdate = updateChecker
+    .check()
+    .then(api.apiSuccess)
+    .catch((error: unknown) => {
+      console.warn('Startup update check failed:', error);
+      return api.apiFailure(error);
+    });
+  ipcMain.handle('api:getAvailableUpdate', async () => availableUpdate);
+  ipcMain.handle('api:dismissUpdateNotice', () => {
+    try {
+      updateChecker.dismiss();
+      availableUpdate = Promise.resolve(api.apiSuccess(null));
+      return api.apiSuccess(null);
+    } catch (error) {
+      console.error('Failed to save update notice dismissal:', error);
+      return api.apiFailure(error);
+    }
+  });
+
+  startupComplete = true;
   createWindow();
 });
 
 app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  if (startupComplete && BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
+  }
 });
 
 function shutdownNext() {

@@ -4,8 +4,10 @@ import {
   AndroidSyncProgressEvent,
 } from './android';
 import { Config, LaunchFlags, Platform } from './config';
-import { FileSystemItem, TableFile } from './file';
-import { GroupType, ScanResult, Table } from './table';
+import { BackglassImportAssignment, FileSystemItem, TableFile } from './file';
+import { IniBackup, IniBackupList, TableConfigDeletion } from './iniBackup';
+import { GroupType, ResolvedTable, ScanResult } from './table';
+import { AvailableUpdate } from './updates';
 
 export interface ApiError {
   code: string;
@@ -32,16 +34,29 @@ export type ApiResult<T> =
     };
 
 export interface Api {
+  getAvailableUpdate: () => Promise<ApiResult<AvailableUpdate | null>>;
+  dismissUpdateNotice: () => Promise<ApiResult<null>>;
+
   // Tables
-  getAllTables: () => Promise<ApiResult<Array<Table>>>;
+  getAllTables: () => Promise<ApiResult<Array<ResolvedTable>>>;
   setTableFavorite: (id: string, fav: boolean) => Promise<ApiResult<null>>;
   setTableForAndroid: (
     id: string,
     isForAndroid: boolean,
   ) => Promise<ApiResult<null>>;
   setTableArchived: (id: string, archived: boolean) => Promise<ApiResult<null>>;
-  deleteTable: (id: string) => Promise<ApiResult<null>>;
+  deleteTable: (
+    id: string,
+    options?: { deleteActiveConfig?: boolean },
+  ) => Promise<ApiResult<null>>;
+  getTableConfigDeletion: (
+    id: string,
+  ) => Promise<ApiResult<TableConfigDeletion>>;
   renameTable: (id: string, newName: string) => Promise<ApiResult<null>>;
+  updateTableBackglass: (
+    tableId: string,
+    backglass: FileSystemItem | null,
+  ) => Promise<ApiResult<null>>;
   updateTableRom: (
     tableId: string,
     rom: FileSystemItem | null,
@@ -66,8 +81,29 @@ export interface Api {
   importTables: (
     tables: Array<TableFile>,
     deleteAfterImport: boolean,
+    existingTableBackglasses?: Array<BackglassImportAssignment>,
   ) => Promise<ApiResult<null>>;
   startTable: (tableId: string) => Promise<ApiResult<null>>;
+  getIniBackups: (tableId: string) => Promise<ApiResult<IniBackupList>>;
+  createIniBackup: (
+    tableId: string,
+    name?: string,
+  ) => Promise<ApiResult<IniBackup>>;
+  restoreIniBackup: (
+    tableId: string,
+    backupId: string,
+  ) => Promise<ApiResult<boolean>>;
+  renameCurrentIni: (tableId: string, name: string) => Promise<ApiResult<null>>;
+  deleteCurrentIni: (tableId: string) => Promise<ApiResult<null>>;
+  renameIniBackup: (
+    tableId: string,
+    backupId: string,
+    name: string,
+  ) => Promise<ApiResult<IniBackup>>;
+  deleteIniBackup: (
+    tableId: string,
+    backupId: string,
+  ) => Promise<ApiResult<null>>;
   clearTables: () => Promise<ApiResult<null>>;
   scanVpxLibrary: () => Promise<ApiResult<ScanResult>>;
   applyScanResult: (scanResult: ScanResult) => Promise<ApiResult<null>>;
@@ -75,7 +111,7 @@ export interface Api {
     destinationPath: string,
     exportGroup: GroupType,
   ) => Promise<ApiResult<null>>;
-  startRandomTable: (tables: Array<Table>) => Promise<ApiResult<null>>;
+  startRandomTable: (tables: Array<ResolvedTable>) => Promise<ApiResult<null>>;
 
   // Android Sync
   scanAndroidLibrary: () => Promise<ApiResult<AndroidScanResult>>;

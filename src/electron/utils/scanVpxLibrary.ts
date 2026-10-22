@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { FileSystemItem, TableFile } from 'src/types/file';
-import { Table } from 'src/types/table';
+import { ResolvedTable, ScanResult } from 'src/types/table';
 
 import { normalizePathForComparison, resolveUserPath } from './path';
 import { getExpectedRomNameFromVpxFile } from './vpxParsing';
@@ -195,13 +195,75 @@ export const scanNewTables = (
   return discoveredTables;
 };
 
+export const scanFilesByExtension = (
+  directoryPath: string,
+  extension: string,
+): Array<FileSystemItem> => {
+  if (!directoryPath) {
+    return [];
+  }
+
+  const normalizedDirectoryPath = resolveUserPath(directoryPath);
+
+  if (!normalizedDirectoryPath) {
+    return [];
+  }
+
+  const files: Array<FileSystemItem> = [];
+  const directoriesToScan = [normalizedDirectoryPath];
+
+  while (directoriesToScan.length > 0) {
+    const currentDirectoryPath = directoriesToScan.pop();
+
+    if (!currentDirectoryPath) {
+      continue;
+    }
+
+    let entries: Array<fs.Dirent> = [];
+
+    try {
+      entries = fs.readdirSync(currentDirectoryPath, { withFileTypes: true });
+    } catch (error) {
+      if (
+        currentDirectoryPath === normalizedDirectoryPath &&
+        error &&
+        typeof error === 'object' &&
+        'code' in error &&
+        error.code === 'ENOENT'
+      ) {
+        return [];
+      }
+
+      throw error;
+    }
+
+    entries.forEach((entry) => {
+      if (entry.isSymbolicLink()) {
+        return;
+      }
+
+      const entryPath = path.join(currentDirectoryPath, entry.name);
+
+      if (entry.isDirectory()) {
+        directoriesToScan.push(entryPath);
+        return;
+      }
+
+      if (
+        entry.isFile() &&
+        path.extname(entry.name).toLowerCase() === extension.toLowerCase()
+      ) {
+        files.push({ path: entryPath, name: entry.name });
+      }
+    });
+  }
+
+  return files;
+};
+
 export const findTablesWithMissingFiles = (
-  tables: Array<Table>,
-): Array<{
-  table: Table;
-  missingVpxFile: boolean;
-  missingRomFile: boolean;
-}> => {
+  tables: Array<ResolvedTable>,
+): ScanResult['tablesWithMissingFiles'] => {
   const resolveFilePath = (filePath?: string): string | null => {
     if (!filePath) {
       return null;
@@ -230,19 +292,18 @@ export const findTablesWithMissingFiles = (
     }
   };
 
-  const tablesWithMissingFiles: Array<{
-    table: Table;
-    missingVpxFile: boolean;
-    missingRomFile: boolean;
-  }> = [];
+  const tablesWithMissingFiles: ScanResult['tablesWithMissingFiles'] = [];
 
   tables.forEach((table) => {
     const missingVpxFile = !fileExists(table.vpxFilePath);
     const missingRomFile =
       Boolean(resolveFilePath(table.romFilePath)) &&
       !fileExists(table.romFilePath);
+    const missingBackglassFile =
+      Boolean(resolveFilePath(table.backglassFilePath)) &&
+      !fileExists(table.backglassFilePath);
 
-    if (!missingVpxFile && !missingRomFile) {
+    if (!missingVpxFile && !missingRomFile && !missingBackglassFile) {
       return;
     }
 
@@ -250,6 +311,7 @@ export const findTablesWithMissingFiles = (
       table,
       missingVpxFile,
       missingRomFile,
+      missingBackglassFile,
     });
   });
 

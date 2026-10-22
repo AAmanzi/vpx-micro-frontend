@@ -2,6 +2,8 @@ import classNames from 'classnames';
 import { FunctionComponent, useEffect, useRef, useState } from 'react';
 
 import FileUpload from 'src/components/FileUpload';
+import Icon from 'src/components/Icon';
+import MacBackglassNotice from 'src/components/MacBackglassNotice';
 import Modal from 'src/components/Modal';
 import api from 'src/consts';
 import { useConfigContext } from 'src/providers/config';
@@ -18,7 +20,12 @@ import style from './ImportTablesModal.module.scss';
 import TableEntry from './components/TableEntry';
 import UnassignedRomEntry from './components/UnassignedRomEntry';
 import { Props } from './types';
-import { buildImportSelectionResult, filterExistingFiles } from './utils';
+import {
+  buildImportSelectionResult,
+  filterExistingBackglassAssignments,
+  filterExistingFiles,
+  matchTableInis,
+} from './utils';
 
 const ImportTablesModal: FunctionComponent<Props> = ({
   onClose,
@@ -30,10 +37,24 @@ const ImportTablesModal: FunctionComponent<Props> = ({
     useToastContext();
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isSubmittingRef = useRef(false);
   const [tablesToImport, setTablesToImport] = useState<Array<TableFile>>([]);
   const [unassignedRoms, setUnassignedRoms] = useState<Array<FileSystemItem>>(
     [],
   );
+  const [unassignedBackglasses, setUnassignedBackglasses] = useState<
+    Array<FileSystemItem>
+  >([]);
+  const [unmatchedInis, setUnmatchedInis] = useState<Array<FileSystemItem>>([]);
+  const [existingTableBackglasses, setExistingTableBackglasses] = useState<
+    Array<{
+      tableId: string;
+      tableName: string;
+      vpxFileName: string;
+      backglass: FileSystemItem;
+    }>
+  >([]);
   const assignedRoms = useAssignedRoms();
   const manuallyImportedRoms = mergeRoms(
     unassignedRoms,
@@ -51,6 +72,18 @@ const ImportTablesModal: FunctionComponent<Props> = ({
   );
   const assignedRomPaths = new Set(
     assignedRoms.map((rom) => normalizePathForComparison(rom.path)),
+  );
+  const libraryBackglasses = tables.flatMap((table) =>
+    table.backglassFilePath && table.backglassFile
+      ? [{ path: table.backglassFilePath, name: table.backglassFile }]
+      : [],
+  );
+  const availableBackglasses = mergeRoms(
+    unassignedBackglasses,
+    tablesToImport
+      .map((table) => table.backglass)
+      .filter((backglass): backglass is FileSystemItem => Boolean(backglass)),
+    existingTableBackglasses.map((item) => item.backglass),
   );
 
   const releaseRom = (
@@ -94,12 +127,19 @@ const ImportTablesModal: FunctionComponent<Props> = ({
       const result = await buildImportSelectionResult({
         currentTables: tablesToImport,
         currentUnassignedRoms: unassignedRoms,
+        currentUnassignedBackglasses: unassignedBackglasses,
+        currentExistingTableBackglasses: existingTableBackglasses,
+        currentUnmatchedInis: unmatchedInis,
         incomingFiles: filteredFiles,
         libraryRoms: assignedRoms,
+        existingTables: tables,
       });
 
       setTablesToImport(result.tablesToImport);
       setUnassignedRoms(result.unassignedRoms);
+      setUnassignedBackglasses(result.unassignedBackglasses);
+      setExistingTableBackglasses(result.existingTableBackglasses);
+      setUnmatchedInis(result.unmatchedInis);
     } finally {
       setIsLoading(false);
     }
@@ -122,13 +162,70 @@ const ImportTablesModal: FunctionComponent<Props> = ({
     setUnassignedRoms((prev) => prev.filter((r) => r.path !== rom.path));
   };
 
+  const handleRemoveBackglassFile = (backglass: FileSystemItem) => {
+    setUnassignedBackglasses((prev) =>
+      prev.filter(
+        (item) =>
+          normalizePathForComparison(item.path) !==
+          normalizePathForComparison(backglass.path),
+      ),
+    );
+  };
+
+  const releaseBackglass = (
+    backglass: FileSystemItem | undefined,
+    otherTables: Array<TableFile>,
+    otherExistingAssignments: typeof existingTableBackglasses,
+  ) => {
+    if (
+      !backglass ||
+      libraryBackglasses.some(
+        (item) =>
+          normalizePathForComparison(item.path) ===
+          normalizePathForComparison(backglass.path),
+      ) ||
+      otherTables.some(
+        (item) =>
+          normalizePathForComparison(item.backglass?.path) ===
+          normalizePathForComparison(backglass.path),
+      ) ||
+      otherExistingAssignments.some(
+        (item) =>
+          normalizePathForComparison(item.backglass.path) ===
+          normalizePathForComparison(backglass.path),
+      )
+    ) {
+      return;
+    }
+
+    setUnassignedBackglasses((prev) =>
+      prev.some(
+        (item) =>
+          normalizePathForComparison(item.path) ===
+          normalizePathForComparison(backglass.path),
+      )
+        ? prev
+        : [...prev, backglass],
+    );
+  };
+
   const handleRemoveTableFile = (table: TableFile) => {
     const remainingTables = tablesToImport.filter(
       (item) => item.filePath !== table.filePath,
     );
 
     releaseRom(table.rom, remainingTables);
-    setTablesToImport(remainingTables);
+    releaseBackglass(
+      table.backglass,
+      remainingTables,
+      existingTableBackglasses,
+    );
+    const result = matchTableInis(remainingTables, [
+      ...unmatchedInis,
+      ...tablesToImport.flatMap((item) => (item.ini ? [item.ini] : [])),
+    ]);
+    setTablesToImport(result.tablesToImport);
+    setUnmatchedInis(result.unmatchedInis);
   };
 
   const handleAssignRom = (table: TableFile, rom: FileSystemItem) => {
@@ -159,6 +256,63 @@ const ImportTablesModal: FunctionComponent<Props> = ({
     );
   };
 
+  const handleAssignBackglass = (
+    table: TableFile,
+    backglass: FileSystemItem,
+  ) => {
+    const otherTables = tablesToImport.filter(
+      (item) => item.filePath !== table.filePath,
+    );
+
+    const nextTables = tablesToImport.map((item) =>
+      item.filePath === table.filePath ? { ...item, backglass } : item,
+    );
+    setTablesToImport(nextTables);
+    setExistingTableBackglasses((prev) =>
+      filterExistingBackglassAssignments(nextTables, prev),
+    );
+    setUnassignedBackglasses((prev) =>
+      prev.filter(
+        (item) =>
+          normalizePathForComparison(item.path) !==
+          normalizePathForComparison(backglass.path),
+      ),
+    );
+
+    if (
+      normalizePathForComparison(table.backglass?.path) !==
+      normalizePathForComparison(backglass.path)
+    ) {
+      releaseBackglass(table.backglass, otherTables, existingTableBackglasses);
+    }
+  };
+
+  const handleRemoveBackglassFromTable = (table: TableFile) => {
+    releaseBackglass(
+      table.backglass,
+      tablesToImport.filter((item) => item.filePath !== table.filePath),
+      existingTableBackglasses,
+    );
+    setTablesToImport((prev) =>
+      prev.map((item) =>
+        item.filePath === table.filePath
+          ? { ...item, backglass: undefined }
+          : item,
+      ),
+    );
+  };
+
+  const handleRemoveExistingBackglassAssignment = (
+    tableId: string,
+    backglass: FileSystemItem,
+  ) => {
+    const remainingAssignments = existingTableBackglasses.filter(
+      (item) => item.tableId !== tableId,
+    );
+    setExistingTableBackglasses(remainingAssignments);
+    releaseBackglass(backglass, tablesToImport, remainingAssignments);
+  };
+
   const handleTableNameChange = (table: TableFile, newName: string) => {
     setTablesToImport((prev) =>
       prev.map((t) =>
@@ -172,9 +326,17 @@ const ImportTablesModal: FunctionComponent<Props> = ({
   };
 
   const handleValidate = () => {
-    if (tablesToImport.length === 0) {
-      showErrorToast('Please select at least one table to import');
+    if (isLoading) {
+      showWarningToast(
+        'Please wait until the selected files finish processing',
+      );
+      return false;
+    }
 
+    if (tablesToImport.length === 0) {
+      showErrorToast(
+        'Import at least one VPX table to import or assign backglasses',
+      );
       return false;
     }
 
@@ -188,58 +350,79 @@ const ImportTablesModal: FunctionComponent<Props> = ({
   };
 
   const handleSubmit = async () => {
-    const { error: importTablesError, warning: importTablesWarning } =
-      await api.importTables(tablesToImport, deleteAfterImport);
-
-    if (importTablesError) {
-      showErrorToast(importTablesError.message || 'Failed to import tables');
-
+    if (isSubmittingRef.current || !handleValidate()) {
       return;
     }
 
-    if (importTablesWarning) {
-      showWarningToast(
-        importTablesWarning.message ||
-          'Some tables failed to import because source files were missing',
-      );
+    isSubmittingRef.current = true;
+    setIsSubmitting(true);
+    try {
+      const { error: importTablesError, warning: importTablesWarning } =
+        await api.importTables(
+          tablesToImport,
+          deleteAfterImport,
+          existingTableBackglasses,
+        );
+
+      if (importTablesError) {
+        showErrorToast(importTablesError.message || 'Failed to import tables');
+
+        return;
+      }
+
+      if (importTablesWarning) {
+        showWarningToast(
+          importTablesWarning.message ||
+            'Some tables failed to import because source files were missing',
+        );
+      }
+
+      const { error: updateDeleteAfterImportError } =
+        await api.updateDeleteFilesAfterImport(deleteAfterImport);
+
+      if (updateDeleteAfterImportError) {
+        showErrorToast(
+          updateDeleteAfterImportError.message ||
+            'Failed to update import setting',
+        );
+
+        return;
+      }
+
+      fetchConfig();
+
+      if (!importTablesWarning) {
+        showSuccessToast('Tables imported successfully!');
+      }
+      onClose();
+    } catch (error) {
+      console.error('Failed to complete table import:', error);
+      showErrorToast('Failed to complete table import');
+    } finally {
+      isSubmittingRef.current = false;
+      setIsSubmitting(false);
     }
-
-    const { error: updateDeleteAfterImportError } =
-      await api.updateDeleteFilesAfterImport(deleteAfterImport);
-
-    if (updateDeleteAfterImportError) {
-      showErrorToast(
-        updateDeleteAfterImportError.message ||
-          'Failed to update import setting',
-      );
-
-      return;
-    }
-
-    fetchConfig();
-
-    if (!importTablesWarning) {
-      showSuccessToast('Tables imported successfully!');
-    }
-    onClose();
   };
 
   return (
     <Modal
       onExitClick={onClose}
-      title='Import Tables & ROMs'
-      description='Drag folders or individual .vpx and .zip files'
+      title='Import Tables, ROMs & Backglasses'
+      description='Add at least one .vpx table. Matching INIs and DirectB2S files can be included.'
       color='blue'>
       <Form submit={handleSubmit} validate={handleValidate}>
         <div className={style.content}>
           <FileUpload
-            label='Select Tables & ROMs'
-            description='Drag and drop .vpx files, .zip ROMs, or folders here'
-            acceptedExtensions={['.vpx', '.zip']}
+            label='Select Tables, ROMs & Backglasses'
+            description='Drag and drop .vpx files, .zip ROMs, .directb2s files, .ini files, or folders here'
+            acceptedExtensions={['.vpx', '.zip', '.directb2s', '.ini']}
             acceptFolders
             onFilesSelected={handleFilesSelected}
             loading={isLoading}
           />
+          {availableBackglasses.length > 0 && (
+            <MacBackglassNotice className={style.section} />
+          )}
           {tablesToImport.length > 0 && (
             <div className={style.section}>
               <div className={style.sectionHeader}>
@@ -257,11 +440,58 @@ const ImportTablesModal: FunctionComponent<Props> = ({
                     table={table}
                     manuallyImportedRoms={manuallyImportedRoms}
                     libraryRoms={assignedRoms}
+                    availableBackglasses={availableBackglasses}
+                    libraryBackglasses={libraryBackglasses}
                     onAssignRom={handleAssignRom}
+                    onAssignBackglass={handleAssignBackglass}
                     onRemoveTable={handleRemoveTableFile}
                     onRemoveRom={handleRemoveRomFromTable}
+                    onRemoveBackglass={handleRemoveBackglassFromTable}
                     onTableNameChange={handleTableNameChange}
                   />
+                ))}
+              </div>
+            </div>
+          )}
+          {existingTableBackglasses.length > 0 && (
+            <div className={style.section}>
+              <div className={style.sectionHeader}>
+                <h4 className='secondary-text-color body-md-semibold uppercase'>
+                  Backglasses matched to library tables
+                </h4>
+                <span className='secondary-text-color body-sm-regular'>
+                  {existingTableBackglasses.length} Matched
+                </span>
+              </div>
+              <div className={style.unassignedRomFiles}>
+                {existingTableBackglasses.map((item) => (
+                  <div className={style.unmatchedBackglass} key={item.tableId}>
+                    <div className={style.backglassMatchDetails}>
+                      <div className='primary-text-color body-sm-semibold'>
+                        {item.tableName}
+                      </div>
+                      <div className='secondary-text-color body-xs-regular'>
+                        {item.backglass.name} to {item.vpxFileName}
+                      </div>
+                    </div>
+                    <button
+                      type='button'
+                      className={style.removeBackglassMatch}
+                      aria-label={`Remove backglass match for ${item.tableName}`}
+                      onClick={() =>
+                        handleRemoveExistingBackglassAssignment(
+                          item.tableId,
+                          item.backglass,
+                        )
+                      }>
+                      <Icon
+                        className='secondary-text-color'
+                        icon='cross'
+                        width={14}
+                        height={14}
+                      />
+                    </button>
+                  </div>
                 ))}
               </div>
             </div>
@@ -283,6 +513,53 @@ const ImportTablesModal: FunctionComponent<Props> = ({
                     rom={rom}
                     onRemove={handleRemoveRomFile}
                   />
+                ))}
+              </div>
+            </div>
+          )}
+          {unassignedBackglasses.length > 0 && (
+            <div className={style.section}>
+              <div className={style.sectionHeader}>
+                <h4 className='secondary-text-color body-md-semibold uppercase'>
+                  Unmatched Backglasses
+                </h4>
+                <span className='secondary-text-color body-sm-regular'>
+                  {unassignedBackglasses.length} Files
+                </span>
+              </div>
+              <div className={style.unassignedRomFiles}>
+                {unassignedBackglasses.map((backglass) => (
+                  <UnassignedRomEntry
+                    key={backglass.path}
+                    rom={backglass}
+                    icon='wallpaper'
+                    onRemove={handleRemoveBackglassFile}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+          {unmatchedInis.length > 0 && (
+            <div className={style.section}>
+              <div className={style.sectionHeader}>
+                <h4 className='secondary-text-color body-md-semibold uppercase'>
+                  Unmatched INIs
+                </h4>
+                <span className='secondary-text-color body-sm-regular'>
+                  {unmatchedInis.length} Files
+                </span>
+              </div>
+              <p className='secondary-text-color body-sm-regular'>
+                No unique table match was found. These files will not be
+                imported or deleted.
+              </p>
+              <div className={style.unassignedRomFiles}>
+                {unmatchedInis.map((ini) => (
+                  <div key={ini.path} title={ini.path}>
+                    <span className='primary-text-color body-sm-regular'>
+                      {ini.name}
+                    </span>
+                  </div>
                 ))}
               </div>
             </div>
@@ -331,7 +608,13 @@ const ImportTablesModal: FunctionComponent<Props> = ({
               type={ButtonType.transparent}
               size={ButtonSize.small}
             />
-            <Button label='Import Tables' isSubmit size={ButtonSize.small} />
+            <Button
+              label='Import Tables'
+              isSubmit
+              size={ButtonSize.small}
+              disabled={isLoading}
+              loading={isSubmitting}
+            />
           </div>
         </div>
       </Form>

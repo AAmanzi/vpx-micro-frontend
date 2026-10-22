@@ -6,12 +6,13 @@ import Button, {
   Type as ButtonType,
 } from 'src/components/Button';
 import Icon from 'src/components/Icon';
+import Tooltip from 'src/components/Tooltip';
 import api from 'src/consts';
 import { TABLE_STARTUP_LOCK_MS } from 'src/consts/platform';
 import { useConfigContext } from 'src/providers/config';
 import { useTablesContext } from 'src/providers/tables';
 import { useToastContext } from 'src/providers/toast';
-import { Table } from 'src/types/table';
+import { ResolvedTable } from 'src/types/table';
 import {
   displayDate,
   displayRelativeDate,
@@ -22,7 +23,7 @@ import {
 import SettingsPopover from '../SettingsPopover';
 import style from './TableListItem.module.scss';
 
-type Props = Table & {
+type Props = ResolvedTable & {
   scrollToTopOnTableStart: boolean;
 };
 
@@ -52,6 +53,7 @@ const TableListItem: FunctionComponent<Props> = ({
   isArchived,
   name,
   romFile,
+  backglassFile,
   romFilePath,
   vpxFile,
   vpxFilePath,
@@ -71,12 +73,12 @@ const TableListItem: FunctionComponent<Props> = ({
     romFile,
     vpxFile,
     id,
-  } as Table);
+  } as ResolvedTable);
   const tableGradientColor = getTableGradientVariable({
     romFile,
     vpxFile,
     id,
-  } as Table);
+  } as ResolvedTable);
   const titleRef = useRef<HTMLHeadingElement | null>(null);
   const { showErrorToast } = useToastContext();
   const { fetchTables } = useTablesContext();
@@ -226,6 +228,20 @@ const TableListItem: FunctionComponent<Props> = ({
         </div>
       </div>
 
+      {backglassFile && (
+        <Tooltip
+          className={style.backglassTooltipContainer}
+          content='DirectB2S backglass file detected'>
+          <span
+            className={classNames(
+              'secondary-text-color',
+              'body-xs-semibold',
+              style.backglassIndicator,
+            )}>
+            B2S
+          </span>
+        </Tooltip>
+      )}
       {romFile && (
         <div className={style.romPill}>
           <span className={style.romDot} />

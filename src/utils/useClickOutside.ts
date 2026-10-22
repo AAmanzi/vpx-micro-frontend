@@ -2,6 +2,7 @@ import { RefObject, useEffect } from 'react';
 
 interface Options {
   ignoreSelector?: string;
+  ignoreRef?: RefObject<HTMLElement>;
 }
 
 const useClickOutside = <T extends HTMLElement>(
@@ -9,7 +10,7 @@ const useClickOutside = <T extends HTMLElement>(
   onOutsideClick: () => void,
   options: Options = {},
 ) => {
-  const { ignoreSelector } = options;
+  const { ignoreSelector, ignoreRef } = options;
 
   useEffect(() => {
     const handleClick = (event: MouseEvent): void => {
@@ -24,17 +25,21 @@ const useClickOutside = <T extends HTMLElement>(
         return;
       }
 
+      if (ignoreRef?.current?.contains(event.target as Node)) {
+        return;
+      }
+
       if (ref.current && !ref.current.contains(event.target as Node)) {
         onOutsideClick();
       }
     };
 
-    document.addEventListener('mousedown', handleClick);
+    document.addEventListener('mousedown', handleClick, true);
 
     return () => {
-      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('mousedown', handleClick, true);
     };
-  }, [ignoreSelector, onOutsideClick, ref]);
+  }, [ignoreSelector, ignoreRef, onOutsideClick, ref]);
 };
 
 export default useClickOutside;

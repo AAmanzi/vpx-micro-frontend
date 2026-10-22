@@ -12,7 +12,7 @@ const normalizeRomName = (value: string): string =>
 export const applyExpectedRoms = (
   tables: Array<TableFile>,
   roms: Array<FileSystemItem>,
-): ImportSelectionResult => {
+): Pick<ImportSelectionResult, 'tablesToImport' | 'unassignedRoms'> => {
   const tablesToImport = tables.map((table) => {
     if (table.rom || !table.expectedRomName) {
       return table;

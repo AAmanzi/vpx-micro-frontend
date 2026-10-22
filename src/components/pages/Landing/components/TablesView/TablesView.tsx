@@ -17,7 +17,7 @@ import { useTablesContext } from 'src/providers/tables';
 import { useToastContext } from 'src/providers/toast';
 import { Order, ViewType } from 'src/types/config';
 import { FileSystemItem } from 'src/types/file';
-import type { Table } from 'src/types/table';
+import type { ResolvedTable } from 'src/types/table';
 
 import style from './TablesView.module.scss';
 import TablesHeader from './components/TablesHeader';
@@ -144,7 +144,7 @@ const TablesView: FunctionComponent<Props> = ({
   };
   const filteredTables = getFilteredTables();
 
-  const getOrderComparison = (a: Table, b: Table): number => {
+  const getOrderComparison = (a: ResolvedTable, b: ResolvedTable): number => {
     switch (order) {
       case Order.nameAsc:
         return a.name.localeCompare(b.name);
@@ -448,7 +448,7 @@ const TablesView: FunctionComponent<Props> = ({
       <FileUploadOverlay
         label='Drop files to import'
         description='Release to import files or folders'
-        acceptedExtensions={['.vpx', '.zip']}
+        acceptedExtensions={['.vpx', '.zip', '.directb2s', '.ini']}
         acceptFolders
         onFilesSelected={handleOverlayFilesSelected}
       />

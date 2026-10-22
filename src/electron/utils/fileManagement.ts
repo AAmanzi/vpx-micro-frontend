@@ -24,9 +24,8 @@ const IGNORABLE_DIRECTORY_ENTRIES = new Set([
   'desktop.ini',
 ]);
 
-export const copyFile = (sourcePath: string, destinationPath: string): void => {
+export const ensureSourceFile = (sourcePath: string): void => {
   const resolvedSourcePath = resolveUserPath(sourcePath);
-  const resolvedDestinationPath = resolveUserPath(destinationPath);
 
   if (!fs.existsSync(resolvedSourcePath)) {
     throw new Error(`Source file does not exist: ${resolvedSourcePath}`);
@@ -36,9 +35,51 @@ export const copyFile = (sourcePath: string, destinationPath: string): void => {
   if (!stat.isFile()) {
     throw new Error(`Source path is not a file: ${resolvedSourcePath}`);
   }
+};
 
+export const copyFile = (sourcePath: string, destinationPath: string): void => {
+  const resolvedSourcePath = resolveUserPath(sourcePath);
+  const resolvedDestinationPath = resolveUserPath(destinationPath);
+
+  ensureSourceFile(sourcePath);
   ensureDestinationDirectory(destinationPath);
   fs.copyFileSync(resolvedSourcePath, resolvedDestinationPath);
+};
+
+export const copyFileIfExists = (
+  sourcePath: string,
+  destinationPath: string,
+): boolean => {
+  const resolvedSourcePath = resolveUserPath(sourcePath);
+
+  try {
+    fs.statSync(resolvedSourcePath);
+  } catch (error) {
+    if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
+      return false;
+    }
+
+    throw error;
+  }
+
+  copyFile(sourcePath, destinationPath);
+  return true;
+};
+
+export const copyFileExclusive = (
+  sourcePath: string,
+  destinationPath: string,
+): void => {
+  const resolvedSourcePath = resolveUserPath(sourcePath);
+  const resolvedDestinationPath = resolveUserPath(destinationPath);
+
+  ensureSourceFile(sourcePath);
+  ensureDestinationDirectory(destinationPath);
+  fs.copyFileSync(
+    resolvedSourcePath,
+    resolvedDestinationPath,
+    fs.constants.COPYFILE_EXCL,
+  );
 };
 
 export const moveFile = (sourcePath: string, destinationPath: string): void => {
@@ -79,7 +120,10 @@ export const deleteFile = (sourcePath: string): void => {
   }
 };
 
-export const removeEmptyParentDirectories = (sourcePath: string): void => {
+export const removeEmptyParentDirectories = (
+  sourcePath: string,
+  preserveIniFiles = false,
+): void => {
   let currentDirectory = path.dirname(resolveUserPath(sourcePath));
   const homeDirectory = path.resolve(os.homedir());
 
@@ -102,27 +146,28 @@ export const removeEmptyParentDirectories = (sourcePath: string): void => {
       }
 
       const entries = fs.readdirSync(resolvedCurrentDirectory);
+      const isIgnorable = (entry: string) =>
+        IGNORABLE_DIRECTORY_ENTRIES.has(entry) &&
+        !(preserveIniFiles && path.extname(entry).toLowerCase() === '.ini');
       const nonIgnorableEntries = entries.filter(
-        (entry) => !IGNORABLE_DIRECTORY_ENTRIES.has(entry),
+        (entry) => !isIgnorable(entry),
       );
 
       if (nonIgnorableEntries.length > 0) {
         return;
       }
 
-      entries
-        .filter((entry) => IGNORABLE_DIRECTORY_ENTRIES.has(entry))
-        .forEach((entry) => {
-          const entryPath = path.join(resolvedCurrentDirectory, entry);
+      entries.filter(isIgnorable).forEach((entry) => {
+        const entryPath = path.join(resolvedCurrentDirectory, entry);
 
-          try {
-            fs.unlinkSync(entryPath);
-          } catch (error: any) {
-            if (error?.code !== 'ENOENT') {
-              throw error;
-            }
+        try {
+          fs.unlinkSync(entryPath);
+        } catch (error: any) {
+          if (error?.code !== 'ENOENT') {
+            throw error;
           }
-        });
+        }
+      });
 
       fs.rmdirSync(resolvedCurrentDirectory);
       currentDirectory = parentDirectory;
