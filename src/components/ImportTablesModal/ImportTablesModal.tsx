@@ -496,6 +496,27 @@ const ImportTablesModal: FunctionComponent<Props> = ({
               </div>
             </div>
           )}
+          {unassignedRoms.length > 0 && (
+            <div className={style.section}>
+              <div className={style.sectionHeader}>
+                <h4 className='secondary-text-color body-md-semibold uppercase'>
+                  Unassigned ROMs
+                </h4>
+                <span className='secondary-text-color body-sm-regular'>
+                  {unassignedRoms.length} Files
+                </span>
+              </div>
+              <div className={style.unassignedRomFiles}>
+                {unassignedRoms.map((rom) => (
+                  <UnassignedRomEntry
+                    key={rom.path}
+                    rom={rom}
+                    onRemove={handleRemoveRomFile}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
           {unassignedBackglasses.length > 0 && (
             <div className={style.section}>
               <div className={style.sectionHeader}>
@@ -539,27 +560,6 @@ const ImportTablesModal: FunctionComponent<Props> = ({
                       {ini.name}
                     </span>
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
-          {unassignedRoms.length > 0 && (
-            <div className={style.section}>
-              <div className={style.sectionHeader}>
-                <h4 className='secondary-text-color body-md-semibold uppercase'>
-                  Unassigned ROMs
-                </h4>
-                <span className='secondary-text-color body-sm-regular'>
-                  {unassignedRoms.length} Files
-                </span>
-              </div>
-              <div className={style.unassignedRomFiles}>
-                {unassignedRoms.map((rom) => (
-                  <UnassignedRomEntry
-                    key={rom.path}
-                    rom={rom}
-                    onRemove={handleRemoveRomFile}
-                  />
                 ))}
               </div>
             </div>

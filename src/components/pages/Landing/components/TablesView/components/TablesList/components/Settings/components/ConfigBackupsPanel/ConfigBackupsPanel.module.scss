@@ -3,6 +3,8 @@
   animation: fadeInBackups 180ms ease-out;
   display: flex;
   width: min(340px, calc(100vw - 16px));
+  height: min(480px, calc(100vh - 16px));
+  height: min(480px, calc(100dvh - 16px));
   max-height: calc(100vh - 16px);
   max-height: calc(100dvh - 16px);
   flex-direction: column;

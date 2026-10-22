@@ -1311,13 +1311,24 @@ export function scanVpxLibrary(): ApiResult<ScanResult> {
   }));
   const matchedBackglassPaths = new Set(
     [
-      ...tables.map((table) => table.vpxFilePath),
+      ...tables
+        .filter((table) => !tableIdsWithMissingVpx.has(table.id))
+        .map((table) => table.vpxFilePath),
       ...scannedTables.map((table) => table.filePath),
     ]
       .map(getBackglassForVpxPath)
       .filter((backglass): backglass is FileSystemItem => Boolean(backglass))
       .map((backglass) => normalizePathForComparison(backglass.path)),
   );
+  tables
+    .filter((table) => !tableIdsWithMissingVpx.has(table.id))
+    .forEach((table) => {
+      if (table.backglassFilePath) {
+        matchedBackglassPaths.add(
+          normalizePathForComparison(table.backglassFilePath),
+        );
+      }
+    });
   const unmatchedBackglasses = backglasses.filter(
     (backglass) =>
       !matchedBackglassPaths.has(normalizePathForComparison(backglass.path)),
@@ -1375,14 +1386,14 @@ export async function applyScanResult(
         );
       }
     });
+    deleteUnusedRoms(scanResult.unmatchedRoms);
+    cleanTablesWithMissingFiles(scanResult.tablesWithMissingFiles);
     for (const backglass of scanResult.unmatchedBackglasses) {
       const result = deleteUnmatchedBackglass(backglass.path);
       if (!result.success) {
         return result;
       }
     }
-    deleteUnusedRoms(scanResult.unmatchedRoms);
-    cleanTablesWithMissingFiles(scanResult.tablesWithMissingFiles);
     scanResult.backglassUpdates.forEach(({ tableId, backglass }) => {
       if (backglass) {
         tablesDb.updateFileReference(

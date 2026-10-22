@@ -60,9 +60,10 @@ const SettingsPopover: FunctionComponent<Props> = ({
   const updatePosition = useCallback(() => {
     const trigger = triggerRef.current;
     const menu = menuRef.current;
-    const anchor = menu?.offsetParent;
+    const anchor =
+      (trigger?.offsetParent as HTMLElement | null) || trigger?.parentElement;
 
-    if (!trigger || !menu || !(anchor instanceof HTMLElement)) {
+    if (!trigger || !menu || !anchor) {
       return;
     }
 
@@ -70,9 +71,9 @@ const SettingsPopover: FunctionComponent<Props> = ({
     const menuRect = menu.getBoundingClientRect();
     const anchorRect = anchor.getBoundingClientRect();
 
-    const spaceAbove = triggerRect.top - GUTTER_PX - GAP_PX;
+    const spaceAbove = triggerRect.top - GUTTER_PX;
     const spaceBelow =
-      window.innerHeight - triggerRect.bottom - GUTTER_PX - GAP_PX;
+      window.innerHeight - triggerRect.bottom - GUTTER_PX;
 
     let topViewport = triggerRect.top - menuRect.height - GAP_PX;
 
@@ -98,9 +99,8 @@ const SettingsPopover: FunctionComponent<Props> = ({
 
     setPosition({
       position: 'absolute',
-      top: topViewport - anchorRect.top - anchor.clientTop + anchor.scrollTop,
-      left:
-        leftViewport - anchorRect.left - anchor.clientLeft + anchor.scrollLeft,
+      top: topViewport - anchorRect.top,
+      left: leftViewport - anchorRect.left,
       zIndex: 20,
       visibility: 'visible',
     });
@@ -119,14 +119,15 @@ const SettingsPopover: FunctionComponent<Props> = ({
       return;
     }
 
+    const frameId = window.requestAnimationFrame(updatePosition);
     const observer = new ResizeObserver(updatePosition);
     observer.observe(menuRef.current);
     window.addEventListener('resize', updatePosition);
-    window.addEventListener('scroll', updatePosition, true);
+
     return () => {
+      window.cancelAnimationFrame(frameId);
       observer.disconnect();
       window.removeEventListener('resize', updatePosition);
-      window.removeEventListener('scroll', updatePosition, true);
     };
   }, [isOpen, updatePosition]);
 
