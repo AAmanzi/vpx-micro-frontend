@@ -448,7 +448,7 @@ const TablesView: FunctionComponent<Props> = ({
       <FileUploadOverlay
         label='Drop files to import'
         description='Release to import files or folders'
-        acceptedExtensions={['.vpx', '.zip', '.directb2s']}
+        acceptedExtensions={['.vpx', '.zip', '.directb2s', '.ini']}
         acceptFolders
         onFilesSelected={handleOverlayFilesSelected}
       />

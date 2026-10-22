@@ -11,7 +11,11 @@ import type {
 } from 'src/types/iniBackup';
 
 import * as tablesDb from '../database/tables';
-import { normalizePathForComparison, resolveUserPath } from '../utils/path';
+import {
+  getTableIniPath,
+  normalizePathForComparison,
+  resolveUserPath,
+} from '../utils/path';
 
 type StoredIniBackup = IniBackup & { lastSwappedAt?: number };
 
@@ -32,11 +36,6 @@ const store = new Store<IniBackupStore>({
 
 const getBackupPath = (backupId: string): string =>
   path.join(app.getPath('userData'), 'ini-backups', `${backupId}.ini`);
-
-const getTableIniPath = (vpxFilePath: string): string => {
-  const parsedPath = path.parse(resolveUserPath(vpxFilePath));
-  return path.join(parsedPath.dir, `${parsedPath.name}.ini`);
-};
 
 const isFileAvailable = (filePath: string): boolean => {
   try {

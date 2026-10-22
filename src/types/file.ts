@@ -10,6 +10,7 @@ export interface TableFile {
   rom?: FileSystemItem;
   expectedRomName?: string;
   backglass?: FileSystemItem;
+  ini?: FileSystemItem;
 }
 
 export interface BackglassImportAssignment {

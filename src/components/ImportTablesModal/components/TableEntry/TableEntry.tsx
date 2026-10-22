@@ -63,6 +63,7 @@ const TableEntry: FunctionComponent<Props> = ({
       </div>
       <div className={style.info}>
         <Tag icon='file-code' label={table.fileName} />
+        {table.ini && <Tag icon='file-code' label={`INI: ${table.ini.name}`} />}
         <RomPicker
           selectedRom={table.rom || null}
           manuallyImportedRoms={manuallyImportedRoms}

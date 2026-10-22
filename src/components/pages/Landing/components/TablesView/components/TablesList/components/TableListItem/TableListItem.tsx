@@ -228,12 +228,6 @@ const TableListItem: FunctionComponent<Props> = ({
         </div>
       </div>
 
-      {romFile && (
-        <div className={style.romPill}>
-          <span className={style.romDot} />
-          <p className='secondary-text-color body-xs-semibold'>{romFile}</p>
-        </div>
-      )}
       {backglassFile && (
         <Tooltip
           className={style.backglassTooltipContainer}
@@ -247,6 +241,12 @@ const TableListItem: FunctionComponent<Props> = ({
             B2S
           </span>
         </Tooltip>
+      )}
+      {romFile && (
+        <div className={style.romPill}>
+          <span className={style.romDot} />
+          <p className='secondary-text-color body-xs-semibold'>{romFile}</p>
+        </div>
       )}
 
       <div className={style.datesContainer}>

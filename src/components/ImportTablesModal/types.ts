@@ -4,6 +4,7 @@ export interface ImportSelectionResult {
   tablesToImport: Array<TableFile>;
   unassignedRoms: Array<FileSystemItem>;
   unassignedBackglasses: Array<FileSystemItem>;
+  unmatchedInis: Array<FileSystemItem>;
   existingTableBackglasses: Array<ExistingTableBackglass>;
 }
 

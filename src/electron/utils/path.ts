@@ -17,6 +17,11 @@ export const resolveUserPath = (inputPath: string): string => {
 export const normalizePathForComparison = (value?: string): string =>
   (value || '').trim().toLowerCase().replace(/\\/g, '/');
 
+export const getTableIniPath = (vpxFilePath: string): string => {
+  const parsedPath = path.parse(resolveUserPath(vpxFilePath));
+  return path.join(parsedPath.dir, `${parsedPath.name}.ini`);
+};
+
 export const getLibraryFilePathKey = (filePath: string): string => {
   if (!filePath.trim()) {
     throw new Error('Library file path is required');

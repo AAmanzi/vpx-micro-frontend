@@ -31,6 +31,7 @@ import {
 } from '../utils/fileManagement';
 import {
   getLibraryFilePathKey,
+  getTableIniPath,
   normalizePathForComparison,
   resolveUserPath,
 } from '../utils/path';
@@ -668,6 +669,7 @@ export async function importTables(
     let missingSourceFailures = 0;
     let permissionFailures = 0;
     let backglassFailures = 0;
+    let iniFailures = 0;
     let sourceCleanupFailures = 0;
     let hasImportedFiles = false;
     const tablesDirectoryPath = configDb.getTablesDirectoryPath();
@@ -758,6 +760,29 @@ export async function importTables(
         .getAllResolved()
         .map((table) => normalizePathForComparison(table.vpxFilePath)),
     );
+    const protectedIniPaths = new Set(
+      [
+        ...tablesDb.getAllResolved().map((table) => table.vpxFilePath),
+        ...tableFiles.map((table) =>
+          path.join(tablesDirectoryPath, table.fileName),
+        ),
+      ].map((vpxPath) => normalizePathForComparison(getTableIniPath(vpxPath))),
+    );
+    const iniCopies = new Map<
+      string,
+      { sourcePath: string; expected: number; completed: number }
+    >();
+    tableFiles.forEach(({ ini }) => {
+      if (!ini) return;
+      const key = normalizePathForComparison(ini.path);
+      const copy = iniCopies.get(key) ?? {
+        sourcePath: ini.path,
+        expected: 0,
+        completed: 0,
+      };
+      copy.expected += 1;
+      iniCopies.set(key, copy);
+    });
 
     for (const tableFile of tableFiles) {
       try {
@@ -794,6 +819,9 @@ export async function importTables(
         if (existingVpxPaths.has(normalizedDestinationPath)) {
           if (tableFile.backglass) {
             backglassFailures += 1;
+          }
+          if (tableFile.ini) {
+            iniFailures += 1;
           }
           continue;
         }
@@ -849,6 +877,29 @@ export async function importTables(
         );
         hasImportedFiles = true;
         existingVpxPaths.add(normalizedDestinationPath);
+
+        if (tableFile.ini) {
+          try {
+            if (path.extname(tableFile.ini.path).toLowerCase() !== '.ini') {
+              throw new Error('INI file must use the .ini extension');
+            }
+            const targetPath = getTableIniPath(vpxDestinationFilePath);
+            const sourceKey = normalizePathForComparison(tableFile.ini.path);
+            if (sourceKey === normalizePathForComparison(targetPath)) {
+              ensureSourceFile(tableFile.ini.path);
+            } else {
+              copyFileExclusive(tableFile.ini.path, targetPath);
+            }
+            const copy = iniCopies.get(sourceKey);
+            if (copy) copy.completed += 1;
+          } catch (error) {
+            iniFailures += 1;
+            console.warn(
+              `Failed to import INI for ${tableFile.fileName}; existing files were preserved:`,
+              error,
+            );
+          }
+        }
 
         if (tableFile.backglass) {
           const backglassDestinationPath = getBackglassDestinationPath(
@@ -916,6 +967,23 @@ export async function importTables(
     });
 
     if (deleteAfterImport) {
+      iniCopies.forEach((copy, sourceKey) => {
+        if (
+          copy.completed === copy.expected &&
+          !protectedIniPaths.has(sourceKey)
+        ) {
+          try {
+            deleteFile(copy.sourcePath);
+            movedSourceFilePaths.add(copy.sourcePath);
+          } catch (error) {
+            sourceCleanupFailures += 1;
+            console.warn(
+              `INI imported, but failed to delete source ${copy.sourcePath}:`,
+              error,
+            );
+          }
+        }
+      });
       expectedBackglassCopies.forEach((copy) => {
         if (
           copy.expected === copy.completed &&
@@ -941,7 +1009,7 @@ export async function importTables(
       });
       Array.from(movedSourceFilePaths).forEach((sourceFilePath) => {
         try {
-          removeEmptyParentDirectories(sourceFilePath);
+          removeEmptyParentDirectories(sourceFilePath, true);
         } catch (error) {
           sourceCleanupFailures += 1;
           console.warn(
@@ -961,6 +1029,9 @@ export async function importTables(
         : '',
       backglassFailures > 0
         ? `${backglassFailures} backglass file(s) could not be assigned because the destination already exists or the copy failed; existing files were preserved`
+        : '',
+      iniFailures > 0
+        ? `${iniFailures} INI file(s) were skipped because the table was not imported, the destination already exists, or the copy failed; existing INIs and skipped source INIs were preserved`
         : '',
       sourceCleanupFailures > 0
         ? `${sourceCleanupFailures} source file/folder cleanup operation(s) failed after import; imported files were kept, but some originals or source folders may remain`
@@ -986,6 +1057,7 @@ export async function importTables(
         warning: {
           code:
             backglassFailures > 0 ||
+            iniFailures > 0 ||
             permissionFailures > 0 ||
             sourceCleanupFailures > 0
               ? 'IMPORT_PARTIAL_FAILURE'
@@ -1376,6 +1448,7 @@ export function exportTables(
       }
     });
     const failedTables: string[] = [];
+    const failedInis: string[] = [];
 
     tables.forEach((table) => {
       try {
@@ -1390,6 +1463,15 @@ export function exportTables(
 
         const vpxTargetPath = path.join(tableDirectoryPath, table.vpxFile);
         copyFile(table.vpxFilePath, vpxTargetPath);
+        try {
+          copyFileIfExists(
+            getTableIniPath(table.vpxFilePath),
+            getTableIniPath(vpxTargetPath),
+          );
+        } catch (error) {
+          failedInis.push(table.name);
+          console.warn(`Failed to export INI for ${table.vpxFile}:`, error);
+        }
 
         if (table.romFilePath && table.romFile) {
           const romTargetPath = path.join(tableDirectoryPath, table.romFile);
@@ -1408,13 +1490,22 @@ export function exportTables(
       }
     });
 
-    if (failedTables.length > 0) {
+    if (failedTables.length > 0 || failedInis.length > 0) {
       return {
         success: true,
         data: null,
         warning: {
           code: 'EXPORT_PARTIAL_FAILURE',
-          message: `Failed to export ${failedTables.length} table(s) because of missing files`,
+          message: [
+            failedTables.length > 0
+              ? `Failed to export ${failedTables.length} table(s) because of missing files`
+              : '',
+            failedInis.length > 0
+              ? `Failed to export INI files for ${failedInis.length} table(s); other table files were still processed`
+              : '',
+          ]
+            .filter(Boolean)
+            .join('. '),
         },
       };
     }
