@@ -145,8 +145,8 @@ If you already have an existing VPX setup, start with Scan Library first.
 ![Import workflow](public/readme/import-tables.gif)
 
 1. Click **Import Tables**.
-2. Drag/drop `.vpx`, `.zip`, `.directb2s`, or folders.
-3. Review detected tables, ROMs, and backglass assignments.
+2. Drag/drop `.vpx`, `.zip`, `.directb2s`, `.ini`, or folders.
+3. Review detected tables, ROMs, backglass assignments, and matched INIs.
 4. Optionally enable **Delete original files after import**.
 5. Click **Import Tables**.
 

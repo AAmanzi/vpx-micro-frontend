@@ -24,6 +24,7 @@ import {
   buildImportSelectionResult,
   filterExistingBackglassAssignments,
   filterExistingFiles,
+  matchTableInis,
 } from './utils';
 
 const ImportTablesModal: FunctionComponent<Props> = ({
@@ -45,6 +46,7 @@ const ImportTablesModal: FunctionComponent<Props> = ({
   const [unassignedBackglasses, setUnassignedBackglasses] = useState<
     Array<FileSystemItem>
   >([]);
+  const [unmatchedInis, setUnmatchedInis] = useState<Array<FileSystemItem>>([]);
   const [existingTableBackglasses, setExistingTableBackglasses] = useState<
     Array<{
       tableId: string;
@@ -127,6 +129,7 @@ const ImportTablesModal: FunctionComponent<Props> = ({
         currentUnassignedRoms: unassignedRoms,
         currentUnassignedBackglasses: unassignedBackglasses,
         currentExistingTableBackglasses: existingTableBackglasses,
+        currentUnmatchedInis: unmatchedInis,
         incomingFiles: filteredFiles,
         libraryRoms: assignedRoms,
         existingTables: tables,
@@ -136,6 +139,7 @@ const ImportTablesModal: FunctionComponent<Props> = ({
       setUnassignedRoms(result.unassignedRoms);
       setUnassignedBackglasses(result.unassignedBackglasses);
       setExistingTableBackglasses(result.existingTableBackglasses);
+      setUnmatchedInis(result.unmatchedInis);
     } finally {
       setIsLoading(false);
     }
@@ -216,7 +220,12 @@ const ImportTablesModal: FunctionComponent<Props> = ({
       remainingTables,
       existingTableBackglasses,
     );
-    setTablesToImport(remainingTables);
+    const result = matchTableInis(remainingTables, [
+      ...unmatchedInis,
+      ...tablesToImport.flatMap((item) => (item.ini ? [item.ini] : [])),
+    ]);
+    setTablesToImport(result.tablesToImport);
+    setUnmatchedInis(result.unmatchedInis);
   };
 
   const handleAssignRom = (table: TableFile, rom: FileSystemItem) => {
@@ -399,14 +408,14 @@ const ImportTablesModal: FunctionComponent<Props> = ({
     <Modal
       onExitClick={onClose}
       title='Import Tables, ROMs & Backglasses'
-      description='Add at least one .vpx table. DirectB2S files can be included with table imports.'
+      description='Add at least one .vpx table. Matching INIs and DirectB2S files can be included.'
       color='blue'>
       <Form submit={handleSubmit} validate={handleValidate}>
         <div className={style.content}>
           <FileUpload
             label='Select Tables, ROMs & Backglasses'
-            description='Drag and drop .vpx files, .zip ROMs, .directb2s files, or folders here'
-            acceptedExtensions={['.vpx', '.zip', '.directb2s']}
+            description='Drag and drop .vpx files, .zip ROMs, .directb2s files, .ini files, or folders here'
+            acceptedExtensions={['.vpx', '.zip', '.directb2s', '.ini']}
             acceptFolders
             onFilesSelected={handleFilesSelected}
             loading={isLoading}
@@ -505,6 +514,31 @@ const ImportTablesModal: FunctionComponent<Props> = ({
                     icon='wallpaper'
                     onRemove={handleRemoveBackglassFile}
                   />
+                ))}
+              </div>
+            </div>
+          )}
+          {unmatchedInis.length > 0 && (
+            <div className={style.section}>
+              <div className={style.sectionHeader}>
+                <h4 className='secondary-text-color body-md-semibold uppercase'>
+                  Unmatched INIs
+                </h4>
+                <span className='secondary-text-color body-sm-regular'>
+                  {unmatchedInis.length} Files
+                </span>
+              </div>
+              <p className='secondary-text-color body-sm-regular'>
+                No unique table match was found. These files will not be
+                imported or deleted.
+              </p>
+              <div className={style.unassignedRomFiles}>
+                {unmatchedInis.map((ini) => (
+                  <div key={ini.path} title={ini.path}>
+                    <span className='primary-text-color body-sm-regular'>
+                      {ini.name}
+                    </span>
+                  </div>
                 ))}
               </div>
             </div>

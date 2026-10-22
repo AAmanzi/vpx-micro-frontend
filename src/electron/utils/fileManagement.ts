@@ -120,7 +120,10 @@ export const deleteFile = (sourcePath: string): void => {
   }
 };
 
-export const removeEmptyParentDirectories = (sourcePath: string): void => {
+export const removeEmptyParentDirectories = (
+  sourcePath: string,
+  preserveIniFiles = false,
+): void => {
   let currentDirectory = path.dirname(resolveUserPath(sourcePath));
   const homeDirectory = path.resolve(os.homedir());
 
@@ -143,27 +146,28 @@ export const removeEmptyParentDirectories = (sourcePath: string): void => {
       }
 
       const entries = fs.readdirSync(resolvedCurrentDirectory);
+      const isIgnorable = (entry: string) =>
+        IGNORABLE_DIRECTORY_ENTRIES.has(entry) &&
+        !(preserveIniFiles && path.extname(entry).toLowerCase() === '.ini');
       const nonIgnorableEntries = entries.filter(
-        (entry) => !IGNORABLE_DIRECTORY_ENTRIES.has(entry),
+        (entry) => !isIgnorable(entry),
       );
 
       if (nonIgnorableEntries.length > 0) {
         return;
       }
 
-      entries
-        .filter((entry) => IGNORABLE_DIRECTORY_ENTRIES.has(entry))
-        .forEach((entry) => {
-          const entryPath = path.join(resolvedCurrentDirectory, entry);
+      entries.filter(isIgnorable).forEach((entry) => {
+        const entryPath = path.join(resolvedCurrentDirectory, entry);
 
-          try {
-            fs.unlinkSync(entryPath);
-          } catch (error: any) {
-            if (error?.code !== 'ENOENT') {
-              throw error;
-            }
+        try {
+          fs.unlinkSync(entryPath);
+        } catch (error: any) {
+          if (error?.code !== 'ENOENT') {
+            throw error;
           }
-        });
+        }
+      });
 
       fs.rmdirSync(resolvedCurrentDirectory);
       currentDirectory = parentDirectory;
