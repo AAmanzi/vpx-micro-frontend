@@ -13,20 +13,23 @@ A desktop application for managing and launching Visual Pinball X tables and ROM
 - [First-time setup - macOS](#first-time-setup---macos)
 - [Add tables to your library](#add-tables-to-your-library)
 - [Work with tables](#work-with-tables)
+- [Config Backups](#config-backups)
 - [Settings reference](#settings-reference)
 - [Minimal run notes (dev)](#minimal-run-notes-dev)
 
 ## What you can do
 
-- Import `.vpx` tables and `.zip` ROM files
-- Scan your VPX folder and auto-detect tables/ROMs
+- Import `.vpx` tables, `.zip` ROMs, `.directb2s` backglasses, and matching `.ini` settings
+- Scan your VPX folder and auto-detect tables, ROMs, and backglasses
 - Search, sort, and favorite tables
 - Auto-detect table image with manual overrides
+- Assign and manage table backglass files
+- Save, swap, and manage table `.ini` configuration backups
 - Play a random table from your selected library
 - Launch tables from the app
 - Rename, delete, or archive entries
 - View recently played tables
-- Export tables (all, favorites, or archived)
+- Export tables (all, favorites, or archived) with available active settings, ROMs, and backglasses
 - Connect Android mobile devices to sync selected tables and ROMs (experimental)
 
 ## Tech Stack
@@ -150,6 +153,8 @@ If you already have an existing VPX setup, start with Scan Library first.
 4. Optionally enable **Delete original files after import**.
 5. Click **Import Tables**.
 
+To import table settings, include an `.ini` with the same filename as its `.vpx` file, for example `MyTable.vpx` and `MyTable.ini`. Existing destination INIs are preserved rather than overwritten.
+
 **DirectB2S on macOS:** Playback compatibility hasn't been verified by this
 project. You can import, assign, scan, and export backglass files, but playback
 may require additional setup outside this app.
@@ -211,7 +216,9 @@ Use **Backups** in a table's actions menu to save and manage configurations (`.i
 - **Load** a backup if no active configuration exists.
 - **Rename** or **Delete** configurations from the management window.
 
-Backups are stored separately in app-managed storage.
+![Config Backups Modal](public/readme/config-backups.png)
+
+Backups are stored separately in app-managed storage. Importing a matching `.ini` sets the table's active configuration; **Backups** lets you save and manage named copies of configurations independently.
 
 ## Settings reference
 
@@ -227,15 +234,28 @@ Backups are stored separately in app-managed storage.
 
 ![Data Management settings](public/readme/settings-data-management.png)
 
-- **Scan VPX Library** — detect and auto-match tables and ROMs
-- **Export Tables** — create a shareable bundle with options:
-  - Export all tables
-  - Export favorites only
-  - Export archived tables only
+- **Scan VPX Library** — detect and auto-match tables, ROMs, and backglasses
+- **Export Tables** — create a shareable bundle. Each table gets its own folder containing the VPX file and, when available, its active `.ini`, ROM, and DirectB2S backglass. Stored configuration backups are managed separately and are not included. Choose which tables to export:
+  - All tables (excluding archived)
+  - Favorites (excluding archived)
+  - All tables (including archived)
+  - Archived tables only
 
 ![Export tables modal](public/readme/export-tables-modal.png)
 
 ![Export result](public/readme/export-result.png)
+
+### Advanced
+
+![Advanced settings](public/readme/settings-advanced.png)
+
+On Windows, expand **VPX launch flags** to configure the global launch defaults. Change these only if VPX fails to start or behaves unexpectedly:
+
+- **Limit CPU threads** passes `-LessCPUthreads` to VPX.
+- **Legacy pause menu** passes `-ExtMinimized` and is enabled by default. It is required for VPX 10.8.0 and earlier; turn it off for VPX 10.8.1 and newer, where it causes a launch error. The newer version's pause menu opens with **F12** by default.
+- Use **Reset to defaults** to restore the built-in settings.
+
+To override either flag for one table, open its **Kebab menu → VPX Executable → Launch flags (advanced)**. Choose **Use default**, **On**, or **Off** for each flag. macOS launches do not use these Windows command-line flags.
 
 ### Android (Experimental)
 
@@ -289,16 +309,6 @@ On your Android device:
 The library migration saves backups of library data, app configuration, and
 migration history in the active app-data directory's `backups` folder before
 converting the library.
-
-### Advanced launch settings (Windows)
-
-In **Settings → Advanced → VPX launch flags**, configure the global defaults:
-
-- **Limit CPU threads** passes `-LessCPUthreads` to VPX.
-- **Legacy pause menu** passes `-ExtMinimized` and is enabled by default. It is required for VPX 10.8.0 and earlier; turn it off for VPX 10.8.1 and newer, where it causes a launch error. The newer version's pause menu opens with **F12** by default.
-- Use **Reset to defaults** to restore the built-in settings.
-
-To override either flag for one table, open its **Kebab menu → VPX Executable → Launch flags (advanced)**. Choose **Use default**, **On**, or **Off** for each flag. macOS launches do not use these Windows command-line flags.
 
 ### VPX utilities
 
