@@ -1,6 +1,7 @@
 export type Icon =
   | 'plus'
   | 'grid'
+  | 'sliders'
   | 'star'
   | 'cog'
   | 'folder'

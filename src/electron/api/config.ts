@@ -4,7 +4,12 @@ import path from 'path';
 
 import { VPX_DEFAULT_ROM_PATH, VPX_DEFAULT_TABLES_PATH } from 'src/consts/vpx';
 import type { ApiResult } from 'src/types/api';
-import type { Config, LaunchFlags, Platform } from 'src/types/config';
+import type {
+  Config,
+  GridSettings,
+  LaunchFlags,
+  Platform,
+} from 'src/types/config';
 import { normalizePath } from 'src/utils';
 
 import * as configDb from '../database/config';
@@ -53,7 +58,9 @@ export function updateRomsDirectoryPath(path: string): ApiResult<null> {
   }
 }
 
-export function updateTablesDirectoryPath(tablesDirectoryPath: string): ApiResult<null> {
+export function updateTablesDirectoryPath(
+  tablesDirectoryPath: string,
+): ApiResult<null> {
   try {
     configDb.updateTablesDirectoryPath(tablesDirectoryPath);
 
@@ -137,6 +144,17 @@ export function updateOrder(order: Config['order']): ApiResult<null> {
 export function updateViewType(viewType: Config['viewType']): ApiResult<null> {
   try {
     configDb.updateViewType(viewType);
+    return apiSuccess(null);
+  } catch (error) {
+    return apiFailure(error);
+  }
+}
+
+export function updateGridSettings(
+  settings: Partial<GridSettings>,
+): ApiResult<null> {
+  try {
+    configDb.updateGridSettings(settings);
     return apiSuccess(null);
   } catch (error) {
     return apiFailure(error);

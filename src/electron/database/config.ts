@@ -6,7 +6,14 @@ import {
   VPX_DEFAULT_LAUNCH_FLAGS,
   VPX_DEFAULT_ROOT_PATH,
 } from 'src/consts/vpx';
-import { Config, LaunchFlags, Order, ViewType } from 'src/types/config';
+import {
+  Config,
+  DEFAULT_GRID_SETTINGS,
+  GridSettings,
+  LaunchFlags,
+  Order,
+  ViewType,
+} from 'src/types/config';
 import {
   getDefaultRomsDirectory,
   getDefaultTablesDirectory,
@@ -28,6 +35,7 @@ const defaultConfig: Config = {
   keepFavoritesOnTop: false,
   order: Order.dateAddedDesc,
   viewType: ViewType.grid,
+  gridSettings: DEFAULT_GRID_SETTINGS,
   androidFeaturesEnabled: false,
   androidWebServerUrl: '',
   androidTablesDirectory: VPX_DEFAULT_ANDROID_TABLES_PATH,
@@ -48,6 +56,10 @@ const getStoredConfig = (): Config => {
   return {
     ...defaultConfig,
     ...stored,
+    gridSettings: {
+      ...DEFAULT_GRID_SETTINGS,
+      ...stored?.gridSettings,
+    },
     launchFlags: {
       ...VPX_DEFAULT_LAUNCH_FLAGS,
       ...stored?.launchFlags,
@@ -160,6 +172,18 @@ export function updateViewType(viewType: Config['viewType']): void {
   store.set('config', {
     ...getStoredConfig(),
     viewType,
+  });
+}
+
+export function updateGridSettings(settings: Partial<GridSettings>): void {
+  const config = getStoredConfig();
+
+  store.set('config', {
+    ...config,
+    gridSettings: {
+      ...config.gridSettings,
+      ...settings,
+    },
   });
 }
 

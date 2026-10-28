@@ -341,6 +341,11 @@ app.whenReady().then(async () => {
     async (_, viewType: Config['viewType']) => api.updateViewType(viewType),
   );
   ipcMain.handle(
+    'api:updateGridSettings',
+    async (_, settings: Partial<Config['gridSettings']>) =>
+      api.updateGridSettings(settings),
+  );
+  ipcMain.handle(
     'api:updateAndroidFeaturesEnabled',
     async (_, androidFeaturesEnabled: boolean) =>
       api.updateAndroidFeaturesEnabled(androidFeaturesEnabled),

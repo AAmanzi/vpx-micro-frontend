@@ -1,10 +1,25 @@
 .container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(min(100%, var(--grid-card-min-width, 240px)), 1fr)
+  );
   gap: 2rem;
 
   &[data-view='list'] {
     grid-template-columns: 1fr;
     gap: 12px;
+  }
+
+  &[data-view='grid'][data-card-size='small'] {
+    --grid-card-min-width: 180px;
+  }
+
+  &[data-view='grid'][data-card-size='medium'] {
+    --grid-card-min-width: 240px;
+  }
+
+  &[data-view='grid'][data-card-size='large'] {
+    --grid-card-min-width: 320px;
   }
 }
