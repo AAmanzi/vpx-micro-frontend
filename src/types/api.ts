@@ -3,7 +3,7 @@ import {
   AndroidSyncApplyPayload,
   AndroidSyncProgressEvent,
 } from './android';
-import { Config, LaunchFlags, Platform } from './config';
+import { Config, GridSettings, LaunchFlags, Platform } from './config';
 import { BackglassImportAssignment, FileSystemItem, TableFile } from './file';
 import { IniBackup, IniBackupList, TableConfigDeletion } from './iniBackup';
 import { GroupType, ResolvedTable, ScanResult } from './table';
@@ -170,6 +170,9 @@ export interface Api {
   updateAndroidRomsDirectoryPath: (path: string) => Promise<ApiResult<null>>;
   updateOrder: (order: Config['order']) => Promise<ApiResult<null>>;
   updateViewType: (viewType: Config['viewType']) => Promise<ApiResult<null>>;
+  updateGridSettings: (
+    settings: Partial<GridSettings>,
+  ) => Promise<ApiResult<null>>;
 }
 
 declare global {

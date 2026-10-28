@@ -1,0 +1,129 @@
+.container {
+  position: relative;
+}
+
+.trigger {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: thin solid var(--gray);
+  border-radius: 999px;
+  background-color: transparent;
+  color: var(--gray-300);
+  cursor: pointer;
+  transition:
+    background-color 200ms ease-in,
+    color 200ms ease-in;
+
+  &:hover,
+  &.active {
+    background-color: var(--gray-800);
+    color: var(--white);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 2px;
+  }
+}
+
+.popover {
+  position: fixed;
+  z-index: 20;
+  width: min(380px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 12px;
+  border: thin solid var(--gray);
+  border-radius: 20px;
+  background-color: var(--dark);
+  color: var(--white);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 2px 14px;
+  border-bottom: thin solid rgba(var(--white-rgb), 0.08);
+}
+
+.headingTitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  h2 {
+    margin: 0;
+  }
+}
+
+.secondaryIcon {
+  color: var(--gray-300);
+}
+
+.section {
+  padding: 14px 0;
+  border-bottom: thin solid rgba(var(--white-rgb), 0.08);
+
+  h3 {
+    margin: 0 0 10px;
+  }
+}
+
+.section:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.segments {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  padding: 3px;
+  border: thin solid var(--gray);
+  border-radius: 14px;
+  background-color: var(--gray-800);
+}
+
+.segment {
+  min-width: 0;
+  min-height: 38px;
+  padding: 6px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background-color: transparent;
+  color: var(--gray-300);
+  cursor: pointer;
+  transition:
+    background-color 200ms ease-in,
+    color 200ms ease-in;
+
+  &:hover {
+    color: var(--white);
+  }
+}
+
+.selected {
+  background-color: rgba(var(--gray-rgb), 0.7);
+  color: var(--white);
+}
+
+.toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toggleRow {
+  display: flex;
+  align-items: center;
+}
+
+.toggleLabel {
+  margin-left: 10px;
+}

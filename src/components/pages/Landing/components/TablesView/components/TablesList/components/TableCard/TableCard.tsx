@@ -12,6 +12,7 @@ import { TABLE_STARTUP_LOCK_MS } from 'src/consts/platform';
 import { useConfigContext } from 'src/providers/config';
 import { useTablesContext } from 'src/providers/tables';
 import { useToastContext } from 'src/providers/toast';
+import { GridSettings } from 'src/types/config';
 import { ResolvedTable } from 'src/types/table';
 import {
   displayDate,
@@ -24,6 +25,7 @@ import SettingsPopover from '../SettingsPopover';
 import style from './TableCard.module.scss';
 
 type Props = ResolvedTable & {
+  gridSettings: GridSettings;
   scrollToTopOnTableStart: boolean;
 };
 
@@ -42,7 +44,7 @@ const waitForMinimumLoadingTime = async (startedAt: number): Promise<void> => {
 
 const getPlayAreaStyle = (gradientColor: string, imgUrl?: string) => ({
   backgroundImage: imgUrl
-    ? `linear-gradient(180deg, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.84) 100%), url("${imgUrl}"), ${gradientColor}`
+    ? `linear-gradient(180deg, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0.36) 100%), url("${imgUrl}"), ${gradientColor}`
     : undefined,
 });
 
@@ -63,6 +65,7 @@ const TableCard: FunctionComponent<Props> = ({
   imagePreference,
   dateAddedTimestamp,
   lastPlayedTimestamp,
+  gridSettings,
   scrollToTopOnTableStart,
 }) => {
   const [favorite, setFavorite] = useState(isFavorite);
@@ -82,6 +85,16 @@ const TableCard: FunctionComponent<Props> = ({
   const { fetchTables } = useTablesContext();
   const { config } = useConfigContext();
   const androidFeaturesEnabled = Boolean(config?.androidFeaturesEnabled);
+  const titleTextClass =
+    gridSettings.cardSize === 'small'
+      ? 'body-sm-semibold'
+      : gridSettings.cardSize === 'large'
+        ? 'body-lg-regular'
+        : 'body-md-semibold';
+  const hasVisibleMetadata =
+    gridSettings.showVpxFilename ||
+    (gridSettings.showRom && Boolean(romFile || backglassFile)) ||
+    gridSettings.showDates;
 
   const handlePlay = async () => {
     if (isStarting) {
@@ -149,7 +162,10 @@ const TableCard: FunctionComponent<Props> = ({
   };
 
   return (
-    <div className={style.card}>
+    <div
+      className={style.card}
+      data-card-size={gridSettings.cardSize}
+      data-compact={!hasVisibleMetadata}>
       <div
         className={classNames(style.playArea, tableGradient)}
         style={getPlayAreaStyle(tableGradientColor, imgUrl)}>
@@ -198,9 +214,10 @@ const TableCard: FunctionComponent<Props> = ({
           <h3
             className={classNames(
               'primary-text-color',
-              'heading-5-bold',
+              titleTextClass,
               style.title,
-            )}>
+            )}
+            title={name}>
             {name}
           </h3>
           <div className={style.settingsButton}>
@@ -222,8 +239,18 @@ const TableCard: FunctionComponent<Props> = ({
         </div>
 
         <div className={style.meta}>
-          <p className='secondary-text-color body-xs-semibold'>{vpxFile}</p>
-          {(romFile || backglassFile) && (
+          {gridSettings.showVpxFilename && (
+            <p
+              className={classNames(
+                'secondary-text-color',
+                'body-xs-regular',
+                style.vpxFilename,
+              )}
+              title={vpxFile}>
+              {vpxFile}
+            </p>
+          )}
+          {gridSettings.showRom && (romFile || backglassFile) && (
             <div className={style.romRow}>
               {romFile && (
                 <div
@@ -243,8 +270,7 @@ const TableCard: FunctionComponent<Props> = ({
                   placement='top-end'>
                   <span
                     className={classNames(
-                      'secondary-text-color',
-                      'body-xs-semibold',
+                      'body-xxs-semibold',
                       style.backglassIndicator,
                     )}>
                     B2S
@@ -254,24 +280,26 @@ const TableCard: FunctionComponent<Props> = ({
             </div>
           )}
 
-          <div className={style.datesGrid}>
-            <div className={style.dateItem}>
-              <p className='secondary-text-color body-xs-semibold uppercase'>
-                Added
-              </p>
-              <p className='secondary-text-color body-xs-semibold uppercase'>
-                {displayDate(dateAddedTimestamp)}
-              </p>
+          {gridSettings.showDates && (
+            <div className={style.datesGrid}>
+              <div className={style.dateItem}>
+                <p className='secondary-text-color body-xxs-semibold uppercase'>
+                  Added
+                </p>
+                <p className='secondary-text-color body-xs-regular'>
+                  {displayDate(dateAddedTimestamp)}
+                </p>
+              </div>
+              <div className={style.dateItem}>
+                <p className='secondary-text-color body-xxs-semibold uppercase'>
+                  Last Played
+                </p>
+                <p className='secondary-text-color body-xs-regular'>
+                  {displayRelativeDate(lastPlayedTimestamp)}
+                </p>
+              </div>
             </div>
-            <div className={style.dateItem}>
-              <p className='secondary-text-color body-xs-semibold uppercase'>
-                Last Played
-              </p>
-              <p className='secondary-text-color body-xs-semibold uppercase'>
-                {displayRelativeDate(lastPlayedTimestamp)}
-              </p>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { FunctionComponent, useEffect, useState } from 'react';
+import { FunctionComponent, useEffect, useRef, useState } from 'react';
 
 import Button, {
   Size as ButtonSize,
@@ -15,7 +15,12 @@ import api from 'src/consts';
 import { useConfigContext } from 'src/providers/config';
 import { useTablesContext } from 'src/providers/tables';
 import { useToastContext } from 'src/providers/toast';
-import { Order, ViewType } from 'src/types/config';
+import {
+  DEFAULT_GRID_SETTINGS,
+  GridSettings,
+  Order,
+  ViewType,
+} from 'src/types/config';
 import { FileSystemItem } from 'src/types/file';
 import type { ResolvedTable } from 'src/types/table';
 
@@ -41,6 +46,11 @@ const TablesView: FunctionComponent<Props> = ({
   const { fetchTables } = useTablesContext();
   const { config, fetchConfig } = useConfigContext();
   const { showErrorToast } = useToastContext();
+  const [gridSettings, setGridSettings] = useState<GridSettings>(
+    DEFAULT_GRID_SETTINGS,
+  );
+  const gridSettingsUpdateQueue = useRef(Promise.resolve());
+  const pendingGridSettingsUpdates = useRef(0);
 
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isRandomTableStarting, setIsRandomTableStarting] = useState(false);
@@ -76,6 +86,12 @@ const TablesView: FunctionComponent<Props> = ({
   const favoritesOnTop = config?.keepFavoritesOnTop ?? true;
   const order = defaultOrder ?? config?.order ?? Order.dateAddedDesc;
   const viewType = config?.viewType ?? ViewType.grid;
+
+  useEffect(() => {
+    if (config) {
+      setGridSettings(config.gridSettings);
+    }
+  }, [config?.gridSettings]);
 
   const scrollToTop = () => {
     if (typeof window === 'undefined') {
@@ -126,6 +142,41 @@ const TablesView: FunctionComponent<Props> = ({
     await api.updateViewType(newValue);
 
     fetchConfig();
+  };
+
+  const handleGridSettingsChange = async (settings: Partial<GridSettings>) => {
+    setGridSettings((currentSettings) => ({
+      ...currentSettings,
+      ...settings,
+    }));
+    pendingGridSettingsUpdates.current += 1;
+
+    const queuedUpdate = gridSettingsUpdateQueue.current.then(async () => {
+      try {
+        const result = await api.updateGridSettings(settings);
+
+        if (!result.success) {
+          showErrorToast(
+            result.error.message || 'Failed to update grid settings',
+          );
+        }
+      } catch (error) {
+        showErrorToast(
+          error instanceof Error
+            ? error.message
+            : 'Failed to update grid settings',
+        );
+      } finally {
+        pendingGridSettingsUpdates.current -= 1;
+
+        if (pendingGridSettingsUpdates.current === 0) {
+          fetchConfig();
+        }
+      }
+    });
+
+    gridSettingsUpdateQueue.current = queuedUpdate;
+    await queuedUpdate;
   };
 
   const getFilteredTables = () => {
@@ -259,6 +310,8 @@ const TablesView: FunctionComponent<Props> = ({
         onQueryChange={setQuery}
         viewType={viewType}
         onViewTypeChange={handleViewTypeChange}
+        gridSettings={gridSettings}
+        onGridSettingsChange={handleGridSettingsChange}
         favoritesOnTop={favoritesOnTop}
         onFavoritesOnTopChange={handleFavoritesOnTopChange}
         order={order}
@@ -327,6 +380,7 @@ const TablesView: FunctionComponent<Props> = ({
               <TablesList
                 tables={orderedTables}
                 viewType={viewType}
+                gridSettings={gridSettings}
                 scrollToTopOnTableStart={order === Order.recentlyPlayed}
               />
             )}{' '}

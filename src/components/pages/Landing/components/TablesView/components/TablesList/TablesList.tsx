@@ -1,6 +1,6 @@
 import { FunctionComponent } from 'react';
 
-import { ViewType } from 'src/types/config';
+import { GridSettings, ViewType } from 'src/types/config';
 import { ResolvedTable } from 'src/types/table';
 
 import style from './TablesList.module.scss';
@@ -10,16 +10,21 @@ import TableListItem from './components/TableListItem';
 interface Props {
   tables: Array<ResolvedTable>;
   viewType: ViewType;
+  gridSettings: GridSettings;
   scrollToTopOnTableStart: boolean;
 }
 
 const TablesList: FunctionComponent<Props> = ({
   tables,
   viewType,
+  gridSettings,
   scrollToTopOnTableStart,
 }) => {
   return (
-    <div className={style.container} data-view={viewType}>
+    <div
+      className={style.container}
+      data-view={viewType}
+      data-card-size={gridSettings.cardSize}>
       {tables.map((table) => {
         if (viewType === ViewType.list) {
           return (
@@ -35,6 +40,7 @@ const TablesList: FunctionComponent<Props> = ({
           <TableCard
             key={table.id}
             {...table}
+            gridSettings={gridSettings}
             scrollToTopOnTableStart={scrollToTopOnTableStart}
           />
         );

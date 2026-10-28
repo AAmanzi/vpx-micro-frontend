@@ -7,6 +7,9 @@ import { Props } from './types';
 const CheckboxSwitch: FunctionComponent<Props> = ({
   checked,
   onChange,
+  ariaLabel,
+  label,
+  labelClassName,
   disabled = false,
   showDisabled = false,
   color = 'blue',
@@ -40,9 +43,11 @@ const CheckboxSwitch: FunctionComponent<Props> = ({
         disabled={disabled}
         role='switch'
         aria-checked={checked}
+        aria-label={ariaLabel}
       />
       <div className={style.slider} />
       <div className={style.circle} />
+      {label && <span className={labelClassName}>{label}</span>}
     </label>
   );
 };

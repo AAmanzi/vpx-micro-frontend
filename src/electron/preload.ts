@@ -6,7 +6,12 @@ import type {
   AndroidSyncProgressEvent,
 } from 'src/types/android';
 import type { Api, ApiResult } from 'src/types/api';
-import type { Config, LaunchFlags, Platform } from 'src/types/config';
+import type {
+  Config,
+  GridSettings,
+  LaunchFlags,
+  Platform,
+} from 'src/types/config';
 import type { FileSystemItem } from 'src/types/file';
 import type {
   IniBackup,
@@ -220,6 +225,10 @@ const frontendApi: Api = {
     invoke<ApiResult<null>>('api:updateOrder', order),
   updateViewType: (viewType: Config['viewType']): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:updateViewType', viewType),
+  updateGridSettings: (
+    settings: Partial<GridSettings>,
+  ): Promise<ApiResult<null>> =>
+    invoke<ApiResult<null>>('api:updateGridSettings', settings),
   startTable: (tableId: string): Promise<ApiResult<null>> =>
     invoke<ApiResult<null>>('api:startTable', tableId),
   getIniBackups: (tableId: string) =>

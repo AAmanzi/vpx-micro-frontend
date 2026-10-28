@@ -5,6 +5,22 @@ export interface LaunchFlags {
   extMinimized: boolean;
 }
 
+export type GridCardSize = 'small' | 'medium' | 'large';
+
+export interface GridSettings {
+  cardSize: GridCardSize;
+  showVpxFilename: boolean;
+  showRom: boolean;
+  showDates: boolean;
+}
+
+export const DEFAULT_GRID_SETTINGS: GridSettings = {
+  cardSize: 'medium',
+  showVpxFilename: true,
+  showRom: true,
+  showDates: true,
+};
+
 export interface Config {
   vpxRootPath: string;
   deleteFilesAfterImport: boolean;
@@ -14,6 +30,7 @@ export interface Config {
   keepFavoritesOnTop: boolean;
   order: Order;
   viewType: ViewType;
+  gridSettings: GridSettings;
   androidFeaturesEnabled?: boolean;
   androidWebServerUrl?: string;
   androidTablesDirectory?: string;
